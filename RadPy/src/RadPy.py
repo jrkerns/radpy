@@ -97,7 +97,7 @@ class MainWindow(QMainWindow):
         #that scan's data.
         self.connect(self.scan_tree, SIGNAL("activated"),
                      self.activated)
-        self.setWindowTitle("SANDY")
+        self.setWindowTitle("RadPy")
         self.fileNew()
         self.statusBar().showMessage("Ready...", 5000)
             

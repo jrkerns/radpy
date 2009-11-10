@@ -38,7 +38,8 @@ class BranchNode(object):
     #tree nodes to active scan window.
     
     def __init__(self, name, column, parent=None):
-        super(BranchNode, self).__init__(parent)
+        #super(BranchNode, self).__init__(parent)
+        super(BranchNode, self).__init__()
         self.name = name
         self.parent = parent
         self.column = column
@@ -102,7 +103,7 @@ class BranchNode(object):
 class LeafNode(object):
 
     def __init__(self, beam, parent=None):
-        super(LeafNode, self).__init__(parent)
+        super(LeafNode, self).__init__()
         self.parent = parent
         #tree_path = beam.get_tree_path() + "|" + beam.get_scan_descriptor()
         self.fields = []
