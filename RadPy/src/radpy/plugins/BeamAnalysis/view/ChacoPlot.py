@@ -48,6 +48,8 @@ class ChacoPlot(HasTraits):
     plot = Instance(Component)
     name = 'Scan Plot'
     id = 'Scan Plot'
+    selected_plot = Instance(Component)
+    selected_beam = Instance(HasTraits)
     traits_view = View(
                          Group(
                              Item('plot', editor=ComponentEditor(size=(400,300)),
@@ -60,6 +62,9 @@ class ChacoPlot(HasTraits):
     def _plot_default(self):
         return self._create_plot_component()
     
+    def _selected_plot_changed(self, new):
+        self.selected_beam = self.beams[new]
+        return
     
     def _create_plot_component(self):
         container = OverlayPlotContainer(padding = 50, fill_padding = True,
@@ -107,7 +112,10 @@ class ChacoPlot(HasTraits):
         self.legend.tools.append(LegendTool(self.legend, drag_button="right"))
         plot.overlays.append(self.legend)
         self.legend.visible = False
-        self.legend.tools.append(HighlightLegend(self.legend))
+        highlight_legend = HighlightLegend(self.legend)
+        highlight_legend.parent = self
+        self.legend.tools.append(highlight_legend)
+#        self.legend.tools.append(HighlightLegend(self.legend))
         
         plot.x_axis.title = "Distance (mm)"
         plot.y_axis.title = "% Dose"
@@ -152,8 +160,8 @@ class ChacoPlot(HasTraits):
        
         
         self.container.add(plot)
-        self.beams[label] = beam
-        self.plots[label] = plot
+        self.beams[plot] = beam
+        self.plots[(label, beam)] = plot
         
         self.legend.visible = True
         self.legend.plots = self.plots
@@ -177,7 +185,7 @@ class ChacoPlot(HasTraits):
             #return self.plots.keys[0]
             return ["Scan"]
         else:
-            plots = self.plots.keys()
+            plots = [i[0] for i in self.plots.keys()]
             plots.sort()
             keys = [x.split("|") for x in plots]
             columns = []
@@ -185,7 +193,7 @@ class ChacoPlot(HasTraits):
                 temp = []
                 for key in keys:
                     temp.append(key[i])
-                tmpset = set(temp)
+                
                 if len(set(temp)) == 1:
                     columns.append(False)
                 else:
@@ -209,16 +217,16 @@ class ChacoPlot(HasTraits):
         #Differing fields will be included in the legend of the scan
         #window.
         if len(self.plots.keys()) < 2:
-            return self.plots.keys()[0]
+            return self.plots.keys()[0][0]
             #return "Scan"
         else:
-            keys = [x.split("|") for x in self.plots.keys()]
+            keys = [x[0].split("|") for x in self.plots.keys()]
             columns = []
             for i in range(len(keys[0])):
                 temp = []
                 for key in keys:
                     temp.append(key[i])
-                tmpset = set(temp)
+                
                 if len(set(temp)) == 1:
                     columns.append(True)
                 else:
@@ -257,6 +265,7 @@ class HighlightLegend(BaseTool):
     """Highlights a scan if its legend label is clicked."""
     _selected_plot = Any
     _selected_renderers = List
+    parent = Instance(HasTraits)
 
     def _get_hit_plots(self, event):
         legend=self.component
@@ -265,12 +274,13 @@ class HighlightLegend(BaseTool):
 
         label = legend.get_label_at(event.x, event.y)
         if label is None:
-             return []
+            return []
 
         index = legend._cached_labels.index(label)
         label_name = legend._cached_label_names[index]
         
-        #legend.plots is a dictionary with keys that are the full
+        #legend.plots is a dictionary with keys that are a tuple 
+        #containing the beam object id and the full
         #scan descriptor returned by the Beam object (a string with
         #each field separated by the | character).  legend.labels
         #is a list with elements consisting of the scan descriptor
@@ -284,7 +294,7 @@ class HighlightLegend(BaseTool):
             return (legend.plots[legend.plots.keys()[0]],)
         else:
             for plot_label in legend.plots.keys():
-                if set(label_name.split('|')).issubset(set(plot_label.split('|'))):
+                if set(label_name.split('|')).issubset(set(plot_label[0].split('|'))): 
                     return (legend.plots[plot_label],)
             
         #return (legend.plots[label_name],)
@@ -313,6 +323,7 @@ class HighlightLegend(BaseTool):
             if plot != selected:
                 plot.alpha /= 3
             else:
+                self.parent.selected_plot = plot
                 plot.line_width *= 2
                 #x = plot.traits()
 #                x = numpy.arange(100)

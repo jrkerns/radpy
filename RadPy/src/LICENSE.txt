@@ -11,24 +11,9 @@
 # Copyright (c) 2007 by Enthought, Inc.
 # http://www.enthought.com
 #
+# Construct is used in the RFB file parsing module and has been released by
+# Tomer Filiba into the public domain. You can find it at 
+# http://construct.wikispaces.com/
+#
 # Copyright (c) 2009 by Radpy.
 # http://code.google.com/p/radpy/  
-
-
-# Enthought library imports.
-from enthought.pyface.workbench.api import Perspective, PerspectiveItem
-
-
-class BeamAnalysisPerspective(Perspective):
-    # The perspective's name.
-    name = 'Beam Analysis'
-
-    # Should the editor area be shown in this perspective?
-    show_editor_area = True
-
-    # The contents of the perspective.
-    contents = [
-        PerspectiveItem(id='TreeView', position='right', relative_to='ScanPlot')
-    ]
-    
-#### EOF ######################################################################

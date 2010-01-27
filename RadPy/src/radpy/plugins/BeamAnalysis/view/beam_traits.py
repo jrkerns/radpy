@@ -1,8 +1,4 @@
-from enthought.traits.api import HasTraits, Array, Dict
-from enthought.traits.ui.api import View, Item
-from enthought.pyface.workbench.traits_ui_view import \
-                TraitsUIView
-from enthought.chaco.chaco_plot_editor import ChacoPlotItem
+from enthought.traits.api import HasTraits, Array, Dict, String
 
 class Beam(HasTraits):
     """Class that defines the data model for a scan.
@@ -13,24 +9,11 @@ class Beam(HasTraits):
     measurement_header = Dict()
     data_abscissa = Array()
     data_ordinate = Array()
-    traits_ui_view = View(
-        ChacoPlotItem(
-            'data_abscissa', 'data_ordinate',
-            show_label       = False,
-            resizable        = True,
-            orientation      = 'h',
-            title            = 'Plot',
-            x_label          = 'time',
-            y_label          = 'x',
-            color            = 'red',
-            bgcolor          = 'white',
-            border_visible   = False ,
-            border_width     = 1,
-            padding_bg_color = 'lightgray'
-        ),
-        id        = 'scanplot.plot2d',
-        resizable = True)
+    label = String()
         
+    def set_label(self):
+        self.label = '|'.join([self.get_tree_path(),self.get_scan_descriptor()]) 
+           
     def get_field_size(self):
         """Return a string with field size information"""
         
@@ -63,8 +46,9 @@ class Beam(HasTraits):
         #Seperator is |.  Uses machine name, energy and field size to tell
         #the GUI tree view where on the tree this beam belongs.
         
-        return self.get_machine() + "|" + self.get_energy() + "|" + \
-                self.get_field_size()
+#        return self.get_machine() + "|" + self.get_energy() + "|" + \
+#                self.get_field_size()
+        return '|'.join([self.get_machine(), self.get_energy(),self.get_field_size()])
                 
     def get_scan_type(self):
         """Determine the type of scan by comparing start and end positions"""

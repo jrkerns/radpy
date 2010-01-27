@@ -89,10 +89,7 @@ class TreeView(View):
     # The category that the view belongs to.
     #category = 'Color'
     name = 'TreeView'
-    
-#    def __init__(self):
-#        
-#        
+          
     
     def __init__(self, *args, **kwds):    
         View.__init__(self, *args, **kwds)

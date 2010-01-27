@@ -162,6 +162,7 @@ class TreeModel(QAbstractItemModel):
         try:
             data = load_multi_data(filename)
             for beam in data:
+                beam.set_label()
                 self.addRecord(beam, False)
         except IOError, e:
             exception = e
