@@ -20,21 +20,21 @@ class TestActionSet(WorkbenchActionSet):
             groups=['XGroup', 'YGroup']
         ),
 
-        Menu(
-            name='Foo', path='MenuBar/Test',
-            groups=['XGroup', 'YGroup']
-        ),
-
-        Menu(
-            name='Bar', path='MenuBar/Test',
-            groups=['XGroup', 'YGroup']
-        ),
+#        Menu(
+#            name='Foo', path='MenuBar/Test',
+#            groups=['XGroup', 'YGroup']
+#        ),
+#
+#        Menu(
+#            name='Bar', path='MenuBar/Test',
+#            groups=['XGroup', 'YGroup']
+#        ),
     ]
 
-    groups = [
-        Group(id='Fred', path='MenuBar/Test')
-    ]
-        
+#    groups = [
+#        Group(id='Fred', path='MenuBar/Test')
+#    ]
+#        
 #    tool_bars = [
 #        ToolBar(name='Fred', groups=['AToolBarGroup']),
 #        ToolBar(name='Wilma'),
@@ -48,7 +48,7 @@ class TestActionSet(WorkbenchActionSet):
 #        ),
 
         Action(
-            path='MenuBar/Test', group='Fred',
+            path='MenuBar/Test', #group='Fred',
             class_name='radpy.plugins.TestPlugin.action.new_view_action:NewViewAction'
         ),
 

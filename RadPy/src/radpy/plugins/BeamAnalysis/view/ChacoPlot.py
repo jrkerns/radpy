@@ -144,6 +144,7 @@ class ChacoPlot(HasTraits):
         x, y = (beam.data_abscissa, beam.data_ordinate)
         
         
+
         plot = create_line_plot((x,y), color=tuple(self.get_plot_color()), width=2.0)
         plot.index.sort_order = "ascending"
     
@@ -161,7 +162,7 @@ class ChacoPlot(HasTraits):
         
         self.container.add(plot)
         self.beams[plot] = beam
-        self.plots[(label, beam)] = plot
+        self.plots[label] = plot
         
         self.legend.visible = True
         self.legend.plots = self.plots
@@ -185,7 +186,7 @@ class ChacoPlot(HasTraits):
             #return self.plots.keys[0]
             return ["Scan"]
         else:
-            plots = [i[0] for i in self.plots.keys()]
+            plots = [i for i in self.plots.keys()]
             plots.sort()
             keys = [x.split("|") for x in plots]
             columns = []
@@ -217,10 +218,10 @@ class ChacoPlot(HasTraits):
         #Differing fields will be included in the legend of the scan
         #window.
         if len(self.plots.keys()) < 2:
-            return self.plots.keys()[0][0]
+            return self.plots.keys()[0]
             #return "Scan"
         else:
-            keys = [x[0].split("|") for x in self.plots.keys()]
+            keys = [x.split("|") for x in self.plots.keys()]
             columns = []
             for i in range(len(keys[0])):
                 temp = []
@@ -279,8 +280,7 @@ class HighlightLegend(BaseTool):
         index = legend._cached_labels.index(label)
         label_name = legend._cached_label_names[index]
         
-        #legend.plots is a dictionary with keys that are a tuple 
-        #containing the beam object id and the full
+        #legend.plots is a dictionary with keys that are the full
         #scan descriptor returned by the Beam object (a string with
         #each field separated by the | character).  legend.labels
         #is a list with elements consisting of the scan descriptor
@@ -291,10 +291,10 @@ class HighlightLegend(BaseTool):
         
         #Handle the special case of only one plot.
         if len(legend.plots.keys()) == 1:
-            return (legend.plots[legend.plots.keys()[0]],)
+            return (legend.plots[legend.plots.keys()],)
         else:
             for plot_label in legend.plots.keys():
-                if set(label_name.split('|')).issubset(set(plot_label[0].split('|'))): 
+                if set(label_name.split('|')).issubset(set(plot_label.split('|'))): 
                     return (legend.plots[plot_label],)
             
         #return (legend.plots[label_name],)

@@ -27,13 +27,14 @@ class BeamAnalysisActionSet(WorkbenchActionSet):
     # The action set's globally unique identifier.
     id = 'radpy.plugins.beam_analysis'
 
-#    menus = [
-#        Menu(
-#            name='&New Scan File', path='MenuBar/File',
-#            #groups=['XGroup', 'YGroup']
-#        ),
-#
-#    ]
+    menus = [
+        Menu(
+            name='&Tools', path='MenuBar'
+            #groups=['XGroup', 'YGroup']
+        ),
+ 
+        ]
+
 
 #    groups = [
 #       Group(id='Fred', path='MenuBar/Test')
@@ -54,6 +55,11 @@ class BeamAnalysisActionSet(WorkbenchActionSet):
         Action(
             path='MenuBar/File', #group='XGroup',
             class_name='radpy.plugins.BeamAnalysis.action.BeamAnalysis_action:OpenDataFileAction'
+        ),
+        
+        Action(
+            path='MenuBar/Tools', #group='Fred',
+            class_name='radpy.plugins.BeamAnalysis.action.BeamAnalysis_action:SmoothAction'
         ),
 #        Action(
 #            path='MenuBar/Test', group='Fred',
