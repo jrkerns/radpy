@@ -20,13 +20,11 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 import Model as Model
-from beam_traits import Beam
 COLUMNS = ['File Name','Machine', 'Energy', 'Field Size']
 from radpy.plugins.BeamAnalysis.view.ChacoPlot import ChacoPlot, ChacoPlotEditor
 
 # Enthought library imports.
 from enthought.pyface.workbench.api import View
-from enthought.traits.api import Instance, on_trait_change, HasTraits
 
 
 class TreeWidget(QTreeView):
@@ -103,31 +101,46 @@ class TreeView(View):
     
     def activated(self, record):
         """ Adds the selected beam object to the active Chaco Plot editor.  If
-        there is no active window, it creates one first.
+        there is no active window, it creates one first.  If the active editor
+        is not the right scan type (crossplane etc.) then it creates a new one.
         """
         
         label, beam = record
+        scan_type_list = ['None', beam.get_scan_type()]
         if self.window.active_editor is not None:
             
-            title = self.window.active_editor.obj.add_plot(label, beam)
-            self.window.active_editor.name = title
+            if self.window.active_editor.obj.plot_type in scan_type_list:
+                title = self.window.active_editor.obj.add_plot(label, beam)
+                if title is not None:
+                    self.window.active_editor.name = title
+            else:
+                self.create_new_plot_editor(label, beam)
         
         #If the tree view is undocked, there may not be an active editor,
         #even if one exists.   
         elif len(self.window.editors) > 0:   
             
-            title = self.window.editors[-1].obj.add_plot(label, beam)
-            self.window.editors[-1].name = title
+            if self.window.editors[-1].obj.plot_type in scan_type_list:
+                title = self.window.editors[-1].obj.add_plot(label, beam)
+                if title is not None:
+                    self.window.editors[-1].name = title
+            else: 
+                self.create_new_plot_editor(label, beam)
         
         else:
-            #Create new ChacoPlot editor window   
-            plot = ChacoPlot()
-            self.window.workbench.edit(plot, kind=ChacoPlotEditor)
-            title = self.window.editors[-1].obj.add_plot(label, beam)
-            self.window.editors[-1].name = title
+            
+            self.create_new_plot_editor(label, beam)
             
           
-                
+    def create_new_plot_editor(self, label, beam):
+        """Create new ChacoPlot editor window"""
+           
+        plot = ChacoPlot()
+        self.window.workbench.edit(plot, kind=ChacoPlotEditor)
+        title = self.window.editors[-1].obj.add_plot(label, beam)
+        self.window.editors[-1].name = title
+        self.window.editors[-1].set_focus()
+        
                 
            
 

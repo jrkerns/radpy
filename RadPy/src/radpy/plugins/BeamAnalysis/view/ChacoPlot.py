@@ -22,7 +22,7 @@ import numpy
 
 # Enthought library imports
 from enthought.enable.api import Window, Component, ComponentEditor
-from enthought.traits.api import Any, List, Instance, HasTraits
+from enthought.traits.api import Any, List, Instance, HasTraits, String
 from enthought.traits.trait_handlers import TraitListObject
 from enthought.pyface.workbench.traits_ui_editor import \
                 TraitsUIEditor
@@ -42,6 +42,7 @@ class ChacoPlotEditor(TraitsUIEditor):
     def _name_default(self):
         return "Scan Plot"
 
+    
 
 class ChacoPlot(HasTraits):
 
@@ -58,6 +59,10 @@ class ChacoPlot(HasTraits):
                          resizable=True, title="Test",
                         width=400, height=300, id='Scan Plot'
                          )
+    plot_type = String()
+    
+    def _plot_type_default(self):
+        return 'None'
     
     def _plot_default(self):
         return self._create_plot_component()
@@ -140,12 +145,16 @@ class ChacoPlot(HasTraits):
         return container
     
     def add_plot(self, label, beam):
-                   
+        if label in self.plots.keys():
+            return          
         x, y = (beam.data_abscissa, beam.data_ordinate)
         
         
-
-        plot = create_line_plot((x,y), color=tuple(self.get_plot_color()), width=2.0)
+        if self.plot_type is not None:
+            self.plot_type = beam.get_scan_type()
+            
+        plot = create_line_plot((x,y), color=tuple(
+                                    self.get_plot_color()), width=2.0)
         plot.index.sort_order = "ascending"
     
         
@@ -297,7 +306,7 @@ class HighlightLegend(BaseTool):
                 if set(label_name.split('|')).issubset(set(plot_label.split('|'))): 
                     return (legend.plots[plot_label],)
             
-        #return (legend.plots[label_name],)
+        
 
     def normal_left_down(self, event):
         new = set(self._get_hit_plots(event))
@@ -325,11 +334,7 @@ class HighlightLegend(BaseTool):
             else:
                 self.parent.selected_plot = plot
                 plot.line_width *= 2
-                #x = plot.traits()
-#                x = numpy.arange(100)
-#                y = numpy.arange(100)
-#                plot.overlays.append(create_line_plot((x,y),
-#                                     color = "black", width = 4.0))
+ 
         plot.request_redraw()
 
     def _deselect(self, selected):
