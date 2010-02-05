@@ -21,29 +21,28 @@
 import numpy
 
 # Enthought library imports
-from enthought.enable.api import Window, Component, ComponentEditor
+from enthought.enable.api import Component, ComponentEditor
 from enthought.traits.api import Any, List, Instance, HasTraits, String
-from enthought.traits.trait_handlers import TraitListObject
 from enthought.pyface.workbench.traits_ui_editor import \
                 TraitsUIEditor
 from enthought.traits.ui.api import View, Item, Group
 
 # Chaco imports
 from enthought.chaco.api import create_line_plot, add_default_axes, \
-        add_default_grids, OverlayPlotContainer, PlotLabel, \
-        create_scatter_plot, Legend, BaseTool
+        add_default_grids, OverlayPlotContainer, PlotLabel, Legend
 from enthought.chaco.tools.api import PanTool, ZoomTool, LegendTool, \
         TraitsTool, DragZoom
 
-                
+#RadPy imports
+from plot_select_tool import PlotSelectTool
+from highlight_legend import HighlightLegend
 
 class ChacoPlotEditor(TraitsUIEditor):
-        
+    # Needed to make the editor window title human readable.
     def _name_default(self):
         return "Scan Plot"
 
     
-
 class ChacoPlot(HasTraits):
 
     plot = Instance(Component)
@@ -59,7 +58,7 @@ class ChacoPlot(HasTraits):
                          resizable=True, title="Test",
                         width=400, height=300, id='Scan Plot'
                          )
-    plot_type = String()
+    plot_type = String
     
     def _plot_type_default(self):
         return 'None'
@@ -98,9 +97,8 @@ class ChacoPlot(HasTraits):
         plot.value_range.tight_bounds = False
         plot.value_range.refresh()
             
-
-            
-        plot.tools.append(PanTool(plot))
+        plot.tools.append(PanTool(plot, drag_button="middle"))
+        
                 
         # The ZoomTool tool is stateful and allows drawing a zoom
         # box to select a zoom region.
@@ -117,21 +115,29 @@ class ChacoPlot(HasTraits):
         self.legend.tools.append(LegendTool(self.legend, drag_button="right"))
         plot.overlays.append(self.legend)
         self.legend.visible = False
+        
+        # The HighlightLegend tool allows plots to be selected by left clicking
+        # on the label in the plot legend.  This tool sets the ChacoPlot 
+        # selected plot trait.
         highlight_legend = HighlightLegend(self.legend)
         highlight_legend.parent = self
         self.legend.tools.append(highlight_legend)
-#        self.legend.tools.append(HighlightLegend(self.legend))
+        
+        # The PlotSelectTool allows plots to be selected by left clicking
+        # on the actual plot trace.  This tools sets the ChacoPlot selected
+        # plot trait.
+        plot_select_tool = PlotSelectTool(self.container)
+        plot_select_tool.parent = self
+        plot.tools.append(plot_select_tool)
         
         plot.x_axis.title = "Distance (mm)"
         plot.y_axis.title = "% Dose"
 
         container.add(plot)
         
-
         # Set the list of plots on the legend
         self.legend.plots = self.plots
         
-
         # Add the title at the top
         self.title = PlotLabel("Scans",
                                   component=container,
@@ -139,48 +145,51 @@ class ChacoPlot(HasTraits):
                                   overlay_position="top")
         container.overlays.append(self.title)
 
-       
-
-        #return Window(self, -1, component=container)
         return container
+   
+    
     
     def add_plot(self, label, beam):
+        
+        # Check to see if beam has already been plotted.
         if label in self.plots.keys():
             return          
+        
         x, y = (beam.data_abscissa, beam.data_ordinate)
         
-        
+        # The plot_type trait is defined by the geometry of the scanned plot 
+        # (inline, crossline, depth dose, etc.).  
         if self.plot_type is not None:
             self.plot_type = beam.get_scan_type()
             
         plot = create_line_plot((x,y), color=tuple(
                                     self.get_plot_color()), width=2.0)
         plot.index.sort_order = "ascending"
-    
-        
+            
         plot.bgcolor = "white"
         plot.border_visible = True
-        
-        
+                
         plot.value_mapper = self.value_mapper
         self.value_mapper.range.add(plot.value)
         plot.index_mapper = self.index_mapper
         self.index_mapper.range.add(plot.index)
-    
-       
-        
+            
         self.container.add(plot)
+        
+        # beams and plots are dictionaries that map plot objects to beam
+        # objects and plot labels to plot objects.  They are used to
+        # determine plot titles and legend labels as well as mapping 
+        # the selected_plot trait to the selected_beam trait.
         self.beams[plot] = beam
         self.plots[label] = plot
         
         self.legend.visible = True
         self.legend.plots = self.plots
         self.legend.labels = self.get_legend_labels()
-        
-            
-            
+                    
         self.title.text = self.get_title()
         self.container.request_redraw()
+        
         return self.title.text
         
     def get_legend_labels(self):
@@ -271,82 +280,6 @@ class ChacoPlot(HasTraits):
     
 
 
-class HighlightLegend(BaseTool):
-    """Highlights a scan if its legend label is clicked."""
-    _selected_plot = Any
-    _selected_renderers = List
-    parent = Instance(HasTraits)
 
-    def _get_hit_plots(self, event):
-        legend=self.component
-        if legend is None or not legend.is_in(event.x, event.y):
-            return []
-
-        label = legend.get_label_at(event.x, event.y)
-        if label is None:
-            return []
-
-        index = legend._cached_labels.index(label)
-        label_name = legend._cached_label_names[index]
-        
-        #legend.plots is a dictionary with keys that are the full
-        #scan descriptor returned by the Beam object (a string with
-        #each field separated by the | character).  legend.labels
-        #is a list with elements consisting of the scan descriptor
-        #with common elements removed by the ChacoPlot.get_legend_label
-        #function.  If everything is working right there should be 
-        #one and only one plot label that contains all of the 
-        #fields of the legend label.
-        
-        #Handle the special case of only one plot.
-        if len(legend.plots.keys()) == 1:
-            return (legend.plots[legend.plots.keys()],)
-        else:
-            for plot_label in legend.plots.keys():
-                if set(label_name.split('|')).issubset(set(plot_label.split('|'))): 
-                    return (legend.plots[plot_label],)
-            
-        
-
-    def normal_left_down(self, event):
-        new = set(self._get_hit_plots(event))
-        old = set(self._selected_renderers)
-
-        if old == new:
-            new = set()
-
-        # select the new ones:
-        for renderer in new - old:
-            self._select(renderer)
-
-        # deselect the old ones that are not new
-        for renderer in old - new:
-            self._deselect(renderer)
-
-        self._selected_renderers = list(new)
-
-    def _select(self, selected):
-        """ Decorates a plot to indicate it is selected """
-        
-        for plot in selected.container.components:
-            if plot != selected:
-                plot.alpha /= 3
-            else:
-                self.parent.selected_plot = plot
-                plot.line_width *= 2
- 
-        plot.request_redraw()
-
-    def _deselect(self, selected):
-        
-        for plot in selected.container.components:
-            if plot != selected:
-                #Prevent newly added plot (with alpha = 1) from being multiplied
-                if plot.alpha < 0.34:
-                    plot.alpha *= 3
-            else:
-                plot.line_width /= 2
-
-        plot.request_redraw()
 
         
