@@ -84,11 +84,8 @@ class TreeWidget(QTreeView):
 
 class TreeView(View):
     
-    # The category that the view belongs to.
-    #category = 'Color'
     name = 'TreeView'
-          
-    
+             
     def __init__(self, *args, **kwds):    
         View.__init__(self, *args, **kwds)
         self.widget = TreeWidget()
@@ -147,8 +144,6 @@ class TreeView(View):
     #### Methods ##############################################################
 
     def create_control(self, parent):
-               
-        #self.widget = TreeWidget(parent)
        
         return self.widget
 

@@ -18,6 +18,7 @@
 # Enthought library imports.
 from enthought.envisage.api import Plugin
 from enthought.traits.api import List
+from enthought.pyface.workbench.api import TraitsUIView
 
 
 class BeamAnalysisWorkbenchPlugin(Plugin):
@@ -80,6 +81,20 @@ class BeamAnalysisWorkbenchPlugin(Plugin):
 
         from radpy.plugins.BeamAnalysis.api import TreeView
 
-        return [TreeView]
+        return [TreeView, self._create_parameter_view]
+    
+    def _create_parameter_view(self, **traits):
+        """ Factory method for the data view. """
+
+        from radpy.plugins.BeamAnalysis.api import ParameterPanel
+
+        parameter_view = TraitsUIView(
+            id   = 'ParameterPanel',
+            name = 'Parameters',
+            obj  = ParameterPanel(),
+            **traits
+        )
+        
+        return parameter_view
 
 #### EOF ######################################################################

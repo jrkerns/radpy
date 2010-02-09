@@ -22,7 +22,8 @@ import numpy
 
 # Enthought library imports
 from enthought.enable.api import Component, ComponentEditor
-from enthought.traits.api import Any, List, Instance, HasTraits, String
+from enthought.traits.api import Any, List, Instance, HasTraits, String, \
+                DelegatesTo
 from enthought.pyface.workbench.traits_ui_editor import \
                 TraitsUIEditor
 from enthought.traits.ui.api import View, Item, Group
@@ -37,26 +38,37 @@ from enthought.chaco.tools.api import PanTool, ZoomTool, LegendTool, \
 from plot_select_tool import PlotSelectTool
 from highlight_legend import HighlightLegend
 
+
 class ChacoPlotEditor(TraitsUIEditor):
     # Needed to make the editor window title human readable.
+    selected_beam = DelegatesTo('obj')
+    
     def _name_default(self):
         return "Scan Plot"
+    
+    def _selected_beam_changed(self):
+        self.window.get_view_by_id('ParameterPanel').obj.update_parameters(
+                                                            self.selected_beam)
 
     
 class ChacoPlot(HasTraits):
 
     plot = Instance(Component)
     name = 'Scan Plot'
-    id = 'Scan Plot'
+    id = 'radpy.plugins.BeamAnalysis.ChacoPlot'
     selected_plot = Instance(Component)
     selected_beam = Instance(HasTraits)
+    
     traits_view = View(
                          Group(
+                               
                              Item('plot', editor=ComponentEditor(size=(400,300)),
                                   show_label=False),
-                             orientation = "vertical"),
-                         resizable=True, title="Test",
-                        width=400, height=300, id='Scan Plot'
+                            id = 'radpy.plugins.BeamAnalysis.ChacoPlotItems'),
+                             
+                        resizable=True, title="Scan Plot",
+                        width=400, height=300, id='radpy.plugins.BeamAnalysis.\
+                        ChacoPlotView'
                          )
     plot_type = String
     

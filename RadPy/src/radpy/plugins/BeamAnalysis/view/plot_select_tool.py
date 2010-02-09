@@ -21,6 +21,10 @@ class PlotSelectTool(BaseTool):
     threshold = Float(20.0)
 
     def _get_hit_plots(self, event):
+        legend = self.parent.legend
+        if legend.is_in(event.x, event.y):
+            return []
+        
         if isinstance(self.component, OverlayPlotContainer):
             #event.offset_xy(self.component.x, self.component.y)
             plot = self._find_curve(self.component.components, event)

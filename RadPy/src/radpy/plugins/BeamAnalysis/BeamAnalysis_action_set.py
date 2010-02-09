@@ -25,7 +25,7 @@ class BeamAnalysisActionSet(WorkbenchActionSet):
     #### 'ActionSet' interface ################################################
     
     # The action set's globally unique identifier.
-    id = 'radpy.plugins.beam_analysis'
+    id = 'radpy.plugins.BeamAnalysis.actions'
 
     menus = [
         Menu(

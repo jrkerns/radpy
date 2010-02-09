@@ -28,7 +28,12 @@ class BeamAnalysisPerspective(Perspective):
 
     # The contents of the perspective.
     contents = [
-        PerspectiveItem(id='TreeView', position='right', relative_to='ScanPlot')
+        PerspectiveItem(id='radpy.plugins.BeamAnalysis.TreeView', 
+                        position='right', 
+                        relative_to='radpy.plugins.BeamAnalysis.ChacoPlot'),
+        PerspectiveItem(id='radpy.plugins.BeamAnalysis.ParameterPanel', 
+                        position='left', 
+                        relative_to='radpy.plugins.BeamAnalysis.ChacoPlot')
     ]
     
 #### EOF ######################################################################
