@@ -49,7 +49,6 @@ class TreeWidget(QTreeView):
         proxy.setDynamicSortFilter(True)
         proxy.setSourceModel(model)
         self.setModel(proxy)
-
         
         
         self.connect(self, SIGNAL("activated(QModelIndex)"),
@@ -80,14 +79,22 @@ class TreeWidget(QTreeView):
     def expanded(self):
         for column in range(self.model().columnCount(QModelIndex())):
             self.resizeColumnToContents(column)
+            
+    def contextMenuEvent(self, event):
+        menu = QMenu(self)
+        addAction = menu.addAction("&Add to plot")        
+        self.connect(addAction, SIGNAL("triggered()"), self.addPlot)        
+        menu.exec_(event.globalPos())
 
-
+    def addPlot(self):
+        self.emit(SIGNAL("activated"), self.currentFields())
+   
 class TreeView(View):
     
     name = 'TreeView'
              
     def __init__(self, *args, **kwds):    
-        View.__init__(self, *args, **kwds)
+        super(View, self).__init__()
         self.widget = TreeWidget()
         QObject.connect(self.widget, SIGNAL('activated'),self.activated)
     
@@ -127,7 +134,6 @@ class TreeView(View):
         else:
             
             self.create_new_plot_editor(label, beam)
-            
           
     def create_new_plot_editor(self, label, beam):
         """Create new ChacoPlot editor window"""
@@ -138,8 +144,7 @@ class TreeView(View):
         self.window.editors[-1].name = title
         self.window.editors[-1].set_focus()
         
-                
-           
+    
 
     #### Methods ##############################################################
 

@@ -40,11 +40,11 @@ class BeamAnalysisActionSet(WorkbenchActionSet):
 #       Group(id='Fred', path='MenuBar/Test')
 #    ]
         
-#    tool_bars = [
-#        ToolBar(name='Fred', groups=['AToolBarGroup']),
+    tool_bars = [
+        ToolBar(name='Beam Analysis'),
 #        ToolBar(name='Wilma'),
 #        ToolBar(name='Barney')
-#    ]
+    ]
         
     actions = [
         Action(
@@ -76,10 +76,19 @@ class BeamAnalysisActionSet(WorkbenchActionSet):
 #            class_name='enthought.envisage.ui.workbench.action.api:ExitAction'
 #        ),
 #
-#        Action(
-#            path='ToolBar/Fred', group='AToolBarGroup',
-#            class_name='enthought.envisage.ui.workbench.action.api:AboutAction'
-#        ),
+        Action(
+            path='ToolBar/Beam Analysis',
+            class_name='radpy.plugins.BeamAnalysis.action.BeamAnalysis_action:NewPlotAction'
+        ),
+        Action(
+            path='ToolBar/Beam Analysis',
+            class_name='radpy.plugins.BeamAnalysis.action.BeamAnalysis_action:OpenDataFileAction'
+        ),
+        Action(
+            path='ToolBar/Beam Analysis',
+            class_name='radpy.plugins.BeamAnalysis.action.BeamAnalysis_action:SmoothAction'
+        ),
+        
 #
 #        Action(
 #            path='ToolBar/Wilma',

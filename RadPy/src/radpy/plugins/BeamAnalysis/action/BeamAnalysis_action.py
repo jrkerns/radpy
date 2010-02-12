@@ -60,7 +60,7 @@ class OpenDataFileAction(Action):
     description = 'Open a beam data file'
 
     # The action's name (displayed on menus/tool bar tools etc).
-    name = 'Open'
+    name = 'Open File'
 
     # A short description of the action used for tooltip text etc.
     tooltip = 'Open a beam data file'
