@@ -1,0 +1,4 @@
+
+    [enthought.envisage.plugins]
+    radpy.BeamAnalysis =     radpy.BeamAnalysis.BeamAnalysis_workbench_plugin:BeamAnalysisWorkbenchPlugin
+    
