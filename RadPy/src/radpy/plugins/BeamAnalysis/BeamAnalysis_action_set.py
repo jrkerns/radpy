@@ -20,7 +20,6 @@ from enthought.envisage.ui.workbench.api import WorkbenchActionSet
 
 
 class BeamAnalysisActionSet(WorkbenchActionSet):
-    """ An action test useful for testing. """
 
     #### 'ActionSet' interface ################################################
     
@@ -57,10 +56,10 @@ class BeamAnalysisActionSet(WorkbenchActionSet):
             class_name='radpy.plugins.BeamAnalysis.action.BeamAnalysis_action:OpenDataFileAction'
         ),
         
-        Action(
-            path='MenuBar/Tools', #group='Fred',
-            class_name='radpy.plugins.BeamAnalysis.action.BeamAnalysis_action:SmoothAction'
-        ),
+#        Action(
+#            path='MenuBar/Tools', #group='Fred',
+#            class_name='radpy.plugins.BeamAnalysis.action.BeamAnalysis_action:SmoothAction'
+#        ),
 #        Action(
 #            path='MenuBar/Test', group='Fred',
 #            class_name='radpy.workbench.action.new_view_action:NewViewAction'
@@ -84,11 +83,11 @@ class BeamAnalysisActionSet(WorkbenchActionSet):
             path='ToolBar/Beam Analysis',
             class_name='radpy.plugins.BeamAnalysis.action.BeamAnalysis_action:OpenDataFileAction'
         ),
-        Action(
-            path='ToolBar/Beam Analysis',
-            class_name='radpy.plugins.BeamAnalysis.action.BeamAnalysis_action:SmoothAction'
-        ),
-        
+#        Action(
+#            path='ToolBar/Beam Analysis',
+#            class_name='radpy.plugins.BeamAnalysis.action.BeamAnalysis_action:SmoothAction'
+#        ),
+#        
 #
 #        Action(
 #            path='ToolBar/Wilma',

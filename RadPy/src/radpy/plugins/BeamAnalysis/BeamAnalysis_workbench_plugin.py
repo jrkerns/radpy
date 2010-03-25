@@ -49,8 +49,11 @@ class BeamAnalysisWorkbenchPlugin(Plugin):
 
         from radpy.plugins.BeamAnalysis.api \
             import BeamAnalysisActionSet
-
-        return [BeamAnalysisActionSet]
+            
+        from radpy.plugins.BeamAnalysis.api \
+            import BeamAnalysisActionSetUser
+         
+        return [BeamAnalysisActionSet, BeamAnalysisActionSetUser]
 
     # Perspectives.
     perspectives = List(contributes_to=PERSPECTIVES)
