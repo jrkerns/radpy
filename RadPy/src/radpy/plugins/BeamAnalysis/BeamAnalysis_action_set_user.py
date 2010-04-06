@@ -55,31 +55,38 @@ class BeamAnalysisActionSetUser(WorkbenchActionSet):
     def _actions_default(self):
         action_list = []
         sys.path.append('./RadPy/plugins/BeamAnalysis/scripts')
-        import scripts
-        for root, dirs, files in os.walk('./RadPy/plugins/BeamAnalysis/scripts'):
-            for name in files:
-                if os.path.splitext('./RadPy/plugins/BeamAnalysis/scripts'+name)[1] == '.py':
-                    if name != '__init__.py':
-                        mod = os.path.splitext(name)[0]
-                        class_name = 'radpy.plugins.BeamAnalysis.scripts.' + \
-                            mod + ':UserAction'
-#                        try:
-                        exec('from '+mod+' import UserAction')
-                        if UserAction.menubar_path:
-                            user_action = Action(
-                                class_name = class_name,
-                                path = UserAction.menubar_path
-                                )
-                            action_list.append(user_action)
-                        if UserAction.toolbar_path:
-                            user_action = Action(
-                                class_name = class_name,
-                                path = UserAction.toolbar_path
-                                )
-                            action_list.append(user_action)
-                                
-#                        except:
-#                            pass
+#        
+        for name in os.listdir('./RadPy/plugins/BeamAnalysis/scripts') :
+            if name.endswith(".py" ) and name != '__init__.py':
+                name = os.path.splitext(name)[0]
+                class_name = 'radpy.plugins.BeamAnalysis.scripts.' + \
+                            name + ':UserAction'
+                try: 
+                    exec("from " + name +" import UserAction")
+                    
+                except ImportError:
+                    pass
+                
+                except:
+                    print "Unexpected error:", sys.exc_info()[0]
+                    raise
+                                        
+                else:
+
+                    if UserAction.menubar_path:
+                        user_action = Action(
+                            class_name = class_name,
+                            path = UserAction.menubar_path
+                            )
+                        action_list.append(user_action)
+                        
+                    if UserAction.toolbar_path:
+                        user_action = Action(
+                            class_name = class_name,
+                            path = UserAction.toolbar_path
+                            )
+                        action_list.append(user_action)
+                            
         return action_list
 
     
