@@ -37,8 +37,6 @@ class BranchNode(object):
     #This represents a branch of the tree model.
     #The code is essentially unchanged from the code in the
     #Summerfield book.
-    #TODO: enable activating a branch node to add all of its
-    #tree nodes to active scan window.
     
     def __init__(self, name, column, parent=None):
         #super(BranchNode, self).__init__(parent)
@@ -101,7 +99,20 @@ class BranchNode(object):
         if not self.children:
             return False
         return isinstance(self.children[0], LeafNode)
-
+    
+    def asRecord(self):
+        """Find all leaf nodes in this branch and return them in list form."""
+        all_leaves = []
+        for text,node in self.children:
+            if isinstance(node, LeafNode):
+                all_leaves.append(node.asRecord())
+            else: 
+                for leaf in node.asRecord():
+                    all_leaves.append(leaf)
+            
+        return all_leaves
+            
+    
 
 class LeafNode(object):
 
@@ -130,9 +141,14 @@ class LeafNode(object):
     def asRecord(self):
         record=[]
         branch=self.parent
+        
+        #Walk up the tree model, inserting the string representation of each
+        #branch into the record list.  (e.g. ['filename', '6X', '40x40'])
+        #This is used to create the plot title.
         while branch is not None:
             record.insert(0,branch.toString())
             branch=branch.parent
+            
         assert record and not record[0]
         record = "|".join(record[1:]) + "|" + \
             self.beam.get_scan_descriptor()
@@ -198,7 +214,7 @@ class TreeModel(QAbstractItemModel):
 
     def asRecord(self, index):
         leaf = self.nodeFromIndex(index)
-        if leaf is not None and isinstance(leaf, LeafNode):
+        if leaf is not None: #and isinstance(leaf, LeafNode):
             return leaf.asRecord()
         return []
 
@@ -285,5 +301,8 @@ class ProxyModel(QSortFilterProxyModel):
     def asRecord(self, index):
         return self.sourceModel().asRecord(self.mapToSource(index))
         
+    def nodeFromIndex(self, index):
+        return self.sourceModel().nodeFromIndex(self.mapToSource(index))
+    
     def columnCount(self, *args, **kwds):
         return self.sourceModel().columnCount(*args, **kwds)

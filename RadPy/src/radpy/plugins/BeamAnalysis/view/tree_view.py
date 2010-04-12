@@ -82,12 +82,28 @@ class TreeWidget(QTreeView):
             
     def contextMenuEvent(self, event):
         menu = QMenu(self)
-        addAction = menu.addAction("&Add to plot")        
-        self.connect(addAction, SIGNAL("triggered()"), self.addPlot)        
+        
+        if isinstance(self.model().nodeFromIndex(self.currentIndex()),
+                      Model.LeafNode):
+                     
+            addAction = menu.addAction("&Add to plot")        
+            self.connect(addAction, SIGNAL("triggered()"), self.addPlot)
+            
+        else:
+            
+            addMultiAction = menu.addAction("&Add all to plot")
+            self.connect(addMultiAction, SIGNAL("triggered()"), self.addMultiPlot)
+            
         menu.exec_(event.globalPos())
 
     def addPlot(self):
         self.emit(SIGNAL("activated"), self.currentFields())
+        
+    def addMultiPlot(self):
+        temp  = self.model().asRecord(self.currentIndex())
+        for i in temp:
+            self.emit(SIGNAL("activated"), i)
+        
    
 class TreeView(View):
     
