@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema elementFormDefault="qualified"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+	<xsd:include schemaLocation="RadiationDevice.xsd"></xsd:include>
+	<xsd:simpleType name="EnergyType">
+		<xsd:restriction base="xsd:double"></xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="ParticleType">
+		<xsd:restriction base="xsd:string"></xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="SADType">
+		<xsd:restriction base="xsd:double"></xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="SSDType">
+		<xsd:restriction base="xsd:double"></xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="CollimatorAngleType">
+		<xsd:restriction base="xsd:double"></xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="GantryAngleType">
+		<xsd:restriction base="xsd:double"></xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:complexType name="JawPositionType">
+		<xsd:sequence maxOccurs="1" minOccurs="1">
+			<xsd:element name="NegativeJaw" type="xsd:double"></xsd:element>
+			<xsd:element name="PositiveJaw" type="xsd:double"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:simpleType name="ApplicatorType">
+		<xsd:restriction base="xsd:string"></xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="AccessoryType">
+		<xsd:restriction base="xsd:string"></xsd:restriction>
+	</xsd:simpleType>
+
+
+	<xsd:complexType name="BeamDetailsType">
+		<xsd:all minOccurs="0">
+			<xsd:element name="Energy" type="EnergyType" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="Particle" type="ParticleType" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="SAD" type="SADType" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="SSD" type="SSDType" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="CollimatorAngle"
+				type="CollimatorAngleType" minOccurs="0" maxOccurs="1">
+			</xsd:element>
+			<xsd:element name="GantryAngle" type="GantryAngleType" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="CrossplaneJawPositions"
+				type="JawPositionType" minOccurs="0" maxOccurs="1">
+			</xsd:element>
+			<xsd:element name="InplaneJawPositions"
+				type="JawPositionType" minOccurs="0" maxOccurs="1">
+			</xsd:element>
+			<xsd:element name="Wedge" type="WedgeType" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="Applicator" type="ApplicatorType" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="Accessory" type="AccessoryType" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="RadiationDevice" type="RadiationDeviceType" minOccurs="0" maxOccurs="1"></xsd:element>
+		</xsd:all>
+	</xsd:complexType>
+
+	<xsd:complexType name="WedgeType">
+		<xsd:all minOccurs="0">
+			<xsd:element name="Angle" type="xsd:double" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="Type" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+		</xsd:all>
+	</xsd:complexType>
+</xsd:schema>
