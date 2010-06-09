@@ -23,7 +23,7 @@ import numpy
 # Enthought library imports
 from enthought.enable.api import Component, ComponentEditor
 from enthought.traits.api import Any, List, Instance, HasTraits, String, \
-                DelegatesTo
+                DelegatesTo, Event
 from enthought.pyface.workbench.traits_ui_editor import \
                 TraitsUIEditor
 from enthought.traits.ui.api import View, Item, Group
@@ -49,7 +49,10 @@ class ChacoPlotEditor(TraitsUIEditor):
     def _selected_beam_changed(self):
         self.window.get_view_by_id('ParameterPanel').obj.update_parameters(
                                                             self.selected_beam)
-
+    def _has_focus_changed(self):
+        
+        self.window.get_view_by_id('ParameterPanel').obj.update_parameters(
+                                                            self.selected_beam)
     
 class ChacoPlot(HasTraits):
 
@@ -67,8 +70,8 @@ class ChacoPlot(HasTraits):
                             id = 'radpy.plugins.BeamAnalysis.ChacoPlotItems'),
                              
                         resizable=True, title="Scan Plot",
-                        width=400, height=300, id='radpy.plugins.BeamAnalysis.\
-                        ChacoPlotView'
+                        width=400, height=300, 
+                        id='radpy.plugins.BeamAnalysis.ChacoPlotView'
                          )
     plot_type = String
     
@@ -167,7 +170,7 @@ class ChacoPlot(HasTraits):
         if label in self.plots.keys():
             return          
         
-        x, y = (beam.data_abscissa, beam.data_ordinate)
+        x, y = (beam.abscissa, beam.ordinate)
         
         # The plot_type trait is defined by the geometry of the scanned plot 
         # (inline, crossline, depth dose, etc.).  

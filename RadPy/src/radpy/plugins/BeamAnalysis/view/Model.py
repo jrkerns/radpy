@@ -27,7 +27,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 # Program specific imports
-from RFB.hdf5 import load_multi_data
+from RFB.rfb_loader import load_multi_data
 
 KEY, NODE = range(2)
 
@@ -284,6 +284,7 @@ class ProxyModel(QSortFilterProxyModel):
         super(ProxyModel, self).__init__(parent)
         
     def lessThan(self, left, right):
+        """ Provides custom sorting by field size (10x10 before 40x40) """
         regex = re.compile('\d*')
         try:
             l = int(regex.findall(left.data().toString())[0])

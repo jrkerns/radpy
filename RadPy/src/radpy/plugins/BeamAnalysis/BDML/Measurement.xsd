@@ -23,9 +23,12 @@
 
 	<xsd:simpleType name="CoordinateAxesType">
 		<xsd:restriction base="xsd:string">
-			<xsd:enumeration value="x"></xsd:enumeration>
-			<xsd:enumeration value="y"></xsd:enumeration>
-			<xsd:enumeration value="z"></xsd:enumeration>
+			<xsd:enumeration value="x_neg"></xsd:enumeration>
+			<xsd:enumeration value="y_neg"></xsd:enumeration>
+			<xsd:enumeration value="z_neg"></xsd:enumeration>
+			<xsd:enumeration value="x_pos"></xsd:enumeration>
+            <xsd:enumeration value="y_pos"></xsd:enumeration>
+            <xsd:enumeration value="z_pos"></xsd:enumeration>
 		</xsd:restriction>
 	</xsd:simpleType>
 

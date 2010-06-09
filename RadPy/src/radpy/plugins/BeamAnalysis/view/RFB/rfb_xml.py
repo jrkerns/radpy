@@ -1,10 +1,11 @@
 import struct
 import sys
-from numpy import append
+from numpy import append, array
+import datetime
 
 from radpy.plugins.BeamAnalysis.view.construct import *
-
-from radpy.plugins.BeamAnalysis.view.beam_traits import Beam
+#from construct import *
+#from radpy.plugins.BeamAnalysis.view.beam_traits import Beam
 
 
 #This is a description file based on Construct 
@@ -67,6 +68,217 @@ class ScanTypeAdapter(Adapter):
     
     def _decode(self, obj, context):         
         return struct.unpack('b', obj[-1])[0]
+    
+class Beam(object):
+    """ A holder object with dictionaries of quantities extracted from the 
+    .rfb files. """
+    
+    def __init__(self):
+        self.main_header = {}
+        self.measurement_header = {}
+        self.abscissa = []
+        self.ordinate = []
+        self.data_elements = {}
+            
+    def machine_axes_to_xyz(self, coordinate):
+        """ Given a point in machine coordinates, converts it to xyz """
+        """ Accepts a tuple of coordinates in machine terms (crossplane, inplane,
+        depth) and returns a numpy 1D array of xyz coordinates.  Uses the 
+        XXX_servo axis values in the measurement header for the conversion. 
+        
+        The coordinate system used is DICOM standard (IEC 1217).  For a patient
+        in the head first supine position, the Y axis runs inferior to superior,
+        the Z axis runs anterior-posterior and the X axis runs patient right to 
+        patient left."""
+        
+        crossplane = self.get_machine_axis_vector(
+                        self.measurement_header['crossplane_servo_axis'])
+        inplane = self.get_machine_axis_vector(
+                        self.measurement_header['inplane_servo_axis'])
+        depth = self.get_machine_axis_vector(
+                        self.measurement_header['depth_servo_axis'])
+        
+        xyz_vector = coordinate[0]*crossplane + coordinate[1]*inplane + \
+                        coordinate[2]*depth
+                        
+        return xyz_vector
+    
+    def get_machine_axis_vector(self, value):
+        
+        vector = array([0,0,0])
+        if 'x' in value:
+            vector[0] = 1
+        elif 'y' in value:
+            vector[1] = 1
+        elif 'z' in value:
+            vector[2] = 1
+        
+        if 'neg' in value:
+            vector *= -1
+        
+            
+        return vector
+    
+    
+    def set_xml_elements(self, data_structure):
+        
+        isocenter_xyz = self.machine_axes_to_xyz(
+                            (self.measurement_header['isocenter_crossplane'],
+                             self.measurement_header['isocenter_inplane'],
+                             self.measurement_header['isocenter_depth']))
+        
+        data_structure.beam.MeasurementDetails.Isocenter.x = \
+            isocenter_xyz[0]
+        data_structure.beam.MeasurementDetails.Isocenter.y = \
+            isocenter_xyz[1]
+        data_structure.beam.MeasurementDetails.Isocenter.z = \
+            isocenter_xyz[2]
+        
+        
+        data_structure.beam.MeasurementDetails.CoordinateAxes.Inplane = \
+            self.measurement_header['inplane_servo_axis']
+        data_structure.beam.MeasurementDetails.CoordinateAxes.Crossplane = \
+            self.measurement_header['crossplane_servo_axis']
+        data_structure.beam.MeasurementDetails.CoordinateAxes.Depth = \
+            self.measurement_header['depth_servo_axis']
+            
+        data_structure.beam.MeasurementDetails.MeasuredDateTime = \
+            datetime.datetime.fromtimestamp(
+                self.measurement_header['measured_date']).isoformat()
+            #time.asctime(time.gmtime(self.measurement_header['measured_date']))
+            
+        
+        data_structure.beam.MeasurementDetails.ModificationHistory.Record = \
+            datetime.datetime.fromtimestamp(
+                self.measurement_header['modified_date']).isoformat() + ',' + \
+                self.measurement_header['measurement_comment']
+        
+        start_pos_xyz = self.machine_axes_to_xyz(
+                            (self.measurement_header['scan_start_crossplane'],
+                             self.measurement_header['scan_start_inplane'],
+                             self.measurement_header['scan_start_depth']))
+        
+        data_structure.beam.MeasurementDetails.StartPosition.x = \
+            start_pos_xyz[0]
+        data_structure.beam.MeasurementDetails.StartPosition.y = \
+            start_pos_xyz[1]
+        data_structure.beam.MeasurementDetails.StartPosition.z = \
+            start_pos_xyz[2]
+        
+        
+        stop_pos_xyz = self.machine_axes_to_xyz(
+                            (self.measurement_header['scan_end_crossplane'],
+                             self.measurement_header['scan_end_inplane'],
+                             self.measurement_header['scan_end_depth']))
+        
+        data_structure.beam.MeasurementDetails.StopPosition.x = \
+            stop_pos_xyz[0]
+        data_structure.beam.MeasurementDetails.StopPosition.y = \
+            stop_pos_xyz[1]
+        data_structure.beam.MeasurementDetails.StopPosition.z = \
+            stop_pos_xyz[2]
+        
+        data_structure.beam.MeasurementDetails.Physicist.EmailAddress = \
+            self.main_header['email']
+            
+        data_structure.beam.MeasurementDetails.Physicist.Telephone = \
+            self.main_header['telephone']
+            
+        data_structure.beam.MeasurementDetails.Physicist.Name = ''
+        
+        data_structure.beam.MeasurementDetails.Physicist.Institution = \
+            self.main_header['institution']
+            
+        data_structure.beam.MeasurementDetails.Medium = \
+            self.main_header['medium']
+                    
+        data_structure.beam.MeasurementDetails.Servo.Model = \
+            self.measurement_header['servo_type']
+        data_structure.beam.MeasurementDetails.Servo.Vendor = \
+            'IBA Dosimetry'
+        
+        data_structure.beam.MeasurementDetails.Electrometer.Model = \
+            self.measurement_header['electrometer_type']
+            
+        data_structure.beam.MeasurementDetails.Electrometer.Vendor = \
+            'IBA Dosimetry'
+            
+        data_structure.beam.MeasurementDetails.Electrometer.Voltage = \
+            self.measurement_header['field_hv']
+        
+        data_structure.beam.MeasurementDetails.MeasuringDevice.Model = \
+            self.measurement_header['detector']
+            
+        data_structure.beam.MeasurementDetails.MeasuringDevice.Manufacturer = \
+            'IBA Dosimetry'
+        
+        data_structure.beam.MeasurementDetails.MeasuringDevice.Type = \
+            self.measurement_header['detector_type']
+        
+        data_structure.beam.BeamDetails.Energy = \
+            self.main_header['energy']
+            
+        data_structure.beam.BeamDetails.Particle = \
+            self.main_header['particle']
+            
+        data_structure.beam.BeamDetails.SAD = \
+            self.main_header['SAD']
+            
+        data_structure.beam.BeamDetails.SSD = \
+            self.main_header['SSD']
+            
+        data_structure.beam.BeamDetails.CollimatorAngle= \
+            self.main_header['collimator_angle']
+            
+        data_structure.beam.BeamDetails.GantryAngle= \
+            self.main_header['gantry_angle']
+        
+        data_structure.beam.BeamDetails.CrossplaneJawPositions.NegativeJaw = \
+            self.main_header['crossplane_jaw_negative']
+        
+        data_structure.beam.BeamDetails.CrossplaneJawPositions.PositiveJaw = \
+            self.main_header['crossplane_jaw_positive']
+        
+        data_structure.beam.BeamDetails.InplaneJawPositions.NegativeJaw = \
+            self.main_header['inplane_jaw_negative']
+            
+        data_structure.beam.BeamDetails.InplaneJawPositions.PositiveJaw = \
+            self.main_header['inplane_jaw_positive']
+        
+        data_structure.beam.BeamDetails.Wedge.Angle = \
+            self.main_header['wedge_angle']
+            
+        data_structure.beam.BeamDetails.Wedge.Type = \
+            self.main_header['wedge_type']
+            
+        data_structure.beam.BeamDetails.Applicator = \
+            self.main_header['applicator']
+            
+        data_structure.beam.BeamDetails.Accessory = \
+            ''
+        
+        data_structure.beam.BeamDetails.RadiationDevice.Vendor = \
+            ''
+        data_structure.beam.BeamDetails.RadiationDevice.Model = \
+            self.main_header['rad_device']
+            
+        data_structure.beam.BeamDetails.RadiationDevice.SerialNumber = \
+            ''
+        
+        scale = self.main_header['gantry_scale']
+        if scale == 'CW_180_Down':
+            data_structure.beam.BeamDetails.RadiationDevice.MachineScale = 'IEC 1217'
+        elif scale == 'CW_180_Up':
+            data_structure.beam.BeamDetails.RadiationDevice.MachineScale = 'Varian IEC'
+        
+       
+        
+#        '.Beam.Data.Ordinate'
+#        '.Beam.Data.Ordinate.Value'
+#        '.Beam.Data.Abscissa'
+#        '.Beam.Data.Abscissa.Value'
+#        data_structure.beam.Data.Quantity'] = self.measurement_header['data_type']
+        data_structure.quantity = self.measurement_header['data_type']
 
 class DataFileAdapter(Adapter):
     
@@ -90,8 +302,8 @@ class DataFileAdapter(Adapter):
                 for j in obj.main_header.measurement_data[i].data.data:
 #                    beam_tmp.data_abscissa.append(j[0])
 #                    beam_tmp.data_ordinate.append(j[1])
-                    beam_tmp.data_abscissa = append(beam_tmp.data_abscissa,j[0])
-                    beam_tmp.data_ordinate = append(beam_tmp.data_ordinate,j[1])
+                    beam_tmp.abscissa = append(beam_tmp.abscissa,j[0])
+                    beam_tmp.ordinate = append(beam_tmp.ordinate,j[1])
                 beams.append(beam_tmp)
             except:
                 print sys.exc_info()[0]
@@ -119,8 +331,8 @@ class DataFileAdapter(Adapter):
                                 measurement_data[i].data.data:
         #                    beam_tmp.data_abscissa.append(j[0])
         #                    beam_tmp.data_ordinate.append(j[1])
-                            beam_tmp.data_abscissa = append(beam_tmp.data_abscissa,j[0])
-                            beam_tmp.data_ordinate = append(beam_tmp.data_ordinate,j[1])
+                            beam_tmp.abscissa = append(beam_tmp.abscissa,j[0])
+                            beam_tmp.ordinate = append(beam_tmp.ordinate,j[1])
                         
                         beams.append(beam_tmp)
                     except:
@@ -148,8 +360,8 @@ class DataFileAdapter(Adapter):
                                 measurement_data[j].data.data:
 #                            beam_tmp.data_abscissa.append(k[0])
 #                            beam_tmp.data_ordinate.append(k[1])
-                            beam_tmp.data_abscissa = append(beam_tmp.data_abscissa,k[0])
-                            beam_tmp.data_ordinate = append(beam_tmp.data_ordinate,k[1])
+                            beam_tmp.abscissa = append(beam_tmp.abscissa,k[0])
+                            beam_tmp.ordinate = append(beam_tmp.ordinate,k[1])
 
                         beams.append(beam_tmp)
                     except:
@@ -177,8 +389,8 @@ class DataFileAdapter(Adapter):
                                     measurement_data[j].data.data:
 #                                beam_tmp.data_abscissa.append(k[0])
 #                                beam_tmp.data_ordinate.append(k[1])
-                                beam_tmp.data_abscissa = append(beam_tmp.data_abscissa,k[0])
-                                beam_tmp.data_ordinate = append(beam_tmp.data_ordinate,k[1])
+                                beam_tmp.abscissa = append(beam_tmp.abscissa,k[0])
+                                beam_tmp.ordinate = append(beam_tmp.ordinate,k[1])
 
                             beams.append(beam_tmp)
                         except:
@@ -230,7 +442,7 @@ measurement_data = Struct("measurement_data",
     
     PascalString("operator"),
     PascalString("measurement_comment"),
-    Enum(SNInt16("crossline_servo_axis"),
+    Enum(SNInt16("crossplane_servo_axis"),
          z_neg = -3,
          y_neg = -2,
          x_neg = -1,
@@ -240,7 +452,7 @@ measurement_data = Struct("measurement_data",
          _default_ = "unknown"
          
     ),
-    Enum(SNInt16("inline_servo_axis"),
+    Enum(SNInt16("inplane_servo_axis"),
          z_neg = -3,
          y_neg = -2,
          x_neg = -1,
@@ -307,11 +519,11 @@ measurement_data = Struct("measurement_data",
          _default_ = "unknown"
     ),
     Field("raw4_b",6),
-    NFloat64("isocenter_crossline"),
-    NFloat64("isocenter_inline"),
+    NFloat64("isocenter_crossplane"),
+    NFloat64("isocenter_inplane"),
     NFloat64("isocenter_depth"),
-    NFloat64("normalization_crossline"),
-    NFloat64("normalization_inline"),
+    NFloat64("normalization_crossplane"),
+    NFloat64("normalization_inplane"),
     NFloat64("normalization_depth"),
     
     
@@ -369,25 +581,25 @@ measurement_data = Struct("measurement_data",
     
            
     Padding(1),
-    NFloat64("position_a_crossline"),
-    NFloat64("position_a_inline"),
+    NFloat64("position_a_crossplane"),
+    NFloat64("position_a_inplane"),
     NFloat64("position_a_depth"),
-    NFloat64("position_b_crossline"),
-    NFloat64("position_b_inline"),
+    NFloat64("position_b_crossplane"),
+    NFloat64("position_b_inplane"),
     NFloat64("position_b_depth"),
-    NFloat64("position_c_crossline"),
-    NFloat64("position_c_inline"),
+    NFloat64("position_c_crossplane"),
+    NFloat64("position_c_inplane"),
     NFloat64("position_c_depth"),
-    NFloat64("position_d_crossline"),
-    NFloat64("position_d_inline"),
+    NFloat64("position_d_crossplane"),
+    NFloat64("position_d_inplane"),
     NFloat64("position_d_depth"),
     Field("raw9",10),
     
-    NFloat64("scan_start_crossline"),
-    NFloat64("scan_start_inline"),
+    NFloat64("scan_start_crossplane"),
+    NFloat64("scan_start_inplane"),
     NFloat64("scan_start_depth"),
-    NFloat64("scan_end_crossline"),
-    NFloat64("scan_end_inline"),
+    NFloat64("scan_end_crossplane"),
+    NFloat64("scan_end_inplane"),
     NFloat64("scan_end_depth"),
     
     #Next two bytes are number of data points in this scan.
@@ -499,13 +711,13 @@ header_data = Struct("header_data",
     PascalString("telephone"),
     PascalString("email"),
     Padding(2),
-    NFloat64("inline_jaw_negative"),
+    NFloat64("inplane_jaw_negative"),
     Padding(2),
-    NFloat64("inline_jaw_positive"),
+    NFloat64("inplane_jaw_positive"),
     Padding(2),
-    NFloat64("crossline_jaw_negative"),
+    NFloat64("crossplane_jaw_negative"),
     Padding(2),
-    NFloat64("crossline_jaw_positive"),
+    NFloat64("crossplane_jaw_positive"),
     Enum(UNInt8("gantry_scale"),
          CW_180_Down = 0,
          CCW_180_Down = 1,
@@ -593,13 +805,13 @@ additional_header = Struct("add_header",
     PascalString("telephone"),
     PascalString("email"),
     Padding(2),
-    NFloat64("inline_jaw_negative"),
+    NFloat64("inplane_jaw_negative"),
     Padding(2),
-    NFloat64("inline_jaw_positive"),
+    NFloat64("inplane_jaw_positive"),
     Padding(2),
-    NFloat64("crossline_jaw_negative"),
+    NFloat64("crossplane_jaw_negative"),
     Padding(2),
-    NFloat64("crossline_jaw_positive"),
+    NFloat64("crossplane_jaw_positive"),
     
     Enum(UNInt8("gantry_scale"),
          CW_180_Down = 0,
@@ -696,13 +908,13 @@ beam = Struct("beam",
     PascalString("telephone"),
     PascalString("email"),
     Repeater(2,UNInt8("raw")),
-    NFloat64("inline_jaw_negative"),
+    NFloat64("inplane_jaw_negative"),
     Repeater(2,UNInt8("raw")),
-    NFloat64("inline_jaw_positive"),
+    NFloat64("inplane_jaw_positive"),
     Repeater(2,UNInt8("raw")),
-    NFloat64("crossline_jaw_negative"),
+    NFloat64("crossplane_jaw_negative"),
     Repeater(2,UNInt8("raw")),
-    NFloat64("crossline_jaw_positive"),
+    NFloat64("crossplane_jaw_positive"),
     Enum(UNInt8("gantry_scale"),
          CW_180_Down = 0,
          CCW_180_Down = 1,
@@ -780,24 +992,24 @@ beam = Struct("beam",
     PascalString("setup_comment"),
     Flag("ca24_calibration"),
     UNInt8("raw"),
-    NFloat64("position_a_crossline"),
-    NFloat64("position_a_inline"),
+    NFloat64("position_a_crossplane"),
+    NFloat64("position_a_inplane"),
     NFloat64("position_a_depth"),
-    NFloat64("position_b_crossline"),
-    NFloat64("position_b_inline"),
+    NFloat64("position_b_crossplane"),
+    NFloat64("position_b_inplane"),
     NFloat64("position_b_depth"),
-    NFloat64("position_c_crossline"),
-    NFloat64("position_c_inline"),
+    NFloat64("position_c_crossplane"),
+    NFloat64("position_c_inplane"),
     NFloat64("position_c_depth"),
-    NFloat64("position_d_crossline"),
-    NFloat64("position_d_inline"),
+    NFloat64("position_d_crossplane"),
+    NFloat64("position_d_inplane"),
     NFloat64("position_d_depth"),
     Repeater(10,UNInt8("raw")),
-    NFloat64("scan_start_crossline"),
-    NFloat64("scan_start_inline"),
+    NFloat64("scan_start_crossplane"),
+    NFloat64("scan_start_inplane"),
     NFloat64("scan_start_depth"),
-    NFloat64("scan_end_crossline"),
-    NFloat64("scan_end_inline"),
+    NFloat64("scan_end_crossplane"),
+    NFloat64("scan_end_inplane"),
     NFloat64("scan_end_depth"),
     Struct("data",
            SNInt16("length"),

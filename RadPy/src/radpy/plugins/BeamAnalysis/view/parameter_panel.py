@@ -43,19 +43,24 @@ class ParameterPanel(HasTraits):
        
     traits_ui_view = View(
                    VGroup(item_list,
-                          id = 'radpy.plugins.BeamAnalysis.Parameters'),
+                          id = 'radpy.plugins.BeamAnalysis.Parameters',
+                          padding=15,show_border=True),
                    width=100,
                    resizable=True, title="Parameters", 
-                   id='radpy.plugins.BeamAnalysis.ParameterPanel')  
+                   id='radpy.plugins.BeamAnalysis.ParameterPanel'
+                   )  
     
     
     def update_parameters(self, beam):
-        self.scan_type = beam.get_scan_type()
-
-        for i in self.parameter_list:
-            parameter = i.calc(beam)
-            exec("self." + i.name + " = parameter")
+        if beam:
+            self.scan_type = beam.get_scan_type()
         
+            for i in self.parameter_list:
+                parameter = i.calc(beam)
+                exec("self." + i.name + " = parameter")
+        
+        else:
+            self.scan_type = 'None'
         
     
     

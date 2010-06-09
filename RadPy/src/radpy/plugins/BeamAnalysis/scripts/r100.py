@@ -24,4 +24,4 @@ class UserParameter(object):
         
     def calc(self, beam):
         
-        return beam.data_abscissa[numpy.argmax(beam.data_ordinate)]
+        return beam.abscissa[numpy.argmax(beam.ordinate)]

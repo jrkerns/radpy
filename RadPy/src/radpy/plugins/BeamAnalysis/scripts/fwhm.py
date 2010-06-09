@@ -11,7 +11,7 @@ class UserParameter(object):
     name = 'fwhm'
     style = 'readonly'
     #tooltip = 'Smooth the scan plot'
-    visible_when = 'scan_type == "Crossline Profile"'
+    visible_when = 'scan_type == "Crossplane Profile"'
     #format_func = lambda v: '%.2f' % v 
     
     
@@ -24,8 +24,8 @@ class UserParameter(object):
         
     def calc(self, beam):
         
-        x = beam.data_abscissa
-        y = beam.data_ordinate
+        x = beam.abscissa
+        y = beam.ordinate
         tck = interpolate.splrep(x,y)
         cax_value = interpolate.splev(0, tck)
         gt_50 = x[numpy.where(y > cax_value/2.)]

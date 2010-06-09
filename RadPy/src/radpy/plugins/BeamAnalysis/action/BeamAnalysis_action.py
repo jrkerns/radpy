@@ -77,3 +77,35 @@ class OpenDataFileAction(Action):
             
             self.window.active_view.control.load(fname)
             
+class SaveDataFileAction(Action):
+    """ An action that opens a new beam data file """
+
+    #### 'Action' interface ###################################################
+    
+    # A longer description of the action.
+    description = 'Save a beam data file into BDML format'
+
+    # The action's name (displayed on menus/tool bar tools etc).
+    name = 'Save File'
+
+    # A short description of the action used for tooltip text etc.
+    tooltip = 'Save a beam data file'
+
+    ###########################################################################
+    # 'Action' interface.
+    ###########################################################################
+
+    def perform(self, event):
+        """ Perform the action. """
+
+        fname = unicode(QFileDialog.getSaveFileName(self.window.control,
+                            "Choose Save Filename", "radpy/plugins/BeamAnalysis/view/RFB/Unit Tests/",
+                            "XML Files *.xml"))
+       
+        if fname:
+#            self.window.active_view.control.load(fname)
+            widget = self.window.active_view.control
+            widget.model().nodeFromIndex(widget.currentIndex()).beam.export_xml(fname)
+#            self.window.active_view.control.model().nodeFromIndex(
+#                        self.window.active_view.control.currentIndex()).
+#            model().nodeFromIndex(self.currentIndex())

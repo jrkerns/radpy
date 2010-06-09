@@ -82,9 +82,10 @@ class HighlightLegend(BaseTool):
             if plot != selected:
                 plot.alpha /= 3
             else:
+                
                 self.parent.selected_plot = plot
                 plot.line_width *= 2
- 
+        
         plot.request_redraw()
 
     def _deselect(self, selected):
@@ -96,5 +97,5 @@ class HighlightLegend(BaseTool):
                     plot.alpha *= 3
             else:
                 plot.line_width /= 2
-
+        
         plot.request_redraw()

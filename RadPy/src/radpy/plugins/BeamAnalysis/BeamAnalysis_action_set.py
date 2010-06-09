@@ -56,6 +56,10 @@ class BeamAnalysisActionSet(WorkbenchActionSet):
             class_name='radpy.plugins.BeamAnalysis.action.BeamAnalysis_action:OpenDataFileAction'
         ),
         
+        Action(
+            path='MenuBar/File', #group='XGroup',
+            class_name='radpy.plugins.BeamAnalysis.action.BeamAnalysis_action:SaveDataFileAction'
+        ),
 #        Action(
 #            path='MenuBar/Tools', #group='Fred',
 #            class_name='radpy.plugins.BeamAnalysis.action.BeamAnalysis_action:SmoothAction'
