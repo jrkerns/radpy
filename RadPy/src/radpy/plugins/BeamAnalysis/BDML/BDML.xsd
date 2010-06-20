@@ -9,7 +9,6 @@
 	<xsd:include schemaLocation="Measurement.xsd"></xsd:include>
 	<xsd:include schemaLocation="Beam.xsd"></xsd:include>
 	<xsd:include schemaLocation="Data.xsd"></xsd:include>
-	<xsd:element name="Beam" type="BeamType"></xsd:element>
 	
     <xsd:complexType name="BeamType" mixed="true">
        <xsd:all>
@@ -25,4 +24,12 @@
 	
 
 	
+
+    <xsd:complexType name="BDMLType">
+    	<xsd:sequence maxOccurs="unbounded" minOccurs="1">
+    		<xsd:element name="Beam" type="BeamType"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+    
+    <xsd:element name="BDML" type="BDMLType"></xsd:element>
 </xsd:schema>

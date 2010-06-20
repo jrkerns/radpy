@@ -27,7 +27,8 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 # Program specific imports
-from RFB.rfb_loader import load_multi_data
+from RFB.rfb_loader import load_rfb_data
+from xml_loader import load_xml_data
 
 KEY, NODE = range(2)
 
@@ -111,6 +112,21 @@ class BranchNode(object):
                     all_leaves.append(leaf)
             
         return all_leaves
+    
+    def getFileBranch(self):
+        """Returns the branch node that contains the entire data file."""
+        """This function can be used to get the filename branch node.  
+        One use is in the Save Data File action, which saves the file that 
+        contains the currently selected node in the tree view."""
+        if self.column == 'File Name':
+            return self
+        else:
+            parent = self.parent
+            while parent.column != 'File Name':
+                parent = parent.parent
+            
+        return parent
+                
             
     
 
@@ -159,6 +175,18 @@ class LeafNode(object):
         assert 0 <= column <= len(self.fields)
         #return self.fields[column]
         return self.beam.get_scan_descriptor()
+    
+    def getFileBranch(self):
+        """Returns the branch node that contains the entire data file."""
+        """This function can be used to get the filename branch node.  
+        One use is in the Save Data File action, which saves the file that 
+        contains the currently selected node in the tree view."""
+        
+        parent = self.parent
+        while parent.column != 'File Name':
+            parent = parent.parent
+            
+        return parent
 
 class TreeModel(QAbstractItemModel):
 
@@ -174,9 +202,15 @@ class TreeModel(QAbstractItemModel):
         self.nesting = nesting
         #self.root = BranchNode("", "")
         exception = None
+        self.filepath = filename
         self.filename = os.path.basename(filename).split('.')[0]
+        extension = os.path.basename(filename).split('.')[1]
         try:
-            data = load_multi_data(filename)
+            if extension == 'rfb':
+                data = load_rfb_data(filename)
+            elif extension == 'xml':
+                data = load_xml_data(filename)
+            
             for beam in data:
                 beam.set_label()
                 self.addRecord(beam, False)
@@ -200,8 +234,10 @@ class TreeModel(QAbstractItemModel):
             branch = root.childWithKey(key)
             if branch is not None:
                 root = branch
-            else:
+            else:                
                 branch = BranchNode(fields[i],self.headers[i])
+                if self.headers[i] == 'File Name':
+                    branch.filename = self.filepath
                 root.insertChild(branch)
                 root = branch
         assert branch is not None

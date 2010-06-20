@@ -2,7 +2,7 @@ from rfb_xml import omnipro_file
 from radpy.plugins.BeamAnalysis.view.beam_xml import Beam
 from lxml import etree, objectify
 
-def load_multi_data(infile):
+def load_rfb_data(infile):
     """Read in a file in RFB format and return a list of Beam objects"""
     f = open(infile,'rb')
     a = omnipro_file.parse(f.read())

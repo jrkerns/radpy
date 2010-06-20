@@ -14,15 +14,15 @@ class Beam(HasTraits):
     
     def __init__(self):
         super(Beam, self).__init__()  
-        filename = 'radpy/plugins/BeamAnalysis/BDML/bdml.xml'
-
-        file = open(filename,'r')
-        self.tree = objectify.parse(filename)
+        xmltree = 'radpy/plugins/BeamAnalysis/BDML/bdml.xml'
+        file = open(xmltree,'r')
+        self.tree = objectify.parse(file)
         file.close()
         self.beam = self.tree.getroot()
         schema_file = open('radpy/plugins/BeamAnalysis/BDML/bdml.xsd','r')
         bdml_schema = etree.parse(schema_file)
         self.xmlschema = etree.XMLSchema(bdml_schema)
+        schema_file.close()
         
     def set_label(self):
         self.label = '|'.join([self.get_tree_path(),self.get_scan_descriptor()])
@@ -125,14 +125,15 @@ class Beam(HasTraits):
         y = self.get_collimator("inplane")
         return 4 * x * y/(2 * x + 2 * y)
     
-    def import_xml(self, filename):
+    def importXML(self, xml_tree):
         
 #        file = open(filename,'r')
 #        tree = objectify.parse(filename)
 #        file.close()
 #        self.beam = tree.getroot()
         
-        
+        self.tree = etree.ElementTree(xml_tree)
+        self.beam = self.tree.getroot()
         abscissa = []
         ordinate = []
         for i in self.beam.Data.Abscissa.iterchildren():
@@ -141,12 +142,12 @@ class Beam(HasTraits):
                 ordinate.append(float(i.text))
         self.abscissa = numpy.array(abscissa)
         self.ordinate = numpy.array(ordinate)
-        self.quantity = self.beam.Data.Quantity
+        self.quantity = str(self.beam.Data.Quantity)
         
 #    def recursive_dict(self, element):
 #        return element.tag, dict(map(self.recursive_dict, element)) or element.text
         
-    def export_xml(self, filename):
+    def exportXML(self):
         
         self.beam.Data.Abscissa.clear()
         for i in self.abscissa:
@@ -163,9 +164,10 @@ class Beam(HasTraits):
         self.beam.Data.Quantity = self.quantity
         
         objectify.deannotate(self.tree)
-        etree.cleanup_namespaces(self.tree)    
-        file = open(filename,'w')
-        self.tree.write(file, pretty_print=True)
-        file.close()
+        etree.cleanup_namespaces(self.tree)   
+        return self.beam 
+#        file = open(filename,'w')
+#        self.tree.write(file, pretty_print=True)
+#        file.close()
         
         

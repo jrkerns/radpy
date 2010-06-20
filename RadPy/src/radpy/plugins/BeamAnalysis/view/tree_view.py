@@ -56,7 +56,7 @@ class TreeWidget(QTreeView):
         self.connect(self, SIGNAL("expanded(QModelIndex)"),
                      self.expanded)
         self.expanded()
-        self.load("radpy/plugins/BeamAnalysis/view/RFB/Unit Tests/Test1.rfb")
+        #self.load("radpy/plugins/BeamAnalysis/view/RFB/Unit Tests/Test1.rfb")
       
         
     def load(self, filename):

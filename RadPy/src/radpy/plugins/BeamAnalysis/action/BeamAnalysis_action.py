@@ -19,6 +19,9 @@ from enthought.pyface.action.api import Action
 from radpy.plugins.BeamAnalysis.view.ChacoPlot import ChacoPlot, ChacoPlotEditor
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+from lxml import objectify, etree
+
+import os
 
 
 
@@ -71,14 +74,14 @@ class OpenDataFileAction(Action):
 
         fname = unicode(QFileDialog.getOpenFileName(self.window.control,
                             "Choose Scan", "radpy/plugins/BeamAnalysis/view/RFB/Unit Tests/",
-                            "RFB Files *.rfb"))
+                            "RFB Files *.rfb;;XML Files *.xml"))
        
         if fname:
             
             self.window.active_view.control.load(fname)
             
 class SaveDataFileAction(Action):
-    """ An action that opens a new beam data file """
+    """ An action that saves the currently selected beam data file """
 
     #### 'Action' interface ###################################################
     
@@ -98,14 +101,42 @@ class SaveDataFileAction(Action):
     def perform(self, event):
         """ Perform the action. """
 
-        fname = unicode(QFileDialog.getSaveFileName(self.window.control,
+#        fname = unicode(QFileDialog.getSaveFileName(self.window.control,
+#                            "Choose Save Filename", "radpy/plugins/BeamAnalysis/view/RFB/Unit Tests/",
+#                            "XML Files *.xml"))
+       
+#        if fname:
+#            self.window.active_view.control.load(fname)
+        widget = self.window.active_view.control
+        file_root = widget.model().nodeFromIndex(widget.currentIndex()).getFileBranch()
+        filename = file_root.filename
+        extension = os.path.basename(filename).split('.')[1]
+        if extension != 'xml':
+            filename = unicode(QFileDialog.getSaveFileName(self.window.control,
                             "Choose Save Filename", "radpy/plugins/BeamAnalysis/view/RFB/Unit Tests/",
                             "XML Files *.xml"))
-       
-        if fname:
-#            self.window.active_view.control.load(fname)
-            widget = self.window.active_view.control
-            widget.model().nodeFromIndex(widget.currentIndex()).beam.export_xml(fname)
+        
+        beam_list = file_root.asRecord()
+        
+        xml_tree = etree.ElementTree(objectify.Element("{http://www.radpy.org}BDML"))
+        xml_root = xml_tree.getroot()
+        
+        for i in beam_list:
+            temp = etree.SubElement(xml_root,"{http://www.radpy.org}Beam")
+            xml_root.Beam[-1] = i[1].exportXML()
+            
+        objectify.deannotate(xml_tree)
+        etree.cleanup_namespaces(xml_tree)
+        
+        file = open(filename,'w')
+        xml_tree.write(file, pretty_print=True)
+        file.close()
+        
+        
+        
+#        test_cur_index = widget.model().nodeFromIndex(widget.currentIndex())
+#        name = test_cur_index.getFileBranch()
+#        widget.model().nodeFromIndex(widget.currentIndex()).beam.export_xml(fname)
 #            self.window.active_view.control.model().nodeFromIndex(
 #                        self.window.active_view.control.currentIndex()).
 #            model().nodeFromIndex(self.currentIndex())
