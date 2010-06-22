@@ -27,21 +27,6 @@ class Beam(HasTraits):
     def set_label(self):
         self.label = '|'.join([self.get_tree_path(),self.get_scan_descriptor()])
         
-    def set_data(self, path, value):
-        """Takes an objectify ObjectPath and sets it to value"""
-        """ Example: set_data("Beam.Data.Quantity","photon").  If the XML
-        element is not valid, no data will be written to the self.beam 
-        object.  path must be a string. See lxml Objectify documentation
-        for more information on ObjectPath."""
-        try:
-#            find = objectify.ObjectPath(path)
-#            a=etree.getpath(self.beam.MeasurementDetails.Isocenter.x)
-            #find(self.beam)._setText(value)
-            a = self.tree.xpath(path,namespaces ={'p':'http://www.radpy.org'})
-            a[0]._setText(str(value))
-        except AttributeError:
-            pass
-           
     def get_field_size(self):
         """Return a string with field size information"""
         
@@ -59,7 +44,7 @@ class Beam(HasTraits):
         """Return a string with the energy and particle type"""
         #Returns a string with the usual energy/particle specification,
         #e.g. 6X, 18E.
-        #energy = str(self.beam.BeamDetails.Energy)
+        
         energy = '%g' % self.beam.BeamDetails.Energy
         if self.beam.BeamDetails.Particle == 'Photon':
             particle = 'X'
@@ -71,11 +56,9 @@ class Beam(HasTraits):
     
     def get_tree_path(self):
         """Returns a string with parameters used to populate the GUI tree"""
-        #Seperator is |.  Uses machine name, energy and field size to tell
+        #Separator is |.  Uses machine name, energy and field size to tell
         #the GUI tree view where on the tree this beam belongs.
         
-#        return self.get_machine() + "|" + self.get_energy() + "|" + \
-#                self.get_field_size()
         return '|'.join([self.get_machine(), self.get_energy(),self.get_field_size()])
                 
     def get_scan_type(self):
@@ -126,11 +109,6 @@ class Beam(HasTraits):
         return 4 * x * y/(2 * x + 2 * y)
     
     def importXML(self, xml_tree):
-        
-#        file = open(filename,'r')
-#        tree = objectify.parse(filename)
-#        file.close()
-#        self.beam = tree.getroot()
         
         self.tree = etree.ElementTree(xml_tree)
         self.beam = self.tree.getroot()

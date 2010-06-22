@@ -121,6 +121,10 @@ class Beam(object):
     
     
     def set_xml_elements(self, data_structure):
+        """Takes an XML beam object and populates the BDML tree."""
+        #The BDML tree contained in a beam_xml.Beam object is populated with
+        #values taken from the dictionaries (self.main_header, 
+        #self.measurement_header, etc.) that the Construct parser returns.
         
         isocenter_xyz = self.machine_axes_to_xyz(
                             (self.measurement_header['isocenter_crossplane'],
@@ -271,13 +275,6 @@ class Beam(object):
         elif scale == 'CW_180_Up':
             data_structure.beam.BeamDetails.RadiationDevice.MachineScale = 'Varian IEC'
         
-       
-        
-#        '.Beam.Data.Ordinate'
-#        '.Beam.Data.Ordinate.Value'
-#        '.Beam.Data.Abscissa'
-#        '.Beam.Data.Abscissa.Value'
-#        data_structure.beam.Data.Quantity'] = self.measurement_header['data_type']
         data_structure.quantity = self.measurement_header['data_type']
 
 class DataFileAdapter(Adapter):
