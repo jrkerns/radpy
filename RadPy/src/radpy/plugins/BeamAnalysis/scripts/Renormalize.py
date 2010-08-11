@@ -40,18 +40,18 @@ class UserAction(Action):
 
     def perform(self, event):
         beam = event.window.active_editor.obj.selected_beam
-        x = beam.abscissa
+        x = beam.Data_Abscissa
         
         scan_type = beam.get_scan_type()  
         if scan_type == "Depth Dose":
-            beam.ordinate = \
-                100*beam.ordinate/numpy.max(beam.ordinate)
+            beam.Data_Ordinate = \
+                100*beam.Data_Ordinate/numpy.max(beam.Data_Ordinate)
             
         elif scan_type.endswith('Profile'):
-            y = beam.ordinate
+            y = beam.Data_Ordinate
             tck = interpolate.splrep(x,y,s=0)
-            beam.ordinate = (100.*beam.ordinate/
+            beam.Data_Ordinate = (100.*beam.Data_Ordinate/
                 interpolate.splev(0,tck))
         
         event.window.active_editor.obj.selected_plot.value.set_data(
-            beam.ordinate)
+            beam.Data_Ordinate)

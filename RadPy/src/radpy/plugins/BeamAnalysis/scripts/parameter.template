@@ -31,7 +31,7 @@ class UserParameter(object):
         
     def calc(self, beam):
         """Returns the value of the parameter for the selected beam"""
-        x = beam.data_abscissa
-        y = beam.data_ordinate
+        x = beam.Data_Abscissa
+        y = beam.Data_Ordinate
         
         return 0

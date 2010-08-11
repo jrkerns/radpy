@@ -170,7 +170,7 @@ class ChacoPlot(HasTraits):
         if label in self.plots.keys():
             return          
         
-        x, y = (beam.abscissa, beam.ordinate)
+        x, y = (beam.Data_Abscissa, beam.Data_Ordinate)
         
         # The plot_type trait is defined by the geometry of the scanned plot 
         # (inline, crossline, depth dose, etc.).  

@@ -57,7 +57,7 @@ class UserAction(Action):
         TODO: the window parameter could be the window itself if an array instead of a string   
         """
         beam = event.window.active_editor.obj.selected_beam
-        x= beam.ordinate
+        x = beam.Data_Ordinate
         window_len = 10
         window = 'hanning'
     
@@ -81,6 +81,6 @@ class UserAction(Action):
         else:
             w = getattr(numpy, window)(window_len)
         y = numpy.convolve(w/w.sum(), s, mode='same')
-        beam.ordinate = y[window_len-1:-window_len+1]
+        beam.Data_Ordinate = y[window_len-1:-window_len+1]
         event.window.active_editor.obj.selected_plot.value.set_data(
             beam.ordinate)

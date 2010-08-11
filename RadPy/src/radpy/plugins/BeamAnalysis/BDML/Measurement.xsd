@@ -4,7 +4,7 @@
 
 	<xsd:include schemaLocation="MeasuringDevice.xsd"></xsd:include>
 	<xsd:complexType name="xyzPositionType">
-		<xsd:sequence minOccurs="0" maxOccurs="1">
+		<xsd:sequence minOccurs="1" maxOccurs="1">
 			<xsd:element name="x" type="xsd:double"></xsd:element>
 			<xsd:element name="y" type="xsd:double"></xsd:element>
 			<xsd:element name="z" type="xsd:double"></xsd:element>
@@ -12,7 +12,7 @@
 	</xsd:complexType>
 
 	<xsd:complexType name="CoordinateOrientationType">
-		<xsd:sequence minOccurs="0" maxOccurs="1">
+		<xsd:sequence minOccurs="1" maxOccurs="1">
 			<xsd:element name="Inplane" type="CoordinateAxesType"></xsd:element>
 			<xsd:element name="Crossplane" type="CoordinateAxesType"></xsd:element>
 			<xsd:element name="Depth" type="CoordinateAxesType"></xsd:element>
@@ -67,12 +67,13 @@
 	</xsd:complexType>
 
 	<xsd:complexType name="PhysicistType">
-		<xsd:all minOccurs="0">
+		<xsd:sequence minOccurs="0">
 			<xsd:element name="EmailAddress" type="xsd:string"></xsd:element>
 			<xsd:element name="Telephone" type="xsd:string"></xsd:element>
 			<xsd:element name="Name" type="xsd:string"></xsd:element>
 			<xsd:element name="Institution" type="xsd:string"></xsd:element>
-		</xsd:all>
+			<xsd:any namespace="##other" minOccurs="0" maxOccurs="unbounded"  processContents="lax"></xsd:any>
+		</xsd:sequence>
 	</xsd:complexType>
 
 	<xsd:simpleType name="MediumType">
@@ -80,22 +81,24 @@
 	</xsd:simpleType>
 
 	<xsd:complexType name="ServoType">
-		<xsd:all minOccurs="0">
+		<xsd:sequence minOccurs="0">
 			<xsd:element name="Model" type="xsd:string"></xsd:element>
 			<xsd:element name="Vendor" type="xsd:string"></xsd:element>
-		</xsd:all>
+			<xsd:any namespace="##other" minOccurs="0" maxOccurs="unbounded" processContents="lax"></xsd:any>
+		</xsd:sequence>
 	</xsd:complexType>
 
 	<xsd:complexType name="ElectrometerType">
-		<xsd:all minOccurs="0">
+		<xsd:sequence minOccurs="0">
 			<xsd:element name="Model" type="xsd:string"></xsd:element>
 			<xsd:element name="Vendor" type="xsd:string"></xsd:element>
 			<xsd:element name="Voltage" type="xsd:string"></xsd:element>
-		</xsd:all>
+			<xsd:any namespace="##other" minOccurs="0" maxOccurs="unbounded" processContents="lax"></xsd:any>
+		</xsd:sequence>
 	</xsd:complexType>
 
 	<xsd:complexType name="MeasurementDetailsType">
-		<xsd:all minOccurs="0">
+		<xsd:sequence minOccurs="0">
 			<xsd:element name="Isocenter" type="xyzPositionType" minOccurs="0" maxOccurs="1"></xsd:element>
 			<xsd:element name="CoordinateAxes"
 				type="CoordinateOrientationType" minOccurs="0" maxOccurs="1">
@@ -113,6 +116,7 @@
 			<xsd:element name="Servo" type="ServoType" minOccurs="0" maxOccurs="1"></xsd:element>
 			<xsd:element name="Electrometer" type="ElectrometerType" minOccurs="0" maxOccurs="1"></xsd:element>
 			<xsd:element name="MeasuringDevice" type="DeviceType" minOccurs="0" maxOccurs="1"></xsd:element>
-		</xsd:all>
+			<xsd:any namespace="##other" minOccurs="0" maxOccurs="unbounded" processContents="lax"></xsd:any>
+		</xsd:sequence>
 	</xsd:complexType>
 </xsd:schema>

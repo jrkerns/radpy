@@ -238,13 +238,13 @@ class Beam(object):
             self.main_header['gantry_angle']
         
         data_structure.beam.BeamDetails.CrossplaneJawPositions.NegativeJaw = \
-            self.main_header['crossplane_jaw_negative']
+            -self.main_header['crossplane_jaw_negative']
         
         data_structure.beam.BeamDetails.CrossplaneJawPositions.PositiveJaw = \
             self.main_header['crossplane_jaw_positive']
         
         data_structure.beam.BeamDetails.InplaneJawPositions.NegativeJaw = \
-            self.main_header['inplane_jaw_negative']
+            -self.main_header['inplane_jaw_negative']
             
         data_structure.beam.BeamDetails.InplaneJawPositions.PositiveJaw = \
             self.main_header['inplane_jaw_positive']

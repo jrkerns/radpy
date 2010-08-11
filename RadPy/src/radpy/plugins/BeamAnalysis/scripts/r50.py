@@ -24,8 +24,8 @@ class UserParameter(object):
         
     def calc(self, beam):
         
-        dmax = beam.abscissa[numpy.argmax(beam.ordinate)]
-        x_axis = numpy.where(beam.abscissa > dmax)
-        tck = interpolate.splrep(beam.abscissa[x_axis], 
-                                 beam.ordinate[x_axis])
+        dmax = beam.Data_Abscissa[numpy.argmax(beam.Data_Ordinate)]
+        x_axis = numpy.where(beam.Data_Abscissa > dmax)
+        tck = interpolate.splrep(beam.Data_Abscissa[x_axis], 
+                                 beam.Data_Ordinate[x_axis])
         return interpolate.splev(50, tck)

@@ -24,8 +24,8 @@ class UserParameter(object):
         
     def calc(self, beam):
         
-        x = beam.abscissa
-        y = beam.ordinate
+        x = beam.Data_Abscissa
+        y = beam.Data_Ordinate
         tck = interpolate.splrep(x,y)
         cax_value = interpolate.splev(0, tck)
         gt_50 = x[numpy.where(y > cax_value/2.)]

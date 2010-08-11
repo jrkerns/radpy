@@ -23,6 +23,7 @@ import Model as Model
 COLUMNS = ['File Name','Machine', 'Energy', 'Field Size']
 from radpy.plugins.BeamAnalysis.view.ChacoPlot import ChacoPlot, ChacoPlotEditor
 
+
 # Enthought library imports.
 from enthought.pyface.workbench.api import View
 
@@ -56,7 +57,8 @@ class TreeWidget(QTreeView):
         self.connect(self, SIGNAL("expanded(QModelIndex)"),
                      self.expanded)
         self.expanded()
-        #self.load("radpy/plugins/BeamAnalysis/view/RFB/Unit Tests/Test1.rfb")
+        self.load("radpy/plugins/BeamAnalysis/view/RFB/Unit Tests/Test2.rfb")
+        #self.load("c:/users/steve/desktop/xml test/test.xml")
       
         
     def load(self, filename):
@@ -89,12 +91,19 @@ class TreeWidget(QTreeView):
             addAction = menu.addAction("&Add to plot")        
             self.connect(addAction, SIGNAL("triggered()"), self.addPlot)
             
+            editAction = menu.addAction("&Edit beam parameters")
+            self.connect(editAction, SIGNAL("triggered()"), self.editPlot)
+            
         else:
             
             addMultiAction = menu.addAction("&Add all to plot")
             self.connect(addMultiAction, SIGNAL("triggered()"), self.addMultiPlot)
             
         menu.exec_(event.globalPos())
+        
+    def editPlot(self):
+        self.currentFields()[1].edit_traits()
+        
 
     def addPlot(self):
         self.emit(SIGNAL("activated"), self.currentFields())
@@ -167,7 +176,7 @@ class TreeView(View):
     def create_control(self, parent):
        
         return self.widget
-
-
+        
+    
 
 #### EOF ######################################################################
