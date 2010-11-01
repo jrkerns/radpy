@@ -279,8 +279,8 @@ class Beam(HasTraits):
     
     def __init__(self):
         super(Beam, self).__init__()  
-#        xmltree = 'radpy/plugins/BeamAnalysis/BDML/bdml.xml'
-        xmltree = 'i:/radpy/src/radpy/plugins/BeamAnalysis/BDML/bdml.xml'
+        xmltree = 'radpy/plugins/BeamAnalysis/BDML/bdml.xml'
+        #xmltree = 'i:/radpy/src/radpy/plugins/BeamAnalysis/BDML/bdml.xml'
         file = open(xmltree,'r')
         self.tree = objectify.parse(file)
         file.close()
@@ -540,7 +540,7 @@ class Beam(HasTraits):
             
             exec('value = self.' + xml)
             test = value.text
-            if test == "0.0":
+            if test == "0.0" or test == "0":
                 exec('self.' + trait + ' = float(value)') 
                 
             elif value:

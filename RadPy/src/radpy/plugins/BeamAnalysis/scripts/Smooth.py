@@ -83,4 +83,4 @@ class UserAction(Action):
         y = numpy.convolve(w/w.sum(), s, mode='same')
         beam.Data_Ordinate = y[window_len-1:-window_len+1]
         event.window.active_editor.obj.selected_plot.value.set_data(
-            beam.ordinate)
+            beam.Data_Ordinate)
