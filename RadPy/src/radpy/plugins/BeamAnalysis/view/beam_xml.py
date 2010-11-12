@@ -311,10 +311,10 @@ class Beam(HasTraits):
         #Returns a string with the usual energy/particle specification,
         #e.g. 6X, 18E.
         
-        energy = '%g' % self.beam.BeamDetails.Energy
-        if self.BeamDetails_Particle == 'Photon':
+        energy = '%g' % self.BeamDetails_Energy
+        if self.BeamDetails_Particle.lower() == 'photon':
             particle = 'X'
-        elif self.BeamDetails_Particle == 'Electron':
+        elif self.BeamDetails_Particle.lower() == 'electron':
             particle = 'E'
         else:
             particle = ''
@@ -329,6 +329,7 @@ class Beam(HasTraits):
                 
     def get_scan_type(self):
         """Determine the type of scan by comparing start and end positions"""
+        
         
         scan_range = [self.MeasurementDetails_StartPosition_x - \
                         self.MeasurementDetails_StopPosition_x,

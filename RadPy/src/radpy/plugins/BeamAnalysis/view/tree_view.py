@@ -22,6 +22,7 @@ from PyQt4.QtGui import *
 import Model as Model
 COLUMNS = ['File Name','Machine', 'Energy', 'Field Size']
 from radpy.plugins.BeamAnalysis.view.ChacoPlot import ChacoPlot, ChacoPlotEditor
+from radpy.plugins.BeamAnalysis.view.Plot3D import Plot3D, Plot3DEditor
 
 
 # Enthought library imports.
@@ -75,6 +76,7 @@ class TreeWidget(QTreeView):
 
 
     def activated(self, index):
+        tmp = self.model().asRecord(index)
         self.emit(SIGNAL("activated"), self.model().asRecord(index))
         #self.activated = self.model().asRecord(index)
 
@@ -145,8 +147,9 @@ class TreeView(View):
             else:
                 self.create_new_plot_editor(label, beam)
         
-        #If the tree view is undocked, there may not be an active editor,
-        #even if one exists.   
+        #If the tree view is undocked, there may not be an active_editor 
+        #property, even if there is an active editor. 
+          
         elif len(self.window.editors) > 0:   
             
             if self.window.editors[-1].obj.plot_type in scan_type_list:
@@ -162,9 +165,12 @@ class TreeView(View):
           
     def create_new_plot_editor(self, label, beam):
         """Create new ChacoPlot editor window"""
-           
-        plot = ChacoPlot()
-        self.window.workbench.edit(plot, kind=ChacoPlotEditor)
+        if beam.get_scan_type() == "Dicom 3D Dose":
+            plot = Plot3D()
+            self.window.workbench.edit(plot, kind=Plot3DEditor)
+        else:   
+            plot = ChacoPlot()
+            self.window.workbench.edit(plot, kind=ChacoPlotEditor)
         title = self.window.editors[-1].obj.add_plot(label, beam)
         self.window.editors[-1].name = title
         self.window.editors[-1].set_focus()

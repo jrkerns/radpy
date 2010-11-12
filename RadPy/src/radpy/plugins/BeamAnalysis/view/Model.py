@@ -29,6 +29,7 @@ from PyQt4.QtGui import *
 # Program specific imports
 from RFB.rfb_loader import load_rfb_data
 from xml_loader import load_xml_data
+from DicomRT.dicom_loader import load_dicom_data
 
 KEY, NODE = range(2)
 
@@ -210,6 +211,8 @@ class TreeModel(QAbstractItemModel):
                 data = load_rfb_data(filename)
             elif extension == 'xml':
                 data = load_xml_data(filename)
+            elif extension == 'dcm':
+                data = load_dicom_data(filename)
             
             for beam in data:
                 beam.set_label()
