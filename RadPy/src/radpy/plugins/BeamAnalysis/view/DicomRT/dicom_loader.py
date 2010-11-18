@@ -12,7 +12,7 @@ class DicomBeam(Beam):
     def __init__(self):
         super(DicomBeam, self).__init__()
         
-    def get_scan_type(self):
+    def get_scan_descriptor(self):
         return "Dicom 3D Dose"
 
 

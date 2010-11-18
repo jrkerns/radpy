@@ -34,12 +34,12 @@ class RTDose(object):
         filename is a string containing the full path to a DICOM RT Dose file.
         '''
         tmp = dicom.read_file(filename)
-        b = tmp.PixelData 
-        #Convert binary PixelData array to dose in DICOM file units
-        #if tmp._is_little_endian == True:
-        image = []
-        for i in range(0,len(b),4):
-            image.append(struct.unpack('L',b[i:i+4])[0]*tmp.DoseGridScaling)
+#        b = tmp.PixelData 
+#        #Convert binary PixelData array to dose in DICOM file units
+#        #if tmp._is_little_endian == True:
+#        image = []
+#        for i in range(0,len(b),4):
+#            image.append(struct.unpack('L',b[i:i+4])[0]*tmp.DoseGridScaling)
             #for i in range(tmp.NumberofFrames):
             #    frame = []
             #    for j in range(tmp.Rows):
@@ -113,9 +113,9 @@ class RTDose(object):
         self.z_axis = -self.y_axis_dicom
             
         #Create 3D numpy array from dose data in DICOM file units
-        image = numpy.array(image)
-        self.dose = image.reshape((self.columns,self.rows,-1),order='F')
-        
+#        image = numpy.array(image)
+#        self.dose = image.reshape((self.columns,self.rows,-1),order='F')
+        self.dose = numpy.swapaxes(tmp.pixel_array*tmp.DoseGridScaling,1,2)
         
         
     def get_dose_value(self,x,y,z):

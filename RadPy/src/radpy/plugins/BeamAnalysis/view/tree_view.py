@@ -76,7 +76,7 @@ class TreeWidget(QTreeView):
 
 
     def activated(self, index):
-        tmp = self.model().asRecord(index)
+       
         self.emit(SIGNAL("activated"), self.model().asRecord(index))
         #self.activated = self.model().asRecord(index)
 
