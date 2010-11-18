@@ -165,7 +165,7 @@ class TreeView(View):
           
     def create_new_plot_editor(self, label, beam):
         """Create new ChacoPlot editor window"""
-        if beam.get_scan_type() == "Dicom 3D Dose":
+        if beam.get_scan_descriptor() == "Dicom 3D Dose":
             plot = Plot3D()
             self.window.workbench.edit(plot, kind=Plot3DEditor)
         else:   

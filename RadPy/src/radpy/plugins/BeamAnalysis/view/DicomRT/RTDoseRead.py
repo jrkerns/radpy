@@ -110,12 +110,15 @@ class RTDose(object):
         
         self.x_axis = self.x_axis_dicom
         self.y_axis = self.z_axis_dicom
-        self.z_axis = -self.y_axis_dicom
+        self.z_axis = -self.y_axis_dicom[::-1]
             
         #Create 3D numpy array from dose data in DICOM file units
-#        image = numpy.array(image)
-#        self.dose = image.reshape((self.columns,self.rows,-1),order='F')
-        self.dose = numpy.swapaxes(tmp.pixel_array*tmp.DoseGridScaling,1,2)
+        #Requires fliplr to reorient the z axis in an increasing direction
+        self.dose = numpy.fliplr(numpy.swapaxes(
+                            tmp.pixel_array*tmp.DoseGridScaling,1,2))
+        
+        
+            
         
         
     def get_dose_value(self,x,y,z):
