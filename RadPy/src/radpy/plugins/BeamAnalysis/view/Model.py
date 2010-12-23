@@ -205,7 +205,7 @@ class TreeModel(QAbstractItemModel):
         exception = None
         self.filepath = filename
         self.filename = os.path.basename(filename).split('.')[0]
-        extension = os.path.basename(filename).split('.')[1]
+        extension = os.path.basename(filename).split('.')[-1]
         try:
             if extension == 'rfb':
                 data = load_rfb_data(filename)

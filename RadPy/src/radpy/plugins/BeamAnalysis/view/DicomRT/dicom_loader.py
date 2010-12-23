@@ -13,7 +13,7 @@ class DicomBeam(Beam):
         super(DicomBeam, self).__init__()
         
     def get_scan_descriptor(self):
-        return "Dicom 3D Dose"
+        return "Dicom_3D_Dose"
 
 
 def load_dicom_data(infile):

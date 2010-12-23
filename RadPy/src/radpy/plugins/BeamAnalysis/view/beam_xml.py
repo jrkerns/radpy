@@ -2,6 +2,7 @@ from enthought.traits.api import HasTraits, Array, Float, String, Enum, List
 from enthought.traits.ui.api import View, Item, Group, Tabbed, Heading
 from lxml import etree, objectify
 import numpy
+from radpy.plugins.BeamAnalysis.view.DicomRT.RTDoseRead import RTDose
 
 TRAITS_TO_XML = [('MeasurementDetails_MeasuringDevice_Model',
                 'beam.MeasurementDetails.MeasuringDevice.Model'),        
@@ -329,20 +330,22 @@ class Beam(HasTraits):
                 
     def get_scan_type(self):
         """Determine the type of scan by comparing start and end positions"""
-        
-        
-        scan_range = [self.MeasurementDetails_StartPosition_x - \
-                        self.MeasurementDetails_StopPosition_x,
-                      self.MeasurementDetails_StartPosition_y - \
-                        self.MeasurementDetails_StopPosition_y,
-                      self.MeasurementDetails_StartPosition_z - \
-                        self.MeasurementDetails_StopPosition_z]
-        scan_types = ["Crossplane Profile", "Inplane Profile", "Depth Dose"]
-        if scan_range.count(0.0) != 2:
-            return "Point to Point"
-        else:
-            return scan_types[[i for i, j in enumerate(scan_range) \
-                               if j !=0][0]]
+        try:
+            if isinstance(self.Data, RTDose):
+                return 'Dicom 3D Dose'
+        except:
+            scan_range = [self.MeasurementDetails_StartPosition_x - \
+                            self.MeasurementDetails_StopPosition_x,
+                          self.MeasurementDetails_StartPosition_y - \
+                            self.MeasurementDetails_StopPosition_y,
+                          self.MeasurementDetails_StartPosition_z - \
+                            self.MeasurementDetails_StopPosition_z]
+            scan_types = ["Crossplane Profile", "Inplane Profile", "Depth Dose"]
+            if scan_range.count(0.0) != 2:
+                return "Point to Point"
+            else:
+                return scan_types[[i for i, j in enumerate(scan_range) \
+                                   if j !=0][0]]
     
 
     def get_scan_descriptor(self):
@@ -410,8 +413,6 @@ class Beam(HasTraits):
         self.Data_Quantity = str(self.beam.Data.Quantity)
         self.MeasurementDetails_ModificationHistory = mod_history
         
-#    def recursive_dict(self, element):
-#        return element.tag, dict(map(self.recursive_dict, element)) or element.text
         
     def exportXML(self):
         
@@ -421,90 +422,6 @@ class Beam(HasTraits):
             if value and not numpy.isnan(value):
                 exec('self.' + xml + ' = value')
                   
-        
-#        self.beam.MeasurementDetails.MeasuringDevice.Model = \
-#                self.MeasurementDetails_MeasuringDevice_Model
-#        self.beam.MeasurementDetails.MeasuringDevice.Type = \
-#                self.MeasurementDetails_MeasuringDevice_Type
-#        self.beam.MeasurementDetails.MeasuringDevice.Manufacturer = \
-#                self.MeasurementDetails_MeasuringDevice_Manufacturer
-#        self.beam.MeasurementDetails.Isocenter.x = \
-#                self.MeasurementDetails_Isocenter_x
-#        self.beam.MeasurementDetails.Isocenter.y = \
-#                self.MeasurementDetails_Isocenter_y
-#        self.beam.MeasurementDetails.Isocenter.z = \
-#                self.MeasurementDetails_Isocenter_z
-#        self.beam.MeasurementDetails.CoordinateAxes.Inplane = \
-#                self.MeasurementDetails_CoordinateAxes_Inplane
-#        self.beam.MeasurementDetails.CoordinateAxes.Crossplane = \
-#                self.MeasurementDetails_CoordinateAxes_Crossplane
-#        self.beam.MeasurementDetails.CoordinateAxes.Depth = \
-#                self.MeasurementDetails_CoordinateAxes_Depth
-#        self.beam.MeasurementDetails.MeasuredDateTime = \
-#                self.MeasurementDetails_MeasuredDateTime
-##        self.beam.MeasurementDetails.ModificationHistory = \
-##                self.MeasurementDetails_ModificationHistory[0]
-#        self.beam.MeasurementDetails.StartPosition.x = \
-#                self.MeasurementDetails_StartPosition_x
-#        self.beam.MeasurementDetails.StartPosition.y = \
-#                self.MeasurementDetails_StartPosition_y
-#        self.beam.MeasurementDetails.StartPosition.z = \
-#                self.MeasurementDetails_StartPosition_z
-#        self.beam.MeasurementDetails.StopPosition.x = \
-#                self.MeasurementDetails_StopPosition_x
-#        self.beam.MeasurementDetails.StopPosition.y = \
-#                self.MeasurementDetails_StopPosition_y
-#        self.beam.MeasurementDetails.StopPosition.z = \
-#                self.MeasurementDetails_StopPosition_z
-#        self.beam.MeasurementDetails.Physicist.Name = \
-#                self.MeasurementDetails_Physicist_Name
-#        self.beam.MeasurementDetails.Physicist.Institution = \
-#                self.MeasurementDetails_Physicist_Institution
-#        self.beam.MeasurementDetails.Physicist.Telephone = \
-#                self.MeasurementDetails_Physicist_Telephone
-#        self.beam.MeasurementDetails.Physicist.EmailAddress = \
-#                self.MeasurementDetails_Physicist_EmailAddress
-#        self.beam.MeasurementDetails.Medium = \
-#                self.MeasurementDetails_Medium
-#        self.beam.MeasurementDetails.Servo.Model = \
-#                self.MeasurementDetails_Servo_Model
-#        self.beam.MeasurementDetails.Servo.Vendor = \
-#                self.MeasurementDetails_Servo_Vendor
-#        self.beam.MeasurementDetails.Electrometer.Model = \
-#                self.MeasurementDetails_Electrometer_Model
-#        self.beam.MeasurementDetails.Electrometer.Vendor = \
-#                self.MeasurementDetails_Electrometer_Vendor
-#        self.beam.MeasurementDetails.Electrometer.Voltage = \
-#                self.MeasurementDetails_Electrometer_Voltage
-#        
-#        self.beam.BeamDetails.Energy = \
-#                self.BeamDetails_Energy
-#        self.beam.BeamDetails.Particle = \
-#                self.BeamDetails_Particle
-#        self.beam.BeamDetails.SAD = self.BeamDetails_SAD
-#        self.beam.BeamDetails.SSD = self.BeamDetails_SSD
-#        self.beam.BeamDetails.CollimatorAngle = self.BeamDetails_CollimatorAngle
-#        self.beam.BeamDetails.GantryAngle = self.BeamDetails_GantryAngle
-#        self.beam.BeamDetails.CrossplaneJawPositions.NegativeJaw = \
-#                self.BeamDetails_CrossplaneJawPositions_NegativeJaw
-#        self.beam.BeamDetails.CrossplaneJawPositions.PositiveJaw = \
-#                self.BeamDetails_CrossplaneJawPositions_PositiveJaw
-#        self.beam.BeamDetails.InplaneJawPositions.NegativeJaw = \
-#                self.BeamDetails_InplaneJawPositions_NegativeJaw
-#        self.beam.BeamDetails.InplaneJawPositions.PositiveJaw = \
-#                self.BeamDetails_InplaneJawPositions_PositiveJaw
-#        self.beam.BeamDetails.Wedge.Angle = self.BeamDetails_Wedge_Angle
-#        self.beam.BeamDetails.Wedge.Type = self.BeamDetails_Wedge_Type
-#        self.beam.BeamDetails.Applicator = self.BeamDetails_Applicator
-#        self.beam.BeamDetails.Accessory = self.BeamDetails_Accessory
-#        self.beam.BeamDetails.RadiationDevice.Vendor = \
-#                self.BeamDetails_RadiationDevice_Vendor
-#        self.beam.BeamDetails.RadiationDevice.Model = \
-#                self.BeamDetails_RadiationDevice_Model
-#        self.beam.BeamDetails.RadiationDevice.SerialNumber = \
-#                self.BeamDetails_RadiationDevice_SerialNumber
-#        self.beam.BeamDetails.RadiationDevice.MachineScale = \
-#                self.BeamDetails_RadiationDevice_MachineScale
         
         self.beam.Data.Abscissa.clear()
         for i in self.Data_Abscissa:
@@ -531,9 +448,7 @@ class Beam(HasTraits):
         objectify.deannotate(self.tree)
         etree.cleanup_namespaces(self.tree)   
         return self.beam 
-#        file = open(filename,'w')
-#        self.tree.write(file, pretty_print=True)
-#        file.close()
+
         
     def initialize_traits(self):
         
@@ -551,90 +466,7 @@ class Beam(HasTraits):
                     exec('self.' + trait + ' = float(value)')
                 else:
                     exec('self.' + trait + ' = str(value)')               
-        
-#        self.MeasurementDetails_MeasuringDevice_Model = \
-#                str(self.beam.MeasurementDetails.MeasuringDevice.Model)        
-#        self.MeasurementDetails_MeasuringDevice_Type = \
-#                str(self.beam.MeasurementDetails.MeasuringDevice.Type)
-#        self.MeasurementDetails_MeasuringDevice_Manufacturer = \
-#                str(self.beam.MeasurementDetails.MeasuringDevice.Manufacturer)
-#        self.MeasurementDetails_Isocenter_x = \
-#                float(self.beam.MeasurementDetails.Isocenter.x)
-#        self.MeasurementDetails_Isocenter_y = \
-#                float(self.beam.MeasurementDetails.Isocenter.y)
-#        self.MeasurementDetails_Isocenter_z = \
-#                float(self.beam.MeasurementDetails.Isocenter.z)
-#        self.MeasurementDetails_CoordinateAxes_Inplane = \
-#                str(self.beam.MeasurementDetails.CoordinateAxes.Inplane)
-#        self.MeasurementDetails_CoordinateAxes_Crossplane = \
-#                str(self.beam.MeasurementDetails.CoordinateAxes.Crossplane)
-#        self.MeasurementDetails_CoordinateAxes_Depth = \
-#                str(self.beam.MeasurementDetails.CoordinateAxes.Depth)
-#        self.MeasurementDetails_MeasuredDateTime = \
-#                str(self.beam.MeasurementDetails.MeasuredDateTime)
-#        self.MeasurementDetails_ModificationHistory = \
-#                [str(self.beam.MeasurementDetails.ModificationHistory)]
-#        self.MeasurementDetails_StartPosition_x = \
-#                float(self.beam.MeasurementDetails.StartPosition.x)
-#        self.MeasurementDetails_StartPosition_y = \
-#                float(self.beam.MeasurementDetails.StartPosition.y)
-#        self.MeasurementDetails_StartPosition_z = \
-#                float(self.beam.MeasurementDetails.StartPosition.z)
-#        self.MeasurementDetails_StopPosition_x = \
-#                float(self.beam.MeasurementDetails.StopPosition.x)
-#        self.MeasurementDetails_StopPosition_y = \
-#                float(self.beam.MeasurementDetails.StopPosition.y)
-#        self.MeasurementDetails_StopPosition_z = \
-#                float(self.beam.MeasurementDetails.StopPosition.z)
-#        self.MeasurementDetails_Physicist_Name = \
-#                str(self.beam.MeasurementDetails.Physicist.Name)
-#        self.MeasurementDetails_Physicist_Institution = \
-#                str(self.beam.MeasurementDetails.Physicist.Institution)
-#        self.MeasurementDetails_Physicist_Telephone = \
-#                str(self.beam.MeasurementDetails.Physicist.Telephone)
-#        self.MeasurementDetails_Physicist_EmailAddress = \
-#                str(self.beam.MeasurementDetails.Physicist.EmailAddress)
-#        self.MeasurementDetails_Medium = \
-#                str(self.beam.MeasurementDetails.Medium)
-#        self.MeasurementDetails_Servo_Model = \
-#                str(self.beam.MeasurementDetails.Servo.Model)
-#        self.MeasurementDetails_Servo_Vendor = \
-#                str(self.beam.MeasurementDetails.Servo.Vendor)
-#        self.MeasurementDetails_Electrometer_Model = \
-#                str(self.beam.MeasurementDetails.Electrometer.Model)
-#        self.MeasurementDetails_Electrometer_Vendor = \
-#                str(self.beam.MeasurementDetails.Electrometer.Vendor)
-#        self.MeasurementDetails_Electrometer_Voltage = \
-#                float(self.beam.MeasurementDetails.Electrometer.Voltage)
-#        
-#        self.BeamDetails_Energy = \
-#                float(self.beam.BeamDetails.Energy)
-#        self.BeamDetails_Particle = \
-#                str(self.beam.BeamDetails.Particle)
-#        self.BeamDetails_SAD = float(self.beam.BeamDetails.SAD)
-#        self.BeamDetails_SSD = float(self.beam.BeamDetails.SSD)
-#        self.BeamDetails_CollimatorAngle = float(self.beam.BeamDetails.CollimatorAngle)
-#        self.BeamDetails_GantryAngle = float(self.beam.BeamDetails.GantryAngle)
-#        self.BeamDetails_CrossplaneJawPositions_NegativeJaw = \
-#                float(self.beam.BeamDetails.CrossplaneJawPositions.NegativeJaw)
-#        self.BeamDetails_CrossplaneJawPositions_PositiveJaw = \
-#                float(self.beam.BeamDetails.CrossplaneJawPositions.PositiveJaw)
-#        self.BeamDetails_InplaneJawPositions_NegativeJaw = \
-#                float(self.beam.BeamDetails.InplaneJawPositions.NegativeJaw)
-#        self.BeamDetails_InplaneJawPositions_PositiveJaw = \
-#                float(self.beam.BeamDetails.InplaneJawPositions.PositiveJaw)
-#        self.BeamDetails_Wedge_Angle = float(self.beam.BeamDetails.Wedge.Angle)
-#        self.BeamDetails_Wedge_Type = str(self.beam.BeamDetails.Wedge.Type)
-#        self.BeamDetails_Applicator = str(self.beam.BeamDetails.Applicator)
-#        self.BeamDetails_Accessory = str(self.beam.BeamDetails.Accessory)
-#        self.BeamDetails_RadiationDevice_Vendor = \
-#                str(self.beam.BeamDetails.RadiationDevice.Vendor)
-#        self.BeamDetails_RadiationDevice_Model = \
-#                str(self.beam.BeamDetails.RadiationDevice.Model)
-#        self.BeamDetails_RadiationDevice_SerialNumber = \
-#                str(self.beam.BeamDetails.RadiationDevice.SerialNumber)
-#        self.BeamDetails_RadiationDevice_MachineScale = \
-#                str(self.beam.BeamDetails.RadiationDevice.MachineScale)
+ 
                 
   
             

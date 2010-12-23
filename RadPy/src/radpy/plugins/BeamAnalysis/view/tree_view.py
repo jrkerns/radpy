@@ -60,6 +60,7 @@ class TreeWidget(QTreeView):
         self.expanded()
         #self.load("radpy/plugins/BeamAnalysis/view/RFB/Unit Tests/Test2.rfb")
         #self.load("c:/users/steve/desktop/xml test/test.xml")
+        self.load("radpy/plugins/BeamAnalysis/view/DicomRT/tests/3d_dose_wedge.dcm")
       
         
     def load(self, filename):
@@ -119,16 +120,16 @@ class TreeWidget(QTreeView):
 class TreeView(View):
     
     name = 'TreeView'
-             
+    id = 'radpy.plugins.BeamAnalysis.TreeView'         
     def __init__(self, *args, **kwds):    
         super(View, self).__init__()
         self.widget = TreeWidget()
         QObject.connect(self.widget, SIGNAL('activated'),self.activated)
     
-    def _id_default(self):
-        """ Trait initializer. """
-
-        return self.name
+#    def _id_default(self):
+#        """ Trait initializer. """
+#
+#        return self.id
     
     def activated(self, record):
         """ Adds the selected beam object to the active Chaco Plot editor.  If
@@ -165,7 +166,8 @@ class TreeView(View):
           
     def create_new_plot_editor(self, label, beam):
         """Create new ChacoPlot editor window"""
-        if beam.get_scan_descriptor() == "Dicom 3D Dose":
+        tmp = beam.get_scan_descriptor()
+        if beam.get_scan_descriptor() == "Dicom_3D_Dose":
             plot = Plot3D()
             self.window.workbench.edit(plot, kind=Plot3DEditor)
         else:   

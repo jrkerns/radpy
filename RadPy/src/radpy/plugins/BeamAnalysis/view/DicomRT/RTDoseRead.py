@@ -34,35 +34,7 @@ class RTDose(object):
         filename is a string containing the full path to a DICOM RT Dose file.
         '''
         tmp = dicom.read_file(filename)
-#        b = tmp.PixelData 
-#        #Convert binary PixelData array to dose in DICOM file units
-#        #if tmp._is_little_endian == True:
-#        image = []
-#        for i in range(0,len(b),4):
-#            image.append(struct.unpack('L',b[i:i+4])[0]*tmp.DoseGridScaling)
-            #for i in range(tmp.NumberofFrames):
-            #    frame = []
-            #    for j in range(tmp.Rows):
-            #        row = []
-            #        for k in range(tmp.Columns):
-            #            field = ''
-            #            iter = (i*tmp.Rows*tmp.Columns+j*tmp.Columns+k)*4
-            #           
-            #            for l in range(4):
-            #                field = b[iter:iter+4]
-            #                row.append(struct.unpack('L',field)[0]*
-            #                           tmp.DoseGridScaling)
-            #               
-            #        frame.append(row)
-                
-            
-                
-        #self.dose = numpy.dstack(image)
-        
-        
-        
-        #self.frame_offset = tmp.GridFrameOffsetVector
-        #self.y_spacing = self.frame_offset[1]-self.frame_offset[0]
+
         self.dose_unit = tmp.DoseUnits
         
         #Call the RTPlan module to find RT Plan DICOM file with same
@@ -75,10 +47,6 @@ class RTDose(object):
         self.particle = self.beam.RadiationType
         self.field = self.beam[0x300a,0x0111][0]
         self.energy = self.field.NominalBeamEnergy
-#        self.field_size_x = -self.field[0x300a,0x011a][0][0x300a,0x011c][0] + \
-#                            self.field[0x300a,0x011a][0][0x300a,0x011c][1]
-#        self.field_size_y = -self.field[0x300a,0x011a][1][0x300a,0x011c][0] +\
-#                            self.field[0x300a,0x011a][1][0x300a,0x011c][1]
         
         
         self.coll_x_neg = self.field[0x300a,0x011a][0][0x300a,0x011c][0]
@@ -99,24 +67,28 @@ class RTDose(object):
         self.origin = tmp.ImagePositionPatient
         
         #Set up coordinate axes relative to the isocenter
-        self.x_axis_dicom = numpy.arange(self.columns)*self.pixel_spacing[0] + \
-            self.origin[0] - self.isocenter[0]
-        self.y_axis_dicom = numpy.arange(self.rows)*self.pixel_spacing[1] + \
-            self.origin[1] - self.isocenter[1]
-        self.z_axis_dicom = numpy.array(tmp.GridFrameOffsetVector) + \
-            self.origin[2] - self.isocenter[2]
+#        self.x_axis_dicom = numpy.arange(self.columns)*self.pixel_spacing[0] + \
+#            self.origin[0] - self.isocenter[0]
+#        self.y_axis_dicom = numpy.arange(self.rows)*self.pixel_spacing[1] + \
+#            self.origin[1] - self.isocenter[1]
+#        self.z_axis_dicom = numpy.array(tmp.GridFrameOffsetVector) + \
+#            self.origin[2] - self.isocenter[2]
+#            
+#        #Change DICOM coordinate system to IEC-61217 coordinate system
+#        
+##        self.x_axis = self.x_axis_dicom
+##        self.y_axis = self.z_axis_dicom
+##        self.z_axis = -self.y_axis_dicom[::-1]
+#        self.x_axis = self.x_axis_dicom
+#        self.y_axis = self.y_axis_dicom
+#        self.z_axis = self.z_axis_dicom
+        self.x_axis = numpy.arange(self.columns)*self.pixel_spacing[0] + self.origin[0]
+        self.y_axis = numpy.arange(self.rows)*self.pixel_spacing[1] + self.origin[1]
+        self.z_axis = numpy.array(tmp.GridFrameOffsetVector) + self.origin[2]
             
-        #Change DICOM coordinate system to IEC-61217 coordinate system
-        
-        self.x_axis = self.x_axis_dicom
-        self.y_axis = self.z_axis_dicom
-        self.z_axis = -self.y_axis_dicom[::-1]
-            
-        #Create 3D numpy array from dose data in DICOM file units
-        #Requires fliplr to reorient the z axis in an increasing direction
-        self.dose = numpy.fliplr(numpy.swapaxes(
-                            tmp.pixel_array*tmp.DoseGridScaling,1,2))
-        
+ 
+        self.dose = numpy.swapaxes(tmp.pixel_array*tmp.DoseGridScaling,0,2)
+                
         
             
         
