@@ -24,8 +24,9 @@ class RTDose(object):
     patient left.  The class uses the RT Plan isocenter position as the 
     origin of this coordinate system.
     
-    To be used in RadPy, the coordinated system is rotated to correspond with
-    the IEC standard. 
+    To be used in RadPy, the coordinate system should correspond to the IEC
+    standard gantry and collimator fixed system where x is the crossplane 
+    direction, y is the inplane direction and z is depth.
     '''
 
 
@@ -88,8 +89,8 @@ class RTDose(object):
             
  
         self.dose = numpy.swapaxes(tmp.pixel_array*tmp.DoseGridScaling,0,2)
-                
-        
+        a = tmp.pixel_array        
+        return
             
         
         

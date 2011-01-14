@@ -80,28 +80,28 @@ class Beam(object):
         self.ordinate = []
         self.data_elements = {}
             
-#    def machine_axes_to_xyz(self, coordinate):
-#        """ Given a point in machine coordinates, converts it to xyz """
-#        """ Accepts a tuple of coordinates in machine terms (crossplane, inplane,
-#        depth) and returns a numpy 1D array of xyz coordinates.  Uses the 
-#        servo axis values in the measurement header for the conversion. 
-#        
-#        The coordinate system used is DICOM standard (IEC 1217).  For a patient
-#        in the head first supine position, the Y axis runs inferior to superior,
-#        the Z axis runs anterior-posterior and the X axis runs patient right to 
-#        patient left."""
-#        
-#        crossplane = self.get_machine_axis_vector(
-#                        self.measurement_header['crossplane_servo_axis'])
-#        inplane = self.get_machine_axis_vector(
-#                        self.measurement_header['inplane_servo_axis'])
-#        depth = self.get_machine_axis_vector(
-#                        self.measurement_header['depth_servo_axis'])
-#        
-#        xyz_vector = coordinate[0]*crossplane + coordinate[1]*inplane + \
-#                        coordinate[2]*depth
-#                        
-#        return xyz_vector
+    def machine_axes_to_xyz(self, coordinate):
+        """ Given a point in machine coordinates, converts it to xyz """
+        """ Accepts a tuple of coordinates in machine terms (crossplane, inplane,
+        depth) and returns a numpy 1D array of xyz coordinates.  Uses the 
+        XXX_servo axis values in the measurement header for the conversion. 
+        
+        The coordinate system used is DICOM standard (IEC 1217).  For a patient
+        in the head first supine position, the Y axis runs inferior to superior,
+        the Z axis runs anterior-posterior and the X axis runs patient right to 
+        patient left."""
+        
+        crossplane = self.get_machine_axis_vector(
+                        self.measurement_header['crossplane_servo_axis'])
+        inplane = self.get_machine_axis_vector(
+                        self.measurement_header['inplane_servo_axis'])
+        depth = self.get_machine_axis_vector(
+                        self.measurement_header['depth_servo_axis'])
+        
+        xyz_vector = coordinate[0]*crossplane + coordinate[1]*inplane + \
+                        coordinate[2]*depth
+                        
+        return xyz_vector
     
     def get_machine_axis_vector(self, value):
         
@@ -125,28 +125,19 @@ class Beam(object):
         #The BDML tree contained in a beam_xml.Beam object is populated with
         #values taken from the dictionaries (self.main_header, 
         #self.measurement_header, etc.) that the Construct parser returns.
-        #The coordinate system used is IEC fixed gantry and collimator (as you
-        #stand at the couch looking towards the gantry, x is
-        #crossplane increasing from left to right, y is inplane increasing
-        #towards the gantry and z is depth increasing vertically).  The origin
-        #is machine isocenter.  See the
-        #report of Task Group 11 "Information Transfer from Beam Data
-        #Acquisition Systems", Figure 1. 
-        #http://www.aapm.org/pubs/reports/OR_01.pdf
         
-#        isocenter_xyz = self.machine_axes_to_xyz(
-#                            (self.measurement_header['isocenter_crossplane'],
-#                             self.measurement_header['isocenter_inplane'],
-#                             self.measurement_header['isocenter_depth']))
+        isocenter_xyz = self.machine_axes_to_xyz(
+                            (self.measurement_header['isocenter_crossplane'],
+                             self.measurement_header['isocenter_inplane'],
+                             self.measurement_header['isocenter_depth']))
         
+        data_structure.beam.MeasurementDetails.Isocenter.x = \
+            isocenter_xyz[0]
+        data_structure.beam.MeasurementDetails.Isocenter.y = \
+            isocenter_xyz[1]
+        data_structure.beam.MeasurementDetails.Isocenter.z = \
+            isocenter_xyz[2]
         
-        data_structure.beam.MeasurementDetails.Isocenter.x = 0
-        data_structure.beam.MeasurementDetails.Isocenter.y = 0          
-        data_structure.beam.MeasurementDetails.Isocenter.z = 0
-            
-        isocenter_xyz = [self.measurement_header['isocenter_crossplane'],
-                         self.measurement_header['isocenter_inplane'],
-                         -self.measurement_header['isocenter_depth']]
         
         data_structure.beam.MeasurementDetails.CoordinateAxes.Inplane = \
             self.measurement_header['inplane_servo_axis']
@@ -166,28 +157,30 @@ class Beam(object):
                 self.measurement_header['modified_date']).isoformat() + ',' + \
                 self.measurement_header['measurement_comment']
         
-        start_pos_xyz = [self.measurement_header['scan_start_crossplane'],
+        start_pos_xyz = self.machine_axes_to_xyz(
+                            (self.measurement_header['scan_start_crossplane'],
                              self.measurement_header['scan_start_inplane'],
-                             self.measurement_header['scan_start_depth']]
+                             self.measurement_header['scan_start_depth']))
         
         data_structure.beam.MeasurementDetails.StartPosition.x = \
-            start_pos_xyz[0] - isocenter_xyz[0]
+            start_pos_xyz[0]
         data_structure.beam.MeasurementDetails.StartPosition.y = \
-            start_pos_xyz[1] - isocenter_xyz[1]
+            start_pos_xyz[1]
         data_structure.beam.MeasurementDetails.StartPosition.z = \
-            -start_pos_xyz[2] - isocenter_xyz[2]
+            start_pos_xyz[2]
         
         
-        stop_pos_xyz = [self.measurement_header['scan_end_crossplane'],
+        stop_pos_xyz = self.machine_axes_to_xyz(
+                            (self.measurement_header['scan_end_crossplane'],
                              self.measurement_header['scan_end_inplane'],
-                             self.measurement_header['scan_end_depth']]
+                             self.measurement_header['scan_end_depth']))
         
         data_structure.beam.MeasurementDetails.StopPosition.x = \
-            stop_pos_xyz[0] - isocenter_xyz[0]
+            stop_pos_xyz[0]
         data_structure.beam.MeasurementDetails.StopPosition.y = \
-            stop_pos_xyz[1] - isocenter_xyz[1]
+            stop_pos_xyz[1]
         data_structure.beam.MeasurementDetails.StopPosition.z = \
-            -stop_pos_xyz[2] - isocenter_xyz[2]
+            stop_pos_xyz[2]
         
         data_structure.beam.MeasurementDetails.Physicist.EmailAddress = \
             self.main_header['email']

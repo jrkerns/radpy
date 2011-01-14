@@ -91,11 +91,9 @@ TRAITS_TO_XML = [('MeasurementDetails_MeasuringDevice_Model',
 
 
 class Beam(HasTraits):
-    """Class that defines the data model for a scan.
-    This needs to be updated when a universal data format
-    is decided upon."""
+    """Class that defines the data model for a scan."""
     
-    
+    #The coordinate system used is the gantry fixed 
     
     MeasurementDetails_MeasuringDevice_Model = String()
     MeasurementDetails_MeasuringDevice_Type = String()
@@ -271,12 +269,11 @@ class Beam(HasTraits):
                               Item(name='MeasurementDetails_ModificationHistory',
                                    label='Modification History'),
                               orientation='vertical'),
-                              
-                              
+                                        
                               orientation='horizontal',
                               label='Measurement Details')
-                             ), buttons = ['Undo', 'OK', 'Cancel'],
-                             resizable = True)
+                              ), buttons = ['Undo', 'OK', 'Cancel'],
+                              resizable = True)
     
     def __init__(self):
         super(Beam, self).__init__()  
@@ -354,10 +351,10 @@ class Beam(HasTraits):
         scan_type = self.get_scan_type()
         if scan_type == "Crossplane Profile":
             return "Crossplane_Profile_" + \
-                str(-self.MeasurementDetails_StopPosition_z/10.)
+                str(self.MeasurementDetails_StopPosition_z/10.)
         elif scan_type == "Inplane Profile":
             return "Inplane_Profile_" + \
-                   str(-self.MeasurementDetails_StopPosition_z/10.)
+                   str(self.MeasurementDetails_StopPosition_z/10.)
         else:
             return "Depth_Dose"
          
