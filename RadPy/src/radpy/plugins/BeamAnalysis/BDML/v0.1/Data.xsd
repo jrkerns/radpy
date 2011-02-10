@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema elementFormDefault="qualified" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+    <xsd:complexType name="BeamDataType">
+
+        <xsd:sequence>
+        	<xsd:element name="Ordinate" type="ArrayType" minOccurs="1" />
+        	<xsd:element name="Abscissa" type="ArrayType" minOccurs="1" />
+        	<xsd:element name="Quantity" type="xsd:string" maxOccurs="1" minOccurs="1"></xsd:element>
+        	<xsd:any namespace="##other" minOccurs="0" maxOccurs="unbounded" processContents="lax"></xsd:any>
+        </xsd:sequence>
+        
+    </xsd:complexType>
+
+    <xsd:complexType name="ArrayType">
+    	<xsd:sequence minOccurs="1" maxOccurs="unbounded">
+    		<xsd:element name="Value" type="xsd:double" />
+    	</xsd:sequence>
+    </xsd:complexType>
+</xsd:schema>

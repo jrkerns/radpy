@@ -3,7 +3,7 @@
     xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
     targetNamespace="http://www.radpy.org"
     xmlns="http://www.radpy.org"
-    version="0.2">
+    version="0.1">
     
     
 

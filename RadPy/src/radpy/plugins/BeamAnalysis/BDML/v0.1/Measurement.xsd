@@ -11,6 +11,27 @@
 		</xsd:sequence>
 	</xsd:complexType>
 
+	<xsd:complexType name="CoordinateOrientationType">
+		<xsd:sequence minOccurs="1" maxOccurs="1">
+			<xsd:element name="Inplane" type="CoordinateAxesType"></xsd:element>
+			<xsd:element name="Crossplane" type="CoordinateAxesType"></xsd:element>
+			<xsd:element name="Depth" type="CoordinateAxesType"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+
+
+	<xsd:simpleType name="CoordinateAxesType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="x_neg"></xsd:enumeration>
+			<xsd:enumeration value="y_neg"></xsd:enumeration>
+			<xsd:enumeration value="z_neg"></xsd:enumeration>
+			<xsd:enumeration value="x_pos"></xsd:enumeration>
+            <xsd:enumeration value="y_pos"></xsd:enumeration>
+            <xsd:enumeration value="z_pos"></xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+
 	<xsd:simpleType name="MeasuredDateTimeType">
 		<xsd:restriction base="xsd:dateTime"></xsd:restriction>
 	</xsd:simpleType>

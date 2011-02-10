@@ -148,12 +148,12 @@ class Beam(object):
                          self.measurement_header['isocenter_inplane'],
                          -self.measurement_header['isocenter_depth']]
         
-        data_structure.beam.MeasurementDetails.CoordinateAxes.Inplane = \
-            self.measurement_header['inplane_servo_axis']
-        data_structure.beam.MeasurementDetails.CoordinateAxes.Crossplane = \
-            self.measurement_header['crossplane_servo_axis']
-        data_structure.beam.MeasurementDetails.CoordinateAxes.Depth = \
-            self.measurement_header['depth_servo_axis']
+#        data_structure.beam.MeasurementDetails.CoordinateAxes.Inplane = \
+#            self.measurement_header['inplane_servo_axis']
+#        data_structure.beam.MeasurementDetails.CoordinateAxes.Crossplane = \
+#            self.measurement_header['crossplane_servo_axis']
+#        data_structure.beam.MeasurementDetails.CoordinateAxes.Depth = \
+#            self.measurement_header['depth_servo_axis']
             
         data_structure.beam.MeasurementDetails.MeasuredDateTime = \
             datetime.datetime.fromtimestamp(

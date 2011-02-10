@@ -27,7 +27,20 @@ from radpy.plugins.BeamAnalysis.view.Plot3D import Plot3D, Plot3DEditor
 
 # Enthought library imports.
 from enthought.pyface.workbench.api import View
+from enthought.traits.api import HasTraits, Str, List
+from enthought.traits.ui.api import Item, SetEditor
+from enthought.traits.ui.api import View as TraitsView
+from enthought.traits.ui.menu import OKButton, CancelButton
 
+
+class MatchDialog(HasTraits):
+    choices = List(Str)
+    selection = List(Str)
+    
+    view = TraitsView(Item('selection', editor=SetEditor(name='choices',
+                    can_move_all=True, ordered=False),show_label=False),
+                    buttons = [OKButton, CancelButton],kind='livemodal')
+    
 
 class TreeWidget(QTreeView):
     #The window that organizes scans from opened files in a tree
@@ -58,7 +71,7 @@ class TreeWidget(QTreeView):
         self.connect(self, SIGNAL("expanded(QModelIndex)"),
                      self.expanded)
         self.expanded()
-        self.load("radpy/plugins/BeamAnalysis/view/RFB/Unit Tests/Test2.rfb")
+        self.load("radpy/plugins/BeamAnalysis/view/RFB/Unit Tests/Test1.rfb")
         #self.load("c:/users/steve/desktop/xml test/test.xml")
         #self.load("radpy/plugins/BeamAnalysis/view/DicomRT/tests/3d_dose_wedge.dcm")
       
@@ -71,6 +84,11 @@ class TreeWidget(QTreeView):
         except IOError, e:
             QMessageBox.warning(self, "Server Info - Error",
                                 unicode(e))
+#        except PlanError as e:
+#            QMessageBox.warning(self,'''Gantry and collimator angles must be 0 
+#                (IEC Scale).  Instead the plan has a gantry angle of ''' + \
+#                str(e.gantry) + ' and a collimator angle of ' + \
+#                str(e.collimator) + '.')
             
     def currentFields(self):
         return self.model().asRecord(self.currentIndex())
@@ -102,6 +120,9 @@ class TreeWidget(QTreeView):
             addMultiAction = menu.addAction("&Add all to plot")
             self.connect(addMultiAction, SIGNAL("triggered()"), self.addMultiPlot)
             
+            addAsRefAction = menu.addAction("Add &matching beams")
+            self.connect(addAsRefAction, SIGNAL("triggered()"), self.addAsRef)
+            
         menu.exec_(event.globalPos())
         
     def editPlot(self):
@@ -114,8 +135,17 @@ class TreeWidget(QTreeView):
     def addMultiPlot(self):
         temp  = self.model().asRecord(self.currentIndex())
         for i in temp:
-            self.emit(SIGNAL("activated"), i)
-        
+            self.emit(SIGNAL('activated'), i)
+    
+    def addAsRef(self):
+        dialog = MatchDialog(choices=
+                             ['field_size', 'scan_type', 'BeamDetails_Energy'])
+        dialog.configure_traits()
+        parameters = dialog.selection[:]
+        temp  = self.model().asRecord(self.currentIndex())
+        for i in temp:
+            self.emit(SIGNAL('reference'), i, parameters)
+            
    
 class TreeView(View):
     
@@ -125,12 +155,23 @@ class TreeView(View):
         super(View, self).__init__()
         self.widget = TreeWidget()
         QObject.connect(self.widget, SIGNAL('activated'),self.activated)
+        QObject.connect(self.widget, SIGNAL('reference'), self.reference)
     
 #    def _id_default(self):
 #        """ Trait initializer. """
 #
 #        return self.id
-    
+    def reference(self, record, parameters):
+        label, beam = record
+        if self.window.active_editor is not None:
+            for i in self.window.active_editor.obj.beams.values():
+                traits_to_match =  beam.trait_get(parameters)
+                if i.does_it_match(traits_to_match):
+                    title = self.window.active_editor.obj.add_plot(label, beam)
+                    if title is not None:
+                        self.window.active_editor.name = title
+            
+        
     def activated(self, record):
         """ Adds the selected beam object to the active Chaco Plot editor.  If
         there is no active window, it creates one first.  If the active editor

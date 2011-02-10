@@ -9,8 +9,11 @@ import os
 import dicom
 import numpy
 from scipy import ndimage
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
 from RTPlanRead import RTPlan
+
 
 class RTDose(object):
     '''
@@ -35,13 +38,14 @@ class RTDose(object):
         filename is a string containing the full path to a DICOM RT Dose file.
         '''
         tmp = dicom.read_file(filename)
-
         self.dose_unit = tmp.DoseUnits
         
         #Call the RTPlan module to find RT Plan DICOM file with same
         #SOP Instance UID
         self.plan = RTPlan(tmp[0x300c,0x0002][0].ReferencedSOPInstanceUID
                            ,os.path.dirname(filename))
+        if len(self.plan.dicom_file[0x300a,0x00b0].value) > 1:
+            raise IOError('Plans with multiple fields are not supported.')
         self.beam = self.plan.dicom_file[0x300a,0x00b0][0]
         self.machine = self.beam.TreatmentMachineName
         self.SAD = self.beam[0x300a,0x00b4]
@@ -49,7 +53,16 @@ class RTDose(object):
         self.field = self.beam[0x300a,0x0111][0]
         self.energy = self.field.NominalBeamEnergy
         
-        
+        try:
+            self.wedge_type = self.beam.Wedges[0].WedgeType
+            self.wedge_angle = self.beam.Wedges[0].WedgeAngle
+        except:
+            pass
+        self.meas_manu = self.plan.dicom_file.Manufacturer
+        self.meas_model = self.plan.dicom_file.ManufacturersModelName
+        self.rad_vend = self.beam.Manufacturer
+        self.rad_model = self.beam.ManufacturersModelName
+        self.rad_serial = self.beam.DeviceSerialNumber
         self.coll_x_neg = self.field[0x300a,0x011a][0][0x300a,0x011c][0]
         self.coll_x_pos = self.field[0x300a,0x011a][0][0x300a,0x011c][1]
         self.coll_y_neg = self.field[0x300a,0x011a][1][0x300a,0x011c][0]
@@ -57,6 +70,11 @@ class RTDose(object):
         self.gantry_angle = self.field.GantryAngle
         self.collimator_angle = self.field.BeamLimitingDeviceAngle
         self.isocenter = self.field.IsocenterPosition
+        if self.gantry_angle != 0 or self.collimator_angle != 0:
+            raise IOError('Gantry and collimator angles must be 0 ' + \
+                '(IEC Scale).  Instead the plan has a gantry angle of ' + \
+                str(self.gantry_angle) + ' and a collimator angle of ' + \
+                str(self.collimator_angle) + '.')
         #self.depth_direction = [0,1,0]
         #self.crossplane_direction = [1,0,0]
         #self.inplane_direction = [0,0,1]

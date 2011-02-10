@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema elementFormDefault="qualified" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+    <xsd:complexType name="RadiationDeviceType">
+    	<xsd:sequence minOccurs="0">
+    		<xsd:element name="Vendor" type="VendorType" minOccurs="0" maxOccurs="1"></xsd:element>
+    		<xsd:element name="Model" type="ModelType" minOccurs="0" maxOccurs="1"></xsd:element>
+    		<xsd:element name="SerialNumber" type="SerialNumberType" minOccurs="0" maxOccurs="1"></xsd:element>
+    		<xsd:element name="MachineScale" type="MachineScaleType" minOccurs="0" maxOccurs="1"></xsd:element>
+    		<xsd:any namespace="##other" minOccurs="0" maxOccurs="unbounded" processContents="lax"></xsd:any>
+    	</xsd:sequence>
+    </xsd:complexType>
+    
+    <xsd:simpleType name="VendorType">
+    	<xsd:restriction base="xsd:string"></xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="ModelType">
+    	<xsd:restriction base="xsd:string"></xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="SerialNumberType">
+    	<xsd:restriction base="xsd:string"></xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="MachineScaleType">
+    	<xsd:restriction base="xsd:string">
+    		<xsd:enumeration value="IEC 1217"></xsd:enumeration>
+    		<xsd:enumeration value="Varian IEC"></xsd:enumeration>
+    	</xsd:restriction>
+    </xsd:simpleType>
+</xsd:schema>

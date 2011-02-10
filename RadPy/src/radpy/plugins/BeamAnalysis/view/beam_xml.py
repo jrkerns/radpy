@@ -16,12 +16,12 @@ TRAITS_TO_XML = [('MeasurementDetails_MeasuringDevice_Model',
                 'beam.MeasurementDetails.Isocenter.y'),
         ('MeasurementDetails_Isocenter_z',
                 'beam.MeasurementDetails.Isocenter.z'),
-        ('MeasurementDetails_CoordinateAxes_Inplane',
-                'beam.MeasurementDetails.CoordinateAxes.Inplane'),
-        ('MeasurementDetails_CoordinateAxes_Crossplane',
-                'beam.MeasurementDetails.CoordinateAxes.Crossplane'),
-        ('MeasurementDetails_CoordinateAxes_Depth',
-                'beam.MeasurementDetails.CoordinateAxes.Depth'),
+#        ('MeasurementDetails_CoordinateAxes_Inplane',
+#                'beam.MeasurementDetails.CoordinateAxes.Inplane'),
+#        ('MeasurementDetails_CoordinateAxes_Crossplane',
+#                'beam.MeasurementDetails.CoordinateAxes.Crossplane'),
+#        ('MeasurementDetails_CoordinateAxes_Depth',
+#                'beam.MeasurementDetails.CoordinateAxes.Depth'),
         ('MeasurementDetails_MeasuredDateTime',
                 'beam.MeasurementDetails.MeasuredDateTime'),
 #        ('MeasurementDetails_ModificationHistory',
@@ -101,12 +101,12 @@ class Beam(HasTraits):
     MeasurementDetails_Isocenter_x = Float(numpy.NaN)
     MeasurementDetails_Isocenter_y = Float(numpy.NaN)
     MeasurementDetails_Isocenter_z = Float(numpy.NaN)
-    MeasurementDetails_CoordinateAxes_Inplane = Enum('', 'x_neg', 'y_neg', 
-                                        'z_neg', 'x_pos', 'y_pos', 'z_pos')
-    MeasurementDetails_CoordinateAxes_Crossplane = Enum('', 'x_neg', 'y_neg', 
-                                        'z_neg', 'x_pos', 'y_pos', 'z_pos')
-    MeasurementDetails_CoordinateAxes_Depth = Enum('','x_neg', 'y_neg', 
-                                        'z_neg', 'x_pos', 'y_pos', 'z_pos')
+#    MeasurementDetails_CoordinateAxes_Inplane = Enum('', 'x_neg', 'y_neg', 
+#                                        'z_neg', 'x_pos', 'y_pos', 'z_pos')
+#    MeasurementDetails_CoordinateAxes_Crossplane = Enum('', 'x_neg', 'y_neg', 
+#                                        'z_neg', 'x_pos', 'y_pos', 'z_pos')
+#    MeasurementDetails_CoordinateAxes_Depth = Enum('','x_neg', 'y_neg', 
+#                                        'z_neg', 'x_pos', 'y_pos', 'z_pos')
     MeasurementDetails_MeasuredDateTime = String()
     MeasurementDetails_ModificationHistory = List()
     MeasurementDetails_StartPosition_x = Float(numpy.NaN)
@@ -143,12 +143,17 @@ class Beam(HasTraits):
     BeamDetails_RadiationDevice_Vendor = String()
     BeamDetails_RadiationDevice_Model = String()
     BeamDetails_RadiationDevice_SerialNumber = String()
-    BeamDetails_RadiationDevice_MachineScale = Enum('', 'IEC 1217', 'Varian IED')
+    BeamDetails_RadiationDevice_MachineScale = Enum('', 'IEC 1217', 'Varian IEC')
+    
         
     Data_Abscissa = Array()
     Data_Ordinate = Array()
     Data_Quantity = String()
+    
+    #Traits that are not part of the XML data structure
     label = String()
+    field_size = String()
+    scan_type = String()
     
     traits_view = View(Tabbed(
                         Group(Group(Heading('Beam Parameters'),
@@ -217,14 +222,14 @@ class Beam(HasTraits):
                               Item(name='MeasurementDetails_Medium',label='Medium'),
                               orientation='vertical'),
                               
-                              Group(Group(Heading('Coordinate Axes'),
-                              Item(name='MeasurementDetails_CoordinateAxes_Inplane',
-                                   label='Inplane'),
-                              Item(name='MeasurementDetails_CoordinateAxes_Crossplane',
-                                   label='Crossplane'),
-                              Item(name='MeasurementDetails_CoordinateAxes_Depth',
-                                   label='Depth'),
-                              show_border=True),
+                              Group(#Group(Heading('Coordinate Axes'),
+#                              Item(name='MeasurementDetails_CoordinateAxes_Inplane',
+#                                   label='Inplane'),
+#                              Item(name='MeasurementDetails_CoordinateAxes_Crossplane',
+#                                   label='Crossplane'),
+#                              Item(name='MeasurementDetails_CoordinateAxes_Depth',
+#                                   label='Depth'),
+#                              show_border=True),
                               
                               Group(Heading('Isocenter'),
                               Item(name='MeasurementDetails_Isocenter_x',
@@ -283,10 +288,28 @@ class Beam(HasTraits):
         self.tree = objectify.parse(file)
         file.close()
         self.beam = self.tree.getroot()
+        
 #        schema_file = open('radpy/plugins/BeamAnalysis/BDML/bdml.xsd','r')
 #        bdml_schema = etree.parse(schema_file)
 #        self.xmlschema = etree.XMLSchema(bdml_schema)
 #        schema_file.close()
+
+    def does_it_match(self, args):
+        """Given a dict with beam parameters, returns True if it has those."""
+        #Each type of beam object must be a subclass of Beam, and must 
+        #implement this method so that RadPy can determine if the object
+        #can provide data that matches a certain set of beam parameters.
+        #For example, a 1D crossplane profile would only return True if 
+        #the given depth matches the depth of measurement.  However, a 3D Dicom 
+        #dose dataset would match any depth as long as the other beam 
+        #parameters (energy, field size, etc.) match.
+        #The dictionary keys are the names of traits of the beam object, and 
+        #the values are the values that trait must match.
+        #Note that it is entirely up to the Beam object to determine if there
+        #is a match.  RadPy will accept any data as long as the Beam object
+        #claims to match.
+        raise NotImplementedError
+        
         
     def set_label(self):
         self.label = '|'.join([self.get_tree_path(),self.get_scan_descriptor()])
@@ -351,10 +374,10 @@ class Beam(HasTraits):
         scan_type = self.get_scan_type()
         if scan_type == "Crossplane Profile":
             return "Crossplane_Profile_" + \
-                str(self.MeasurementDetails_StopPosition_z/10.)
+                str(-self.MeasurementDetails_StopPosition_z/10.)
         elif scan_type == "Inplane Profile":
             return "Inplane_Profile_" + \
-                   str(self.MeasurementDetails_StopPosition_z/10.)
+                   str(-self.MeasurementDetails_StopPosition_z/10.)
         else:
             return "Depth_Dose"
          
@@ -464,7 +487,8 @@ class Beam(HasTraits):
                 else:
                     exec('self.' + trait + ' = str(value)')               
  
-                
+        self.field_size = self.get_field_size()
+        self.scan_type = self.get_scan_type()
   
             
                 

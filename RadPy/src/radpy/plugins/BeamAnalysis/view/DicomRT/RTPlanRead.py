@@ -4,7 +4,6 @@ Created on Jul 13, 2009
 @author: Stephen_Terry
 '''
 import os
-from os.path import join
 
 import dicom 
 
