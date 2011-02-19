@@ -71,7 +71,7 @@ class BeamAnalysisWorkbenchPlugin(Plugin):
     def _preferences_pages_default(self):
         """ Trait initializer. """
 
-        from radpy.plugins.BeamAnalysis.api \
+        from radpy.plugins.BeamAnalysis.preferences.api \
             import BeamAnalysisPreferencesPage
         
         return [BeamAnalysisPreferencesPage]

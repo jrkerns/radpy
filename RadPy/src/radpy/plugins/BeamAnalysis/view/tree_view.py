@@ -23,15 +23,17 @@ import Model as Model
 COLUMNS = ['File Name','Machine', 'Energy', 'Field Size']
 from radpy.plugins.BeamAnalysis.view.ChacoPlot import ChacoPlot, ChacoPlotEditor
 from radpy.plugins.BeamAnalysis.view.Plot3D import Plot3D, Plot3DEditor
-
+from radpy.plugins.BeamAnalysis.preferences.api import BeamAnalysisPreferencesHelper
 
 # Enthought library imports.
 from enthought.pyface.workbench.api import View
-from enthought.traits.api import HasTraits, Str, List
+from enthought.traits.api import HasTraits, Str, List, Dict
 from enthought.traits.ui.api import Item, SetEditor
 from enthought.traits.ui.api import View as TraitsView
 from enthought.traits.ui.menu import OKButton, CancelButton
-
+#from enthought.etsconfig.api import ETSConfig
+#from enthought.preferences.api import Preferences
+#from os.path import join
 
 class MatchDialog(HasTraits):
     choices = List(Str)
@@ -40,7 +42,10 @@ class MatchDialog(HasTraits):
     view = TraitsView(Item('selection', editor=SetEditor(name='choices',
                     can_move_all=True, ordered=False),show_label=False),
                     buttons = [OKButton, CancelButton],kind='livemodal')
+
+
     
+
 
 class TreeWidget(QTreeView):
     #The window that organizes scans from opened files in a tree
@@ -138,13 +143,28 @@ class TreeWidget(QTreeView):
             self.emit(SIGNAL('activated'), i)
     
     def addAsRef(self):
-        dialog = MatchDialog(choices=
-                             ['field_size', 'scan_type', 'BeamDetails_Energy'])
+        
+        #app_home = ETSConfig.get_application_home()
+       
+        helper = BeamAnalysisPreferencesHelper()
+        choices = {'Energy':'BeamDetails_Energy',
+                   'Field Size':'field_size',
+                   'Scan Type':'scan_type',
+                   'SSD':'BeamDetails_SSD',
+                   'Wedge Angle':'BeamDetails_Wedge_Angle',
+                   'Applicator':'BeamDetails_Applicator',
+                   'Linac Model':'BeamDetails_RadiationDevice_Model'}
+        
+        dialog = MatchDialog(choices=choices.keys())
+        dialog.selection = helper.match_traits
         dialog.configure_traits()
-        parameters = dialog.selection[:]
+        match_traits = [choices[x] for x in dialog.selection[:]]
+        helper.match_traits = dialog.selection
+        helper.preferences.flush()
+        
         temp  = self.model().asRecord(self.currentIndex())
         for i in temp:
-            self.emit(SIGNAL('reference'), i, parameters)
+            self.emit(SIGNAL('reference'), i, match_traits)
             
    
 class TreeView(View):

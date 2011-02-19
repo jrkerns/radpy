@@ -17,7 +17,7 @@
 
 # Enthought library imports.
 from enthought.preferences.ui.api import PreferencesPage
-from enthought.traits.api import Bool, Color, Int, Float, Font, Str
+from enthought.traits.api import Bool, Color, Int, Float, Font, Str, List
 from enthought.traits.ui.api import View
 
 
@@ -42,23 +42,25 @@ class BeamAnalysisPreferencesPage(PreferencesPage):
 
     #### Preferences ##########################################################
 
-    # Width.
-    width = Int(100)
-
-    # Height.
-    height = Int(200)
-
-    # Ratio.
-    ratio = Float(0.1)
+#    # Width.
+#    width = Int(100)
+#
+#    # Height.
+#    height = Int(200)
+#
+#    # Ratio.
+#    ratio = Float(0.1)
+#    
+#    # Background color.
+#    bgcolor = Color('red')
+#
+#    # Text font.
+#    font = Font('helvetica')
     
-    # Background color.
-    bgcolor = Color('red')
-
-    # Text font.
-    font = Font('helvetica')
+    match_params = List(['Energy','Scan Type','Field Size'])
     
     #### Traits UI views ######################################################
 
-    trait_view = View('width', 'height', 'ratio', 'font', 'bgcolor')
+    trait_view = View('match_params')
 
 #### EOF ######################################################################

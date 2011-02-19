@@ -17,6 +17,7 @@
 #Force usage of Qt backend.
 from enthought.etsconfig.api import ETSConfig
 ETSConfig.toolkit = 'qt4'
+ETSConfig.company = 'RadPy'
 
 # Standard library imports.
 import logging
