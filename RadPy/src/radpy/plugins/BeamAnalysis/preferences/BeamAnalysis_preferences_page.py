@@ -18,7 +18,7 @@
 # Enthought library imports.
 from enthought.preferences.ui.api import PreferencesPage
 from enthought.traits.api import Bool, Color, Int, Float, Font, Str, List
-from enthought.traits.ui.api import View
+from enthought.traits.ui.api import View, Item, SetEditor, Group
 
 
 class BeamAnalysisPreferencesPage(PreferencesPage):
@@ -57,10 +57,23 @@ class BeamAnalysisPreferencesPage(PreferencesPage):
 #    # Text font.
 #    font = Font('helvetica')
     
-    match_params = List(['Energy','Scan Type','Field Size'])
+    match_traits = List(['Energy','Scan Type','Field Size'])
+    choices_dict = {'Energy':'BeamDetails_Energy',
+                   'Field Size':'field_size',
+                   'Scan Type':'scan_type',
+                   'SSD':'BeamDetails_SSD',
+                   'Wedge Angle':'BeamDetails_Wedge_Angle',
+                   'Applicator':'BeamDetails_Applicator',
+                   'Linac Model':'BeamDetails_RadiationDevice_Model'}
     
+    choices = choices_dict.keys()
     #### Traits UI views ######################################################
 
-    trait_view = View('match_params')
+    trait_view = View(Group(Item('match_traits',editor=SetEditor(name='choices',
+                    can_move_all=True, ordered=False, 
+                    left_column_title = 'Beam Parameters',
+                    right_column_title = 'Parameters to Match'),show_label=False),
+                    label='Default Parameters a Reference Beam Must Match'))
+                    
 
 #### EOF ######################################################################
