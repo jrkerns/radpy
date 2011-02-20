@@ -79,7 +79,7 @@ class TreeWidget(QTreeView):
         self.load("radpy/plugins/BeamAnalysis/view/RFB/Unit Tests/Test1.rfb")
         #self.load("c:/users/steve/desktop/xml test/test.xml")
         #self.load("radpy/plugins/BeamAnalysis/view/DicomRT/tests/3d_dose_wedge.dcm")
-      
+
         
     def load(self, filename):
         #Passes lists of scans to tree model class.
@@ -94,6 +94,7 @@ class TreeWidget(QTreeView):
 #                (IEC Scale).  Instead the plan has a gantry angle of ''' + \
 #                str(e.gantry) + ' and a collimator angle of ' + \
 #                str(e.collimator) + '.')
+        
             
     def currentFields(self):
         return self.model().asRecord(self.currentIndex())
@@ -118,7 +119,10 @@ class TreeWidget(QTreeView):
             self.connect(addAction, SIGNAL("triggered()"), self.addPlot)
             
             editAction = menu.addAction("&Edit beam parameters")
-            self.connect(editAction, SIGNAL("triggered()"), self.editPlot)
+            self.connect(editAction, SIGNAL("triggered()"), self.editTraits)
+            
+            delAction = menu.addAction("&Remove beam")
+            self.connect(delAction, SIGNAL("triggered()"), self.delBeam)
             
         else:
             
@@ -130,7 +134,19 @@ class TreeWidget(QTreeView):
             
         menu.exec_(event.globalPos())
         
-    def editPlot(self):
+    def delBeam(self):
+        
+        index = self.currentIndex()
+        row = index.row()
+        beam = self.model().nodeFromIndex(index)
+        parent = self.model().parent(index)    
+        self.model().beginRemoveRows(parent,row,row)
+        beam.parent.children.pop(row)
+        self.model().endRemoveRows()
+        
+        
+    def editTraits(self):
+        
         self.currentFields()[1].edit_traits()
         
 

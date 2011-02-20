@@ -225,7 +225,7 @@ class TreeModel(QAbstractItemModel):
             
             if exception is not None:
                 raise exception
-
+        
 
     def addRecord(self, beam, callReset=True):
         #assert len(fields) > self.nesting
@@ -346,3 +346,10 @@ class ProxyModel(QSortFilterProxyModel):
     
     def columnCount(self, *args, **kwds):
         return self.sourceModel().columnCount(*args, **kwds)
+    
+    def reset(self):
+        return self.sourceModel().reset()
+    
+    def removeRow(self, *args, **kwds):
+        return self.sourceModel().removeRow(*args, **kwds)
+        
