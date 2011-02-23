@@ -1,4 +1,4 @@
-from enthought.traits.api import HasTraits, Array, Float, String, Enum, List
+from enthought.traits.api import HasTraits, Array, Float, String, Enum, List, on_trait_change
 from enthought.traits.ui.api import View, Item, Group, Tabbed, Heading
 from lxml import etree, objectify
 import numpy
@@ -278,7 +278,7 @@ class Beam(HasTraits):
                               orientation='horizontal',
                               label='Measurement Details')
                               ), buttons = ['Undo', 'OK', 'Cancel'],
-                              resizable = True)
+                              resizable = True, kind='livemodal')
     
     def __init__(self):
         super(Beam, self).__init__()  
@@ -288,6 +288,7 @@ class Beam(HasTraits):
         self.tree = objectify.parse(file)
         file.close()
         self.beam = self.tree.getroot()
+        
         
 #        schema_file = open('radpy/plugins/BeamAnalysis/BDML/bdml.xsd','r')
 #        bdml_schema = etree.parse(schema_file)
@@ -310,7 +311,19 @@ class Beam(HasTraits):
         #claims to match.
         raise NotImplementedError
         
-        
+    @on_trait_change('BeamDetails_Energy', 
+                      'BeamDetails_RadiationDevice_Model',
+                      'BeamDetails_RadiationDevice_SerialNumber',
+                      'self.BeamDetails_CrossplaneJawPositions_PositiveJaw',
+                      'self.BeamDetails_CrossplaneJawPositions_NegativeJaw',
+                      'self.BeamDetails_InplaneJawPositions_PositiveJaw',
+                      'self.BeamDetails_InplaneJawPositions_NegativeJaw',
+                      'self.MeasurementDetails_StartPosition_x', 
+                      'self.MeasurementDetails_StopPosition_x',
+                      'self.MeasurementDetails_StartPosition_y',
+                      'self.MeasurementDetails_StopPosition_y',
+                      'self.MeasurementDetails_StartPosition_z',
+                    'self.MeasurementDetails_StopPosition_z')
     def set_label(self):
         self.label = '|'.join([self.get_tree_path(),self.get_scan_descriptor()])
         

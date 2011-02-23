@@ -136,19 +136,28 @@ class TreeWidget(QTreeView):
         
     def delBeam(self):
         
-        index = self.currentIndex()
-        row = index.row()
-        beam = self.model().nodeFromIndex(index)
-        parent = self.model().parent(index)    
-        self.model().beginRemoveRows(parent,row,row)
-        beam.parent.children.pop(row)
-        self.model().endRemoveRows()
+        self.model().removeRecord(self.currentIndex())
+#        
+#        if not index:
+#            index = self.currentIndex()
+#        row = index.row()
+#        beam = self.model().nodeFromIndex(index)
+#        parent = self.model().parent(index)    
+#        self.model().beginRemoveRows(parent,row,row)
+#        beam.parent.children.remove((beam.fields[0].lower(),beam))
+#        self.emit(SIGNAL("dataChanged()"))
+#        self.emit(SIGNAL("layoutChanged()"))
+#        self.model().endRemoveRows()
+#        #self.model().reset()
+        
         
         
     def editTraits(self):
-        
-        self.currentFields()[1].edit_traits()
-        
+        index = self.currentIndex()
+        beam = self.currentFields()[1]
+        self.model().removeRecord(index=index) 
+        beam.edit_traits()
+        self.model().addRecord(beam, False)
 
     def addPlot(self):
         self.emit(SIGNAL("activated"), self.currentFields())

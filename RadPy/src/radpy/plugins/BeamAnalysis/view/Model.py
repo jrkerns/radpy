@@ -225,6 +225,18 @@ class TreeModel(QAbstractItemModel):
             
             if exception is not None:
                 raise exception
+    
+    def removeRecord(self, index):
+
+        row = index.row()
+        beam = self.nodeFromIndex(index)
+        parent = self.parent(index)    
+        self.beginRemoveRows(parent,row,row)
+        beam.parent.children.remove((beam.fields[0].lower(),beam))
+#        self.emit(SIGNAL("dataChanged()"))
+#        self.emit(SIGNAL("layoutChanged()"))
+        self.endRemoveRows()
+#        #self.model().reset()
         
 
     def addRecord(self, beam, callReset=True):
@@ -347,9 +359,9 @@ class ProxyModel(QSortFilterProxyModel):
     def columnCount(self, *args, **kwds):
         return self.sourceModel().columnCount(*args, **kwds)
     
-    def reset(self):
-        return self.sourceModel().reset()
+    def addRecord(self, *args, **kwds):
+        return self.sourceModel().addRecord(*args, **kwds)
     
-    def removeRow(self, *args, **kwds):
-        return self.sourceModel().removeRow(*args, **kwds)
+    def removeRecord(self, index):
+        return self.sourceModel().removeRecord(self.mapToSource(index))
         
