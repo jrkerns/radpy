@@ -46,8 +46,9 @@ class BranchNode(object):
         self.name = name
         self.parent = parent
         self.column = column
+        self.row = 0
         self.children = []
-
+    
 
     def orderKey(self):
         
@@ -84,7 +85,13 @@ class BranchNode(object):
     def childWithKey(self, key):
         if not self.children:
             return None
-        i = bisect.bisect_left(self.children, (key, None))
+#        i = bisect.bisect_left(self.children, (key, None))
+        i = -1
+        for n,child in enumerate(self.children):
+            if child[KEY] == key:
+                i = n
+                break
+
         if i < 0 or i >= len(self.children):
             return None
         if self.children[i][KEY] == key:
@@ -94,7 +101,14 @@ class BranchNode(object):
 
     def insertChild(self, child):
         child.parent = self
-        bisect.insort(self.children, (child.orderKey(), child))
+#        row = bisect.bisect_left(self.children, (child.orderKey(), child))
+#        bisect.insort(self.children, (child.orderKey(), child))
+#        return row
+        row = len(self.children)
+        child.row = row
+        self.children.append((child.orderKey(), child))
+        
+        
 
 
     def hasLeaves(self):
@@ -127,6 +141,7 @@ class BranchNode(object):
                 parent = parent.parent
             
         return parent
+
                 
             
     
@@ -138,7 +153,7 @@ class LeafNode(object):
         self.parent = parent
         #tree_path = beam.get_tree_path() + "|" + beam.get_scan_descriptor()
         self.fields = []
-        
+        self.row = 0
         #self.fields = fields
         self.fields.append(beam.get_scan_descriptor())
         self.beam = beam
@@ -188,6 +203,7 @@ class LeafNode(object):
             parent = parent.parent
             
         return parent
+    
 
 class TreeModel(QAbstractItemModel):
 
@@ -232,11 +248,11 @@ class TreeModel(QAbstractItemModel):
         beam = self.nodeFromIndex(index)
         parent = self.parent(index)    
         self.beginRemoveRows(parent,row,row)
-        beam.parent.children.remove((beam.fields[0].lower(),beam))
-#        self.emit(SIGNAL("dataChanged()"))
-#        self.emit(SIGNAL("layoutChanged()"))
+        
+        beam.parent.children.pop(row)
         self.endRemoveRows()
-#        #self.model().reset()
+        if len(beam.parent.children) == 0:
+            self.removeRecord(parent)
         
 
     def addRecord(self, beam, callReset=True):
@@ -253,12 +269,26 @@ class TreeModel(QAbstractItemModel):
                 branch = BranchNode(fields[i],self.headers[i])
                 if self.headers[i] == 'File Name':
                     branch.filename = self.filepath
+
+                parent_index = self.createIndex(root.row,0,root)
+                self.beginInsertRows(parent_index,len(root),len(root))
                 root.insertChild(branch)
+                self.endInsertRows()
+
                 root = branch
         assert branch is not None
-        item = beam
+
+        item = LeafNode(beam, branch)
         self.columns = max(self.columns, 1)
-        branch.insertChild(LeafNode(item, branch))
+
+        
+
+        parent_index = self.createIndex(branch.row,0,branch)
+        self.beginInsertRows(parent_index,len(branch),len(branch))
+        branch.insertChild(item)
+        
+        self.endInsertRows()
+        
         if callReset:
             self.reset()
 
@@ -288,9 +318,11 @@ class TreeModel(QAbstractItemModel):
             return QVariant()
         node = self.nodeFromIndex(index)
         assert node is not None
+
         if isinstance(node, BranchNode):
             return QVariant(node.toString()) \
                 if index.column() == 0 else QVariant(QString(""))
+
         return QVariant(node.field(index.column()))
 
 

@@ -31,9 +31,6 @@ from enthought.traits.api import HasTraits, Str, List, Dict
 from enthought.traits.ui.api import Item, SetEditor
 from enthought.traits.ui.api import View as TraitsView
 from enthought.traits.ui.menu import OKButton, CancelButton
-#from enthought.etsconfig.api import ETSConfig
-#from enthought.preferences.api import Preferences
-#from os.path import join
 
 class MatchDialog(HasTraits):
     choices = List(Str)
@@ -137,20 +134,6 @@ class TreeWidget(QTreeView):
     def delBeam(self):
         
         self.model().removeRecord(self.currentIndex())
-#        
-#        if not index:
-#            index = self.currentIndex()
-#        row = index.row()
-#        beam = self.model().nodeFromIndex(index)
-#        parent = self.model().parent(index)    
-#        self.model().beginRemoveRows(parent,row,row)
-#        beam.parent.children.remove((beam.fields[0].lower(),beam))
-#        self.emit(SIGNAL("dataChanged()"))
-#        self.emit(SIGNAL("layoutChanged()"))
-#        self.model().endRemoveRows()
-#        #self.model().reset()
-        
-        
         
     def editTraits(self):
         index = self.currentIndex()
@@ -169,7 +152,6 @@ class TreeWidget(QTreeView):
     
     def addAsRef(self):
         
-        #app_home = ETSConfig.get_application_home()
        
         helper = BeamAnalysisPreferencesHelper()
         choices = {'Energy':'BeamDetails_Energy',
@@ -202,10 +184,7 @@ class TreeView(View):
         QObject.connect(self.widget, SIGNAL('activated'),self.activated)
         QObject.connect(self.widget, SIGNAL('reference'), self.reference)
     
-#    def _id_default(self):
-#        """ Trait initializer. """
-#
-#        return self.id
+
     def reference(self, record, parameters):
         label, beam = record
         if self.window.active_editor is not None:
@@ -252,7 +231,6 @@ class TreeView(View):
           
     def create_new_plot_editor(self, label, beam):
         """Create new ChacoPlot editor window"""
-        tmp = beam.get_scan_descriptor()
         if beam.get_scan_descriptor() == "Dicom_3D_Dose":
             plot = Plot3D()
             self.window.workbench.edit(plot, kind=Plot3DEditor)
