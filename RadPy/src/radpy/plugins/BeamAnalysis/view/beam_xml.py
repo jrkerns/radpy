@@ -314,18 +314,23 @@ class Beam(HasTraits):
     @on_trait_change('BeamDetails_Energy', 
                       'BeamDetails_RadiationDevice_Model',
                       'BeamDetails_RadiationDevice_SerialNumber',
-                      'self.BeamDetails_CrossplaneJawPositions_PositiveJaw',
-                      'self.BeamDetails_CrossplaneJawPositions_NegativeJaw',
-                      'self.BeamDetails_InplaneJawPositions_PositiveJaw',
-                      'self.BeamDetails_InplaneJawPositions_NegativeJaw',
-                      'self.MeasurementDetails_StartPosition_x', 
-                      'self.MeasurementDetails_StopPosition_x',
-                      'self.MeasurementDetails_StartPosition_y',
-                      'self.MeasurementDetails_StopPosition_y',
-                      'self.MeasurementDetails_StartPosition_z',
-                    'self.MeasurementDetails_StopPosition_z')
+                      'BeamDetails_CrossplaneJawPositions_PositiveJaw',
+                      'BeamDetails_CrossplaneJawPositions_NegativeJaw',
+                      'BeamDetails_InplaneJawPositions_PositiveJaw',
+                      'BeamDetails_InplaneJawPositions_NegativeJaw',
+                      'MeasurementDetails_StartPosition_x', 
+                      'MeasurementDetails_StopPosition_x',
+                      'MeasurementDetails_StartPosition_y',
+                      'MeasurementDetails_StopPosition_y',
+                      'MeasurementDetails_StartPosition_z',
+                      'MeasurementDetails_StopPosition_z')
     def set_label(self):
         self.label = '|'.join([self.get_tree_path(),self.get_scan_descriptor()])
+        
+    #If the isocenter depth coordinate is changed, recalculate SSD.
+    @on_trait_change('MeasurementDetails_Isocenter_z')
+    def recalc_SSD(self):
+        self.BeamDetails_SSD = self.BeamDetails_SAD - self.MeasurementDetails_Isocenter_z
         
     def get_field_size(self):
         """Return a string with field size information"""

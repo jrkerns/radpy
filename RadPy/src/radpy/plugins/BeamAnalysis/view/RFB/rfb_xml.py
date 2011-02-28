@@ -128,8 +128,9 @@ class Beam(object):
         #The coordinate system used is IEC fixed gantry and collimator (as you
         #stand at the couch looking towards the gantry, x is
         #crossplane increasing from left to right, y is inplane increasing
-        #towards the gantry and z is depth increasing vertically).  The origin
-        #is machine isocenter.  See the
+        #towards the gantry and z is depth increasing vertically).  The crossplane
+        #and inplane coordinates of the origin correspond to those of the 
+        #isocenter and the depth coordinate is the water surface.  See the
         #report of Task Group 11 "Information Transfer from Beam Data
         #Acquisition Systems", Figure 1. 
         #http://www.aapm.org/pubs/reports/OR_01.pdf
@@ -138,15 +139,17 @@ class Beam(object):
 #                            (self.measurement_header['isocenter_crossplane'],
 #                             self.measurement_header['isocenter_inplane'],
 #                             self.measurement_header['isocenter_depth']))
-        
-        
-        data_structure.beam.MeasurementDetails.Isocenter.x = 0
-        data_structure.beam.MeasurementDetails.Isocenter.y = 0          
-        data_structure.beam.MeasurementDetails.Isocenter.z = 0
-            
+
         isocenter_xyz = [self.measurement_header['isocenter_crossplane'],
                          self.measurement_header['isocenter_inplane'],
                          -self.measurement_header['isocenter_depth']]
+        
+        
+        data_structure.beam.MeasurementDetails.Isocenter.x = isocenter_xyz[0]
+        data_structure.beam.MeasurementDetails.Isocenter.y = isocenter_xyz[1]          
+        data_structure.beam.MeasurementDetails.Isocenter.z = isocenter_xyz[2]
+            
+        
         
 #        data_structure.beam.MeasurementDetails.CoordinateAxes.Inplane = \
 #            self.measurement_header['inplane_servo_axis']
@@ -171,11 +174,11 @@ class Beam(object):
                              self.measurement_header['scan_start_depth']]
         
         data_structure.beam.MeasurementDetails.StartPosition.x = \
-            start_pos_xyz[0] - isocenter_xyz[0]
+            start_pos_xyz[0]# - isocenter_xyz[0]
         data_structure.beam.MeasurementDetails.StartPosition.y = \
-            start_pos_xyz[1] - isocenter_xyz[1]
+            start_pos_xyz[1]# - isocenter_xyz[1]
         data_structure.beam.MeasurementDetails.StartPosition.z = \
-            -start_pos_xyz[2] - isocenter_xyz[2]
+            -start_pos_xyz[2]# - isocenter_xyz[2]
         
         
         stop_pos_xyz = [self.measurement_header['scan_end_crossplane'],
@@ -183,11 +186,11 @@ class Beam(object):
                              self.measurement_header['scan_end_depth']]
         
         data_structure.beam.MeasurementDetails.StopPosition.x = \
-            stop_pos_xyz[0] - isocenter_xyz[0]
+            stop_pos_xyz[0]# - isocenter_xyz[0]
         data_structure.beam.MeasurementDetails.StopPosition.y = \
-            stop_pos_xyz[1] - isocenter_xyz[1]
+            stop_pos_xyz[1]# - isocenter_xyz[1]
         data_structure.beam.MeasurementDetails.StopPosition.z = \
-            -stop_pos_xyz[2] - isocenter_xyz[2]
+            -stop_pos_xyz[2]# - isocenter_xyz[2]
         
         data_structure.beam.MeasurementDetails.Physicist.EmailAddress = \
             self.main_header['email']
