@@ -25,6 +25,7 @@ def load_rfb_data(infile):
         i.set_xml_elements(xml_class)
         xml_class.Data_Abscissa = i.abscissa
         xml_class.Data_Ordinate = i.ordinate
+        xml_class.Data_Quantity = i.measurement_header['data_type']
         xml_class.initialize_traits()
         b.append(xml_class)
     f.close()

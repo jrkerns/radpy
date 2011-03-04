@@ -18,12 +18,14 @@
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+import numpy
 
 import Model as Model
 COLUMNS = ['File Name','Machine', 'Energy', 'Field Size']
 from radpy.plugins.BeamAnalysis.view.ChacoPlot import ChacoPlot, ChacoPlotEditor
 from radpy.plugins.BeamAnalysis.view.Plot3D import Plot3D, Plot3DEditor
 from radpy.plugins.BeamAnalysis.preferences.api import BeamAnalysisPreferencesHelper
+from radpy.plugins.BeamAnalysis.view.beam_xml import Beam
 
 # Enthought library imports.
 from enthought.pyface.workbench.api import View
@@ -129,8 +131,41 @@ class TreeWidget(QTreeView):
             addAsRefAction = menu.addAction("Add &matching beams")
             self.connect(addAsRefAction, SIGNAL("triggered()"), self.addAsRef)
             
+            editAllAction = menu.addAction("&Edit parameters for all beams")
+            self.connect(editAllAction, SIGNAL("triggered()"), self.editAll)
+            
+            delAction = menu.addAction("&Remove beams")
+            self.connect(delAction, SIGNAL("triggered()"), self.delBeam)
+            
         menu.exec_(event.globalPos())
         
+    def editAll(self):
+        
+        global_beam = Beam()
+        beams = self.model().asRecord(self.currentIndex())
+        global_dict = global_beam.trait_get()
+        for key in global_dict.keys():
+            if key == 'Data_Abscissa' or key == 'Data_Ordinate':
+                continue
+            traits = [getattr(beam[1], key) for beam in beams]
+            #Test if all traits in the list are the same
+            if all(traits[0] == trait for trait in traits):
+                setattr(global_beam, key, traits[0])
+        self.model().removeRecord(self.currentIndex())
+        global_beam.edit_traits()
+        
+        global_dict = global_beam.trait_get()
+        for beam in beams:
+            for key in global_dict.keys():
+                try:
+                    global_val = getattr(global_beam, key)
+                    trait_val = getattr(beam[1], key)
+                    if  global_val != trait_val and not global_beam.is_null(key):
+                        setattr(beam[1], key, global_val)
+                except AttributeError:
+                    pass
+            self.model().addRecord(beam[1], False)
+            
     def delBeam(self):
         
         self.model().removeRecord(self.currentIndex())
@@ -152,7 +187,6 @@ class TreeWidget(QTreeView):
     
     def addAsRef(self):
         
-       
         helper = BeamAnalysisPreferencesHelper()
         choices = {'Energy':'BeamDetails_Energy',
                    'Field Size':'field_size',

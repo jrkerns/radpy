@@ -88,7 +88,12 @@ TRAITS_TO_XML = [('MeasurementDetails_MeasuringDevice_Model',
         ('BeamDetails_RadiationDevice_MachineScale',
                 'beam.BeamDetails.RadiationDevice.MachineScale')]
 
-
+def format_func(x):
+    """Format function for Item that hides NaNs"""
+    if numpy.isnan(x):
+        return ''
+    else:
+        return str(x)
 
 class Beam(HasTraits):
     """Class that defines the data model for a scan."""
@@ -157,29 +162,39 @@ class Beam(HasTraits):
     
     traits_view = View(Tabbed(
                         Group(Group(Heading('Beam Parameters'),
-                             Item(name='BeamDetails_Energy',label='Energy (MV)'),
+                             Item(name='BeamDetails_Energy',label='Energy (MV)',
+                                  format_func = format_func),
                              Item(name='BeamDetails_Particle',label='Particle'),
-                             Item(name='BeamDetails_SAD',label='SAD (mm)'),
-                             Item(name='BeamDetails_SSD',label='SSD (mm)'),
+                             Item(name='BeamDetails_SAD',label='SAD (mm)',
+                                  format_func = format_func),
+                             Item(name='BeamDetails_SSD',label='SSD (mm)',
+                                  format_func = format_func),
                              Item(name='BeamDetails_CollimatorAngle',
-                                  label='Collimator Angle'),
+                                  label='Collimator Angle',
+                                  format_func = format_func),
                              Item(name='BeamDetails_GantryAngle',
-                                  label='Gantry Angle'),show_border=True),
+                                  label='Gantry Angle',
+                                  format_func = format_func),show_border=True),
                              
                              Group(Heading('Jaw Positions'),
                              Item(name='BeamDetails_CrossplaneJawPositions_NegativeJaw',
-                                  label='Crossplane Negative Jaw (mm)'),
+                                  label='Crossplane Negative Jaw (mm)',
+                                  format_func = format_func),
                              Item(name='BeamDetails_CrossplaneJawPositions_PositiveJaw',
-                                   label='Crossplane Positive Jaw (mm)'),
+                                   label='Crossplane Positive Jaw (mm)',
+                                  format_func = format_func),
                              Item(name='BeamDetails_InplaneJawPositions_NegativeJaw',
-                                   label='Inplane Negative Jaw (mm)'),
+                                   label='Inplane Negative Jaw (mm)',
+                                  format_func = format_func),
                              Item(name='BeamDetails_InplaneJawPositions_PositiveJaw',
-                                   label='Inplane Positive Jaw (mm)'),
+                                   label='Inplane Positive Jaw (mm)',
+                                  format_func = format_func),
                              show_border=True),
                              
                              Group(Heading('Accessories'),
                              Item(name='BeamDetails_Wedge_Type', label='Wedge Type'),
-                             Item(name='BeamDetails_Wedge_Angle',label='Wedge Angle'),
+                             Item(name='BeamDetails_Wedge_Angle',label='Wedge Angle',
+                                  format_func = format_func),
                              Item(name='BeamDetails_Applicator',label='Applicator'),
                              Item(name='BeamDetails_Accessory',label='Accessory'),
                              show_border=True),
@@ -233,29 +248,29 @@ class Beam(HasTraits):
                               
                               Group(Heading('Isocenter'),
                               Item(name='MeasurementDetails_Isocenter_x',
-                                   label='x'),
+                                   label='x', format_func = format_func),
                               Item(name='MeasurementDetails_Isocenter_y',
-                                   label='y'),
+                                   label='y', format_func = format_func),
                               Item(name='MeasurementDetails_Isocenter_z',
-                                   label='z'),
+                                   label='z', format_func = format_func),
                               show_border=True),
                               
                               Group(Heading('Start Position'),
                               Item(name='MeasurementDetails_StartPosition_x',
-                                   label='x'),
+                                   label='x', format_func = format_func),
                               Item(name='MeasurementDetails_StartPosition_y',
-                                   label='y'),
+                                   label='y', format_func = format_func),
                               Item(name='MeasurementDetails_StartPosition_z',
-                                   label='z'),
+                                   label='z', format_func = format_func),
                               show_border=True),
                               
                               Group(Heading('Stop Position'),
                               Item(name='MeasurementDetails_StopPosition_x',
-                                   label='x'),
+                                   label='x', format_func = format_func),
                               Item(name='MeasurementDetails_StopPosition_y',
-                                   label='y'),
+                                   label='y', format_func = format_func),
                               Item(name='MeasurementDetails_StopPosition_z',
-                                   label='z'),
+                                   label='z', format_func = format_func),
                               show_border=True),orientation='vertical'),
                               
                               Group(Group(Heading('Physicist'),
@@ -330,8 +345,19 @@ class Beam(HasTraits):
     #If the isocenter depth coordinate is changed, recalculate SSD.
     @on_trait_change('MeasurementDetails_Isocenter_z')
     def recalc_SSD(self):
-        self.BeamDetails_SSD = self.BeamDetails_SAD - self.MeasurementDetails_Isocenter_z
+        self.BeamDetails_SSD = self.BeamDetails_SAD + self.MeasurementDetails_Isocenter_z
+     
+    def is_null(self, key):
+        """Test to see if a given key has a null value (NAN or '')"""
+        trait = self.trait(key)
         
+        if trait.is_trait_type(String) and getattr(self, key) == '':
+            return True
+        elif trait.is_trait_type(Float) and numpy.isnan(getattr(self, key)):
+            return True
+        else:
+            return False
+           
     def get_field_size(self):
         """Return a string with field size information"""
         
@@ -490,20 +516,18 @@ class Beam(HasTraits):
         
     def initialize_traits(self):
         
-        for trait, xml in TRAITS_TO_XML:
-            
-            exec('value = self.' + xml)
+        for trait, xml in TRAITS_TO_XML:       
+
+            value = reduce(getattr, xml.split('.'), self)
             test = value.text
             if test == "0.0" or test == "0":
-                exec('self.' + trait + ' = float(value)') 
-                
+                setattr(self, trait, float(value))
             elif value:
-                
-                exec('is_float = self.trait(\"'+trait+'\").is_trait_type(Float)')
+                is_float = self.trait(trait).is_trait_type(Float)
                 if is_float:
-                    exec('self.' + trait + ' = float(value)')
+                    setattr(self, trait, float(value))
                 else:
-                    exec('self.' + trait + ' = str(value)')               
+                    setattr(self, trait, str(value))
  
         self.field_size = self.get_field_size()
         self.scan_type = self.get_scan_type()

@@ -285,7 +285,7 @@ class Beam(object):
         elif scale == 'CW_180_Up':
             data_structure.beam.BeamDetails.RadiationDevice.MachineScale = 'Varian IEC'
         
-        data_structure.quantity = self.measurement_header['data_type']
+        #data_structure.quantity = self.measurement_header['data_type']
 
 class DataFileAdapter(Adapter):
     
