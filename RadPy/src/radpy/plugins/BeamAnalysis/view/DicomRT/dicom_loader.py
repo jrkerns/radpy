@@ -3,6 +3,7 @@ Created on Nov 7, 2010
 
 @author: Steve
 '''
+import scipy, numpy 
 
 from radpy.plugins.BeamAnalysis.view.beam_xml import Beam
 from RTDoseRead import RTDose
@@ -24,6 +25,28 @@ class DicomBeam(Beam):
                 return False
         return True
 
+    def get_profile(self, start, stop):
+        """Given two points, returns a dose profile between them"""
+        x0 = self.Data.x_axis[0]
+        x_step = self.Data.x_axis[1] - x0
+        x1 = self.Data.x_axis[-1] + x_step
+        y0 = self.Data.y_axis[0]
+        y_step = self.Data.y_axis[1] - y0
+        y1 = self.Data.y_axis[-1] + y_step
+        z0 = self.Data.z_axis[0]
+        z_step = self.Data.z_axis[1] - z0
+        z1 = self.Data.z_axis[-1] + z_step
+        
+        grid_x, grid_y, grid_z = numpy.mgrid[x0:x1:x_step, y0:y1:y_step,
+                                             z0:z1:z_step]
+        
+        n = 100
+        step = (numpy.ndarray(stop) - numpy.ndarray(start))/n
+        
+        abscissa = numpy.ndarray(start) + step*numpy.arange(n)
+        
+        
+        
 
 def load_dicom_data(infile):
     """Read in a file in RFB format and return a list of Beam objects"""

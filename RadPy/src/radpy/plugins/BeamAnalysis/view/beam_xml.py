@@ -94,6 +94,13 @@ def format_func(x):
         return ''
     else:
         return str(x)
+    
+def ext_setattr(obj, attr, val):
+    """Convienience function for setting the nested XML attributes"""
+    attributes = attr.split('.')
+    for subattr in attributes[:-1]:
+        obj = getattr(obj, subattr)
+    setattr(obj, attributes[-1], val)
 
 class Beam(HasTraits):
     """Class that defines the data model for a scan."""
@@ -293,7 +300,7 @@ class Beam(HasTraits):
                               orientation='horizontal',
                               label='Measurement Details')
                               ), buttons = ['Undo', 'OK', 'Cancel'],
-                              resizable = True, kind='livemodal')
+                              resizable = True, kind='modal')
     
     def __init__(self):
         super(Beam, self).__init__()  
@@ -482,10 +489,13 @@ class Beam(HasTraits):
         
         for trait, xml in TRAITS_TO_XML:
             
-            exec('value = self.' + trait) 
-            if value and not numpy.isnan(value):
-                exec('self.' + xml + ' = value')
-                  
+            #exec('value = self.' + trait) 
+            value = getattr(self, trait)
+            if value and not self.is_null(trait):
+                #exec('self.' + xml + ' = value')
+                ext_setattr(self, xml, value)
+            
+            
         
         self.beam.Data.Abscissa.clear()
         for i in self.Data_Abscissa:

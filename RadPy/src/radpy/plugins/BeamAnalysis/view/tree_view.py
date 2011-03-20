@@ -40,7 +40,7 @@ class MatchDialog(HasTraits):
     
     view = TraitsView(Item('selection', editor=SetEditor(name='choices',
                     can_move_all=True, ordered=False),show_label=False),
-                    buttons = [OKButton, CancelButton],kind='livemodal')
+                    buttons = [OKButton, CancelButton],kind='modal')
 
 
     
@@ -134,7 +134,7 @@ class TreeWidget(QTreeView):
             editAllAction = menu.addAction("&Edit parameters for all beams")
             self.connect(editAllAction, SIGNAL("triggered()"), self.editAll)
             
-            delAction = menu.addAction("&Remove beams")
+            delAction = menu.addAction("&Delete")
             self.connect(delAction, SIGNAL("triggered()"), self.delBeam)
             
         menu.exec_(event.globalPos())
@@ -151,8 +151,19 @@ class TreeWidget(QTreeView):
             #Test if all traits in the list are the same
             if all(traits[0] == trait for trait in traits):
                 setattr(global_beam, key, traits[0])
-        self.model().removeRecord(self.currentIndex())
+                
+        #removeRecord returns True if the root node is deleted.  This will
+        #require a reset of the TreeView.  (the second parameter of addRecord
+        #must be True)
+        root_reset = self.model().removeRecord(self.currentIndex())
+        
+        #Since traitsUI windows cannot be set to be application modal, the
+        #tree view must be disabled to prevent the user from making changes
+        #to the tree model during editing.  Allowing changes can lead to 
+        #unexpected behavior.
+        self.setEnabled(False)
         global_beam.edit_traits()
+        self.setEnabled(True)
         
         global_dict = global_beam.trait_get()
         for beam in beams:
@@ -164,7 +175,7 @@ class TreeWidget(QTreeView):
                         setattr(beam[1], key, global_val)
                 except AttributeError:
                     pass
-            self.model().addRecord(beam[1], False)
+            self.model().addRecord(beam[1], root_reset)
             
     def delBeam(self):
         
@@ -174,7 +185,15 @@ class TreeWidget(QTreeView):
         index = self.currentIndex()
         beam = self.currentFields()[1]
         self.model().removeRecord(index=index) 
+        
+        #Since traitsUI windows cannot be set to be application modal, the
+        #tree view must be disabled to prevent the user from making changes
+        #to the tree model during editing.  Allowing changes can lead to 
+        #unexpected behavior.
+        self.setEnabled(False)
         beam.edit_traits()
+        self.setEnabled(True)
+        
         self.model().addRecord(beam, False)
 
     def addPlot(self):
@@ -198,7 +217,15 @@ class TreeWidget(QTreeView):
         
         dialog = MatchDialog(choices=choices.keys())
         dialog.selection = helper.match_traits
+        
+        #Since traitsUI windows cannot be set to be application modal, the
+        #tree view must be disabled to prevent the user from making changes
+        #to the tree model during editing.  Allowing changes can lead to 
+        #unexpected behavior.
+        self.setEnabled(False)
         dialog.configure_traits()
+        self.setEnabled(True)
+        
         match_traits = [choices[x] for x in dialog.selection[:]]
         helper.match_traits = dialog.selection
         helper.preferences.flush()
@@ -222,9 +249,18 @@ class TreeView(View):
     def reference(self, record, parameters):
         label, beam = record
         if self.window.active_editor is not None:
+            #Check all beams in the active window to see if there is a match
             for i in self.window.active_editor.obj.beams.values():
                 traits_to_match =  beam.trait_get(parameters)
                 if i.does_it_match(traits_to_match):
+                    if beam.get_scan_descriptor == 'Dicom_3D_Dose':
+                        start = [float(i.MeasurementDetails_StartPosition_x),
+                                 float(i.MeasurementDetails_StartPosition_y),
+                                 float(i.MeasurementDetails_StartPosition_z)]
+                        stop = [float(i.MeasurementDetails_StopPosition_x),
+                                float(i.MeasurementDetails_StopPosition_y),
+                                 float(i.MeasurementDetails_StopPosition_z)]
+                        x, y = beam.get_profile(start, stop)
                     title = self.window.active_editor.obj.add_plot(label, beam)
                     if title is not None:
                         self.window.active_editor.name = title

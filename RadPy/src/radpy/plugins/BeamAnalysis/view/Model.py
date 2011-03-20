@@ -243,17 +243,21 @@ class TreeModel(QAbstractItemModel):
                 raise exception
     
     def removeRecord(self, index):
-
+        
+        root_reset = False
         row = index.row()
         beam = self.nodeFromIndex(index)
-        parent = self.parent(index)    
-        self.beginRemoveRows(parent,row,row)
-        
-        beam.parent.children.pop(row)
-        self.endRemoveRows()
-        if len(beam.parent.children) == 0:
-            self.removeRecord(parent)
-        
+        if beam.parent is None:
+            return True
+        else:           
+            parent = self.parent(index)    
+            self.beginRemoveRows(parent,row,row)
+            
+            beam.parent.children.pop(row)
+            self.endRemoveRows()
+            if len(beam.parent.children) == 0:
+                root_reset = self.removeRecord(parent)
+        return root_reset
 
     def addRecord(self, beam, callReset=True):
         #assert len(fields) > self.nesting
@@ -313,25 +317,25 @@ class TreeModel(QAbstractItemModel):
 
     def data(self, index, role):
         if role == Qt.TextAlignmentRole:
-            return QVariant(int(Qt.AlignTop|Qt.AlignLeft))
+            return int(Qt.AlignTop|Qt.AlignLeft)
         if role != Qt.DisplayRole:
-            return QVariant()
+            return None
         node = self.nodeFromIndex(index)
         assert node is not None
 
         if isinstance(node, BranchNode):
-            return QVariant(node.toString()) \
-                if index.column() == 0 else QVariant(QString(""))
+            return node.toString() \
+                if index.column() == 0 else ""
 
-        return QVariant(node.field(index.column()))
+        return node.field(index.column())
 
 
     def headerData(self, section, orientation, role):
         if orientation == Qt.Horizontal and \
            role == Qt.DisplayRole:
             assert 0 <= section <= len(self.headers)
-            return QVariant(self.headers[section])
-        return QVariant()
+            return self.headers[section]
+        return None
 
 
     def index(self, row, column, parent):
@@ -370,8 +374,8 @@ class ProxyModel(QSortFilterProxyModel):
         """ Provides custom sorting by field size (10x10 before 40x40) """
         regex = re.compile('\d*')
         try:
-            l = int(regex.findall(left.data().toString())[0])
-            r = int(regex.findall(right.data().toString())[0])
+            l = int(regex.findall(left.data())[0])
+            r = int(regex.findall(right.data())[0])
             if l < r:
                 return False
             else:

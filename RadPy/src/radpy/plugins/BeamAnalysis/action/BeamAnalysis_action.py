@@ -73,8 +73,9 @@ class OpenDataFileAction(Action):
         """ Perform the action. """
 
         fname = unicode(QFileDialog.getOpenFileName(self.window.control,
-                            "Choose Scan", "radpy/plugins/BeamAnalysis/view/DicomRT/Tests/",
-                            "Dicom Files *.dcm;;RFB Files *.rfb;;XML Files *.xml"))
+            "Choose Scan", "radpy/plugins/BeamAnalysis/view/DicomRT/Tests/",
+            "RadPy Files (*.dcm *.rfb *.xml)" + \
+            ";;Dicom Files (*.dcm);;RFB Files (*.rfb);;XML Files (*.xml)"))
        
         if fname:
             
