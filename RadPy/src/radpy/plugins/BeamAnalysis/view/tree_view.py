@@ -77,7 +77,7 @@ class TreeWidget(QTreeView):
         self.expanded()
         self.load("radpy/plugins/BeamAnalysis/view/RFB/Unit Tests/Test1.rfb")
         #self.load("c:/users/steve/desktop/xml test/test.xml")
-        #self.load("radpy/plugins/BeamAnalysis/view/DicomRT/tests/3d_dose_wedge.dcm")
+        self.load("radpy/plugins/BeamAnalysis/view/DicomRT/tests/3d_dose_wedge.dcm")
 
         
     def load(self, filename):
@@ -168,6 +168,8 @@ class TreeWidget(QTreeView):
         global_dict = global_beam.trait_get()
         for beam in beams:
             for key in global_dict.keys():
+                if key == 'Data_Abscissa' or key == 'Data_Ordinate':
+                    continue
                 try:
                     global_val = getattr(global_beam, key)
                     trait_val = getattr(beam[1], key)
@@ -253,15 +255,18 @@ class TreeView(View):
             for i in self.window.active_editor.obj.beams.values():
                 traits_to_match =  beam.trait_get(parameters)
                 if i.does_it_match(traits_to_match):
-                    if beam.get_scan_descriptor == 'Dicom_3D_Dose':
+                    if beam.get_scan_descriptor() == 'Dicom_3D_Dose':
                         start = [float(i.MeasurementDetails_StartPosition_x),
                                  float(i.MeasurementDetails_StartPosition_y),
                                  float(i.MeasurementDetails_StartPosition_z)]
                         stop = [float(i.MeasurementDetails_StopPosition_x),
                                 float(i.MeasurementDetails_StopPosition_y),
                                  float(i.MeasurementDetails_StopPosition_z)]
-                        x, y = beam.get_profile(start, stop)
-                    title = self.window.active_editor.obj.add_plot(label, beam)
+                        axis_len = len(i.Data_Abscissa)
+                        ref_beam = beam.get_beam(start, stop, axis_len)
+                    else:
+                        ref_beam = beam                       
+                    title = self.window.active_editor.obj.add_plot(label, ref_beam)
                     if title is not None:
                         self.window.active_editor.name = title
             

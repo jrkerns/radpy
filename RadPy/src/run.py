@@ -54,9 +54,9 @@ def main():
             CorePlugin(),
             WorkbenchPlugin(),
             BeamAnalysisWorkbenchPlugin(),
-            AcmeWorkbenchPlugin(),
-            DeveloperPlugin(),
-            DeveloperUIPlugin()
+#            AcmeWorkbenchPlugin(),
+#           DeveloperPlugin(),
+#          DeveloperUIPlugin()
         ]
     )
 

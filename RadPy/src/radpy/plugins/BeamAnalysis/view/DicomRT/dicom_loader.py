@@ -4,6 +4,8 @@ Created on Nov 7, 2010
 @author: Steve
 '''
 import scipy, numpy 
+import scipy.interpolate
+import scipy.ndimage
 
 from radpy.plugins.BeamAnalysis.view.beam_xml import Beam
 from RTDoseRead import RTDose
@@ -12,6 +14,7 @@ class DicomBeam(Beam):
     
     def __init__(self):
         super(DicomBeam, self).__init__()
+        
         
     def get_scan_descriptor(self):
         return "Dicom_3D_Dose"
@@ -25,25 +28,55 @@ class DicomBeam(Beam):
                 return False
         return True
 
-    def get_profile(self, start, stop):
-        """Given two points, returns a dose profile between them"""
-        x0 = self.Data.x_axis[0]
-        x_step = self.Data.x_axis[1] - x0
-        x1 = self.Data.x_axis[-1] + x_step
-        y0 = self.Data.y_axis[0]
-        y_step = self.Data.y_axis[1] - y0
-        y1 = self.Data.y_axis[-1] + y_step
-        z0 = self.Data.z_axis[0]
-        z_step = self.Data.z_axis[1] - z0
-        z1 = self.Data.z_axis[-1] + z_step
+    def get_beam(self, start, stop, axis_len):
+        """Given two points, returns a beam object with a profile between them"""
+        #Currently, this assumes that the profile will be either
+        #inplane, crossplane or a depth dose (i.e. start and stop positions
+        #are the same in two coordinates).
+        #This function needs a good way to determine the abscissa axis values
+        #in order to generalize to any linear scan.
         
-        grid_x, grid_y, grid_z = numpy.mgrid[x0:x1:x_step, y0:y1:y_step,
-                                             z0:z1:z_step]
+        x_interp = scipy.interpolate.interp1d(self.Data.x_axis, 
+                                          numpy.arange(len(self.Data.x_axis)))
+        y_interp = scipy.interpolate.interp1d(self.Data.y_axis, 
+                                          numpy.arange(len(self.Data.y_axis)))
+        z_interp = scipy.interpolate.interp1d(self.Data.z_axis, 
+                                          numpy.arange(len(self.Data.z_axis)))
         
-        n = 100
-        step = (numpy.ndarray(stop) - numpy.ndarray(start))/n
+        x_values = x_interp(numpy.linspace(start[0],stop[0],axis_len))
+        y_values = y_interp(numpy.linspace(start[1],stop[1],axis_len))
+        z_values = z_interp(numpy.linspace(start[2],stop[2],axis_len))
         
-        abscissa = numpy.ndarray(start) + step*numpy.arange(n)
+        interp_vals = numpy.array([x_values,y_values,z_values])
+        ordinate = scipy.ndimage.map_coordinates(self.Data.dose, interp_vals)
+        
+#        abscissa = []
+#        i0 = numpy.sqrt(start[0]**2 + start[1]**2 + start[2]**2)
+#        i1 = numpy.sqrt((stop[0] - start[0])**2 + (stop[1] - start[1])**2 +
+#                         (stop[2] - start[2])**2)/len(ordinate)
+#        for i in range(len(ordinate)):
+#            abscissa.append(i0 + i*i1)
+
+        scan_range = numpy.array([start[0]-stop[0],start[1]-stop[1],
+                                  start[2]-stop[2]])
+        axis = scan_range.nonzero()[0][0]
+        abs_0 = start[axis]
+        abs_1 = stop[axis]
+        abscissa = numpy.linspace(abs_0,abs_1,axis_len)
+        
+        #Create and initialize a new Beam object
+        xml_beam = Beam()
+        xml_beam.copy_traits(self)
+        xml_beam.Data_Abscissa = abscissa[numpy.argsort(abscissa)]
+        xml_beam.Data_Ordinate = ordinate[numpy.argsort(abscissa)]
+        xml_beam.MeasurementDetails_StartPosition_x = start[0]
+        xml_beam.MeasurementDetails_StopPosition_x = stop[0]
+        xml_beam.MeasurementDetails_StartPosition_y = start[1]
+        xml_beam.MeasurementDetails_StopPosition_y = stop[1]
+        xml_beam.MeasurementDetails_StartPosition_z = start[2]
+        xml_beam.MeasurementDetails_StopPosition_z = stop[2]
+            
+        return xml_beam
         
         
         
@@ -80,6 +113,8 @@ def load_dicom_data(infile):
     xml_class.BeamDetails_RadiationDevice_Vendor = f.rad_vend
     xml_class.BeamDetails_RadiationDevice_Model = f.rad_model
     xml_class.BeamDetails_RadiationDevice_SerialNumber = f.rad_serial
+    xml_class.field_size = xml_class.get_field_size()
+    xml_class.scan_type = xml_class.get_scan_type()
 #    xml_class.Data_Abscissa = i.abscissa
 #    xml_class.Data_Ordinate = i.ordinate
 #    xml_class.initialize_traits()

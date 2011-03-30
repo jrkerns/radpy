@@ -232,6 +232,7 @@ class TreeModel(QAbstractItemModel):
             
             for beam in data:
                 beam.set_label()
+                beam.filename = self.filename
                 self.addRecord(beam, False)
         except IOError, e:
             exception = e
@@ -247,9 +248,11 @@ class TreeModel(QAbstractItemModel):
         root_reset = False
         row = index.row()
         beam = self.nodeFromIndex(index)
-        if beam.parent is None:
-            return True
-        else:           
+        if beam.parent is None or beam.parent == self.root:
+            root_reset = True
+        if beam.parent is not None:
+#            return True
+#        else:           
             parent = self.parent(index)    
             self.beginRemoveRows(parent,row,row)
             
@@ -263,7 +266,7 @@ class TreeModel(QAbstractItemModel):
         #assert len(fields) > self.nesting
         root = self.root
         branch = None
-        fields = (self.filename + "|" + beam.get_tree_path()).split("|")
+        fields = (beam.filename + "|" + beam.get_tree_path()).split("|")
         for i in range(self.nesting):
             key = fields[i].lower()
             branch = root.childWithKey(key)
