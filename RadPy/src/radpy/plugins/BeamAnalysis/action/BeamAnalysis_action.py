@@ -21,7 +21,7 @@ from radpy.plugins.BeamAnalysis.BDML.bdml_export import bdml_export
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-import os
+import os, fnmatch
 
 
 
@@ -115,4 +115,38 @@ class SaveDataFileAction(Action):
         beam_list = file_root.asRecord()
         bdml_export(beam_list, filename)
         
+class OpenDirectoryAction(Action):
+    """ An action that opens all files in a directory and its subdirectories"""
+    
+    #### 'Action' interface ###################################################
+    
+    # A longer description of the action.
+    description = 'Open all data files in a directory and its subdirectories'
+
+    # The action's name (displayed on menus/tool bar tools etc).
+    name = 'Open Directory'
+
+    # A short description of the action used for tooltip text etc.
+    tooltip = 'Open all files in a directory'
+
+    ###########################################################################
+    # 'Action' interface.
+    ###########################################################################
+        
+    def perform(self, event):
+        """Perform the action. """
+        
+        fname = unicode(QFileDialog.getExistingDirectory(self.window.control,
+            "Choose Directory", "radpy/plugins/BeamAnalysis/view/DicomRT/Tests/"))
+       
+        if fname:
+            rootPath = fname
+            patterns = ['*.rfb','*.dcm','*.xml'] 
+ 
+            for root, dirs, files in os.walk(rootPath):
+                for p in patterns:
+                    for filename in fnmatch.filter(files, p):
+                        
+                        self.window.active_view.control.load(os.path.join(root, filename))
+                        
         
