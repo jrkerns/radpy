@@ -27,7 +27,11 @@ class DicomBeam(Beam):
             elif self.trait_get(i) != dict([(i,j)]):
                 return False
         return True
-
+    
+    def overlap(self, a, b):
+        """Takes 2-tuples a and b and returns True if the ranges overlap"""
+        return a[1] > b[0] and a[0] < b[1]
+        
     def get_beam(self, start, stop, axis_len):
         """Given two points, returns a beam object with a profile between them"""
         #Currently, this assumes that the profile will be either
@@ -36,12 +40,40 @@ class DicomBeam(Beam):
         #This function needs a good way to determine the abscissa axis values
         #in order to generalize to any linear scan.
         
+        #Orient start-stop from negative to positive values
+        scan_range = numpy.array([start[0]-stop[0],start[1]-stop[1],
+                                  start[2]-stop[2]])
+        if len(scan_range.nonzero()[0]) != 1:
+            raise ValueError("Point to point scans are not able to matched in RadPy.")
+        axis = scan_range.nonzero()[0][0]
+        if start[axis] > stop[axis]:
+            start[axis], stop[axis] = stop[axis], start[axis]
+            
+        dcm_start = [min(self.Data.x_axis), min(self.Data.y_axis),
+                     min(self.Data.z_axis)]
+        dcm_stop = [max(self.Data.x_axis), max(self.Data.y_axis),
+                     max(self.Data.z_axis)]
+        for i in range(3):
+            if not (self.overlap((start[i],stop[i]),(dcm_start[i], dcm_stop[i]))):
+                raise ValueError("The scan range is outside the Dicom data range.")
+            
+        
+        
+        axis = scan_range.nonzero()[0][0]
+        abs_0 = dcm_start[axis]
+        abs_1 = dcm_stop[axis]
+        
+#        abs_0 = start[axis]
+#        abs_1 = stop[axis]
+        abscissa = numpy.linspace(abs_0,abs_1,axis_len)
+        
         x_interp = scipy.interpolate.interp1d(self.Data.x_axis, 
                                           numpy.arange(len(self.Data.x_axis)))
         y_interp = scipy.interpolate.interp1d(self.Data.y_axis, 
                                           numpy.arange(len(self.Data.y_axis)))
         z_interp = scipy.interpolate.interp1d(self.Data.z_axis, 
                                           numpy.arange(len(self.Data.z_axis)))
+        
         
         x_values = x_interp(numpy.linspace(start[0],stop[0],axis_len))
         y_values = y_interp(numpy.linspace(start[1],stop[1],axis_len))
@@ -57,12 +89,7 @@ class DicomBeam(Beam):
 #        for i in range(len(ordinate)):
 #            abscissa.append(i0 + i*i1)
 
-        scan_range = numpy.array([start[0]-stop[0],start[1]-stop[1],
-                                  start[2]-stop[2]])
-        axis = scan_range.nonzero()[0][0]
-        abs_0 = start[axis]
-        abs_1 = stop[axis]
-        abscissa = numpy.linspace(abs_0,abs_1,axis_len)
+       
         
         #Create and initialize a new Beam object
         xml_beam = Beam()
@@ -75,7 +102,8 @@ class DicomBeam(Beam):
         xml_beam.MeasurementDetails_StopPosition_y = stop[1]
         xml_beam.MeasurementDetails_StartPosition_z = start[2]
         xml_beam.MeasurementDetails_StopPosition_z = stop[2]
-            
+        xml_beam.filename = self.filename
+        xml_beam.set_label()
         return xml_beam
         
         

@@ -254,21 +254,28 @@ class TreeView(View):
             #Check all beams in the active window to see if there is a match
             for i in self.window.active_editor.obj.beams.values():
                 traits_to_match =  beam.trait_get(parameters)
-                if i.does_it_match(traits_to_match):
-                    if beam.get_scan_descriptor() == 'Dicom_3D_Dose':
-                        start = [float(i.MeasurementDetails_StartPosition_x),
-                                 float(i.MeasurementDetails_StartPosition_y),
-                                 float(i.MeasurementDetails_StartPosition_z)]
-                        stop = [float(i.MeasurementDetails_StopPosition_x),
-                                float(i.MeasurementDetails_StopPosition_y),
-                                 float(i.MeasurementDetails_StopPosition_z)]
-                        axis_len = len(i.Data_Abscissa)
-                        ref_beam = beam.get_beam(start, stop, axis_len)
-                    else:
-                        ref_beam = beam                       
-                    title = self.window.active_editor.obj.add_plot(label, ref_beam)
-                    if title is not None:
-                        self.window.active_editor.name = title
+                try:
+                    if i.does_it_match(traits_to_match):
+                        if beam.get_scan_descriptor() == 'Dicom_3D_Dose':
+                            start = [float(i.MeasurementDetails_StartPosition_x),
+                                     float(i.MeasurementDetails_StartPosition_y),
+                                     float(i.MeasurementDetails_StartPosition_z)]
+                            stop = [float(i.MeasurementDetails_StopPosition_x),
+                                    float(i.MeasurementDetails_StopPosition_y),
+                                     float(i.MeasurementDetails_StopPosition_z)]
+                            axis_len = len(i.Data_Abscissa)
+                            ref_beam = beam.get_beam(start, stop, axis_len)
+                            #Setup new beam object label/tree path.
+                            label = '|'.join([ref_beam.filename,ref_beam.label])
+                        else:
+                            ref_beam = beam                       
+                        title = self.window.active_editor.obj.add_plot(label, ref_beam)
+                        if title is not None:
+                            self.window.active_editor.name = title
+                except NotImplementedError:
+                    pass
+                except ValueError as e:
+                    QMessageBox.warning(self.widget, "Warning", unicode(e))
             
         
     def activated(self, record):
