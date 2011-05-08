@@ -14,6 +14,12 @@
 # Copyright (c) 2009 by Radpy.
 # http://code.google.com/p/radpy/   
 
+#Force usage of API v2 for SIP/PyQt 
+#ETS is moving to API v2 so this ensures forward compatibility
+import sip
+sip.setapi('QVariant', 2)
+
+
 #Force usage of Qt backend.
 from enthought.etsconfig.api import ETSConfig
 ETSConfig.toolkit = 'qt4'
@@ -24,6 +30,7 @@ import logging
 
 # Example imports.
 from radpy.api import RadPy
+#import qrc_resources
 
 # Enthought plugins.
 from enthought.envisage.core_plugin import CorePlugin

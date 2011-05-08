@@ -22,7 +22,7 @@
 # Copyright (c) 2007 by Enthought, Inc.
 # http://www.enthought.com
 #
-# Copyright (c) 2009 by Radpy.
+# Copyright (c) 2009-2011 by Radpy.
 # http://code.google.com/p/radpy/  
 
 # Standard library imports.
@@ -62,7 +62,7 @@ _DIALOG_TEXT = '''
       Qt %s<br>
       </p>
       <p>
-      Copyright &copy; 2009 RadPy group<br>
+      Copyright &copy; 2009-2011 RadPy group<br>
       http://code.google.com/p/radpy/
       </p>
   </center>
@@ -101,8 +101,8 @@ class AboutDialog(MAboutDialog, Dialog):
 
         # Load the image to be displayed in the about box.
         image = self.image.create_image()
-        path = self.image.absolute_path
-
+        #path = self.image.absolute_path
+        path = './radpy/images/about.png'
         # The additional strings.
         additions = '<br />'.join(self.additions)
 

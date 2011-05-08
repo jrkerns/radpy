@@ -140,13 +140,13 @@ class OpenDirectoryAction(Action):
             "Choose Directory", "radpy/plugins/BeamAnalysis/view/DicomRT/Tests/"))
        
         if fname:
-            rootPath = fname
-            patterns = ['*.rfb','*.dcm','*.xml'] 
- 
-            for root, dirs, files in os.walk(rootPath):
-                for p in patterns:
-                    for filename in fnmatch.filter(files, p):
-                        
-                        self.window.active_view.control.load(os.path.join(root, filename))
-                        
+#            rootPath = fname
+#            patterns = ['*.rfb','*.dcm','*.xml'] 
+# 
+#            for root, dirs, files in os.walk(rootPath):
+#                for p in patterns:
+#                    for filename in fnmatch.filter(files, p):
+#                        
+#                        self.window.active_view.control.load(os.path.join(root, filename))
+            self.window.active_view.control.load(fname)
         

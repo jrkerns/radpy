@@ -21,10 +21,15 @@ import bisect
 import string
 import re
 import os
+import fnmatch
 
 # Major library imports
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+import scipy
+import numpy
+import lxml
+
 
 # Program specific imports
 from RFB.rfb_loader import load_rfb_data
@@ -220,28 +225,46 @@ class TreeModel(QAbstractItemModel):
         #self.root = BranchNode("", "")
         exception = None
         self.filepath = filename
-        self.filename = os.path.basename(filename).split('.')[0]
-        extension = os.path.basename(filename).split('.')[-1]
-        try:
-            if extension == 'rfb':
-                data = load_rfb_data(filename)
-            elif extension == 'xml':
-                data = load_xml_data(filename)
-            elif extension == 'dcm':
-                data = load_dicom_data(filename)
+        if os.path.isdir(filename):
+            filenames = []
+            rootPath = filename
+            self.filename = os.path.split(os.path.basename(filename))[-1]
+            patterns = ['*.rfb','*.dcm','*.xml'] 
+ 
+            for root, dirs, files in os.walk(rootPath):
+                for p in patterns:
+                    for file in fnmatch.filter(files, p):
+                        
+                        filenames.append((os.path.join(root, file)))
+        
+        else:
+            filenames = [filename]
+            #self.filename = os.path.basename(filename).split('.')[0]
+            self.filename = os.path.splitext(os.path.basename(filename))[0]
+        for file in filenames:
             
-            for beam in data:
-                beam.set_label()
-                beam.filename = self.filename
-                self.addRecord(beam, False)
-        except IOError, e:
-            exception = e
-        finally:
-            
-            self.reset()
-            
-            if exception is not None:
-                raise exception
+            #extension = os.path.basename(file).split('.')[-1]
+            extension = os.path.splitext(file)[-1]
+            try:
+                if extension == '.rfb':
+                    data = load_rfb_data(file)
+                elif extension == '.xml':
+                    data = load_xml_data(file)
+                elif extension == '.dcm':
+                    data = load_dicom_data(file)
+                
+                for beam in data:
+                    beam.set_label()
+                    beam.filename = self.filename
+                    self.addRecord(beam, False)
+            except IOError, e:
+                exception = e
+            finally:
+                
+                self.reset()
+                
+                if exception is not None:
+                    raise exception
     
     def removeRecord(self, index):
         
