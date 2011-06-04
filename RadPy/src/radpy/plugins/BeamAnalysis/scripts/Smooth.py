@@ -1,8 +1,12 @@
+#Python imports
+import os
+
 # Major library imports.
 import numpy
 
 # Enthought library imports.
 from enthought.pyface.action.api import Action
+from enthought.pyface.api import ImageResource
 
 class UserAction(Action):
     
@@ -12,6 +16,7 @@ class UserAction(Action):
     description = 'Smooth the scan plot'
     name = 'Smooth'
     tooltip = 'Smooth the scan plot'
+    image = ImageResource(os.getcwd()+'/radpy/images/smooth.png')
     
     #### BeamAnalysis metadata#################################################
     

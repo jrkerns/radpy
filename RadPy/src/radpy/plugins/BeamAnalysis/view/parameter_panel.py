@@ -3,7 +3,9 @@ import scipy
 from scipy import interpolate
 
 from enthought.traits.api import HasTraits, Float, String
-from enthought.traits.ui.api import View, Item, VGroup
+from enthought.traits.ui.api import Item, VGroup
+#from enthought.traits.ui.qt4.extra.qt_view import QtView
+from enthought.traits.ui.api import View
 
 # Python imports
 import sys, os
@@ -47,10 +49,11 @@ class ParameterPanel(HasTraits):
                           padding=15,show_border=True),
                    width=100,
                    resizable=True, title="Parameters", 
-                   id='radpy.plugins.BeamAnalysis.ParameterPanel'
+                   id='radpy.plugins.BeamAnalysis.ParameterPanel'#,
+                   #style_sheet='* { background-color: #c08e8b; font: 12pt "Calibri";  }'
                    )  
-    
-    
+
+
     def update_parameters(self, beam):
         if beam:
             self.scan_type = beam.get_scan_type()

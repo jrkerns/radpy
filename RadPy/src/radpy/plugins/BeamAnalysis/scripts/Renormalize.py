@@ -1,9 +1,13 @@
+#Python imports
+import os
+
 # Major library imports
 import numpy
 from scipy import interpolate
 
 # Enthought library imports.
 from enthought.pyface.action.api import Action
+from enthought.pyface.api import ImageResource
 
 class UserAction(Action):
     
@@ -25,7 +29,7 @@ class UserAction(Action):
     accelerator = None
     
     # Image to use for toolbar menu buttons.
-    image = None
+    image = ImageResource(os.getcwd()+'/radpy/images/renormalize.png')
         
     #### BeamAnalysis metadata#################################################
     

@@ -41,8 +41,8 @@ from enthought.envisage.ui.workbench.workbench_plugin import WorkbenchPlugin
 # Example plugins.
 from radpy.plugins.BeamAnalysis.api import \
     BeamAnalysisWorkbenchPlugin
-from radpy.plugins.TestPlugin.acme_workbench_plugin import \
-    AcmeWorkbenchPlugin
+#from radpy.plugins.TestPlugin.acme_workbench_plugin import \
+#    AcmeWorkbenchPlugin
 
 
 # Do whatever you want to do with log messages! Here we create a log file.

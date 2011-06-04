@@ -17,11 +17,17 @@
 
 # Standard library imports.
 from logging import DEBUG
+import logging
 
 # Enthought library imports.
 from enthought.envisage.ui.workbench.api import WorkbenchApplication
 from enthought.pyface.api import ImageResource, SplashScreen
 from about_dialog import AboutDialog
+
+from PyQt4 import QtGui, QtCore
+
+# Logging.
+logger = logging.getLogger(__name__)
 
 class RadPy(WorkbenchApplication):
     """ The RadPy application. """
@@ -35,11 +41,12 @@ class RadPy(WorkbenchApplication):
     # Branding information.
     #
     # The icon used on window title bars etc.
-    icon = ImageResource('acmelab.ico')
+    icon = ImageResource('RadPy.ico')
     
     # The name of the application (also used on window title bars etc).
     name = 'RadPy'
     version = '0.0.1'
+    
     ###########################################################################
     # 'WorkbenchApplication' interface.
     ###########################################################################
@@ -65,6 +72,50 @@ class RadPy(WorkbenchApplication):
         )
         
         return splash_screen
+    
+    def run(self):
+        """Overrides WorkbenchApplication.run()"""
+        """ Run the application.
+
+        This does the following (so you don't have to ;^):-
+
+        1) Starts the application
+        2) Creates and opens a workbench window
+        3) Starts the GUI event loop
+        4) When the event loop terminates, stops the application
+
+        """
+
+        logger.debug('---------- workbench application ----------')
+
+        # Make sure the GUI has been created (so that, if required, the splash
+        # screen is shown).
+        gui = self.gui
+        
+        # Start the application.
+        if self.start():
+            # Create and open the first workbench window.
+            window = self.workbench.create_window(
+                position=self.window_position, size=self.window_size
+            )
+            window.open()
+
+            # We stop the application when the workbench has exited.
+            self.workbench.on_trait_change(self._on_workbench_exited, 'exited')
+            style_sheet_file = open('style_sheet.css')
+            window.control.setStyleSheet(style_sheet_file.read())
+            
+            #Awful hack until I can figure out why this doesn't work in the
+            #style sheet
+            window.control.findChild(QtGui.QToolBar).setIconSize(
+                                                            QtCore.QSize(32,32))
+
+            # Start the GUI event loop.
+            #
+            # THIS CALL DOES NOT RETURN UNTIL THE GUI IS CLOSED.
+            gui.start_event_loop()
+        
+        return
     
 #### EOF ######################################################################
 

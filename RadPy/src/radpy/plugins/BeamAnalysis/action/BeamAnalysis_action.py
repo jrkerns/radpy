@@ -16,6 +16,7 @@
 
 # Enthought library imports.
 from enthought.pyface.action.api import Action
+from enthought.pyface.api import ImageResource
 from radpy.plugins.BeamAnalysis.view.ChacoPlot import ChacoPlot, ChacoPlotEditor
 from radpy.plugins.BeamAnalysis.BDML.bdml_export import bdml_export
 from PyQt4.QtCore import *
@@ -38,7 +39,8 @@ class NewPlotAction(Action):
 
     # A short description of the action used for tooltip text etc.
     tooltip = 'Open a new plot window'
-
+    
+    image = ImageResource(os.getcwd()+'/radpy/images/window_new.png')
     ###########################################################################
     # 'Action' interface.
     ###########################################################################
@@ -65,6 +67,8 @@ class OpenDataFileAction(Action):
     # A short description of the action used for tooltip text etc.
     tooltip = 'Open a beam data file'
 
+    image = ImageResource(os.getcwd()+'/radpy/images/open_file.png')
+    
     ###########################################################################
     # 'Action' interface.
     ###########################################################################

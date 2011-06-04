@@ -1,0 +1,10 @@
+QDockWidget {font: bold 12pt "Calibri"} 
+QDockWidget::title {background-color: #c08e8b}
+QToolBar {background-color: #c9e1eb}
+QToolButton {background-color: #c9e1eb}
+QMenuBar {background-color: #c9e1eb}
+QMenuBar::item {background-color: #c9e1eb}
+QMenu {background-color: #c9e1eb}
+QTreeView {font: 12pt "Calibri"; background-color: qlineargradient(x1:0, y1:0, x2:0, y2: 1,stop: 0 #c9e1eb, stop: 1 #FFFFFF); border: 2px solid black}
+QGroupBox { background-color: qlineargradient(x1:0, y1:0, x2:0, y2: 1,stop: 0 #c9e1eb, stop: 1 #FFFFFF); font: 12pt "Calibri"; border: 2px solid black}
+QMainWindow {background-color: qlineargradient(x1:0, y1:0, x2:0, y2: 1,stop: 0#c08e8b, stop: 1 #FFFFFF)}

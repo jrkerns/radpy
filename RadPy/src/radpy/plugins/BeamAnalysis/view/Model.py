@@ -309,7 +309,7 @@ class TreeModel(QAbstractItemModel):
         assert branch is not None
 
         item = LeafNode(beam, branch)
-        self.columns = max(self.columns, 1)
+        self.columns = max(self.columns,1)
 
         
 

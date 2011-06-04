@@ -87,7 +87,8 @@ class ChacoPlot(HasTraits):
     
     def _create_plot_component(self):
         container = OverlayPlotContainer(padding = 50, fill_padding = True,
-                                         bgcolor = "lightgray", use_backbuffer=True)
+                                         bgcolor = 0xc9e1eb,
+                                         use_backbuffer=True)
         self.container = container
 
         self.value_mapper = None

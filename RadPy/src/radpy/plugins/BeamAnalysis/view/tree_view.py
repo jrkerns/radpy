@@ -239,14 +239,13 @@ class TreeWidget(QTreeView):
    
 class TreeView(View):
     
-    name = 'TreeView'
+    name = 'Tree View'
     id = 'radpy.plugins.BeamAnalysis.TreeView'         
     def __init__(self, *args, **kwds):    
-        super(View, self).__init__()
+        super(TreeView, self).__init__()
         self.widget = TreeWidget()
         QObject.connect(self.widget, SIGNAL('activated'),self.activated)
         QObject.connect(self.widget, SIGNAL('reference'), self.reference)
-    
 
     def reference(self, record, parameters):
         label, beam = record
@@ -328,7 +327,7 @@ class TreeView(View):
     #### Methods ##############################################################
 
     def create_control(self, parent):
-       
+        #self._qt4_dock.setStyleSheet('QDockWidget {font: bold 14pt "Calibri"} QDockWidget::title {background-color: #c08e8b}')
         return self.widget
         
     
