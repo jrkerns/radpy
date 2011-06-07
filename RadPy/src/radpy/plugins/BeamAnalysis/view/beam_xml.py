@@ -392,12 +392,24 @@ class Beam(HasTraits):
             particle = ''
         return energy + particle
     
+    def get_accessory(self):
+        
+        if self.BeamDetails_Wedge_Type == 'Open':
+            return 'Open'
+        else:
+            return self.BeamDetails_Wedge_Type + '_' + str(self.BeamDetails_Wedge_Angle)
+    
     def get_tree_path(self):
         """Returns a string with parameters used to populate the GUI tree"""
         #Separator is |.  Uses machine name, energy and field size to tell
         #the GUI tree view where on the tree this beam belongs.
         
-        return '|'.join([self.get_machine(), self.get_energy(),self.get_field_size()])
+#        return '|'.join([self.get_machine(), self.get_energy(),
+#                         self.get_accessory(), self.get_field_size()])
+        temp = '|'.join([self.get_machine(), self.get_energy(),
+                         self.get_accessory(), self.get_field_size(),
+                         self.get_scan_type(), self.get_scan_depth()])
+        return temp
                 
     def get_scan_type(self):
         """Determine the type of scan by comparing start and end positions"""
@@ -418,6 +430,16 @@ class Beam(HasTraits):
                 return scan_types[[i for i, j in enumerate(scan_range) \
                                    if j !=0][0]]
     
+    def get_scan_depth(self):
+        
+        scan_type = self.get_scan_type()
+        if scan_type == "Crossplane Profile":
+            return str(-self.MeasurementDetails_StopPosition_z/10.)
+        elif scan_type == "Inplane Profile":
+            return str(-self.MeasurementDetails_StopPosition_z/10.)
+        else:
+            return "-"
+        
 
     def get_scan_descriptor(self):
         """Return a string with scan type and position information"""

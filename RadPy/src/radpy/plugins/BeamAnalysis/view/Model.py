@@ -138,14 +138,14 @@ class BranchNode(object):
         """This function can be used to get the filename branch node.  
         One use is in the Save Data File action, which saves the file that 
         contains the currently selected node in the tree view."""
-        if self.column == 'File Name':
+        if self.parent.parent == None:
             return self
         else:
             parent = self.parent
-            while parent.column != 'File Name':
+            while True:
+                if hasattr(parent, 'filename'):
+                    return parent
                 parent = parent.parent
-            
-        return parent
 
                 
             
@@ -203,11 +203,14 @@ class LeafNode(object):
         One use is in the Save Data File action, which saves the file that 
         contains the currently selected node in the tree view."""
         
-        parent = self.parent
-        while parent.column != 'File Name':
-            parent = parent.parent
-            
-        return parent
+       if self.parent.parent == None:
+            return self
+        else:
+            parent = self.parent
+            while True:
+                if hasattr(parent, 'filename'):
+                    return parent
+                parent = parent.parent
     
 
 class TreeModel(QAbstractItemModel):
@@ -296,8 +299,8 @@ class TreeModel(QAbstractItemModel):
             if branch is not None:
                 root = branch
             else:                
-                branch = BranchNode(fields[i],self.headers[i])
-                if self.headers[i] == 'File Name':
+                branch = BranchNode(fields[i],self.headers[0])
+                if i == 0: 
                     branch.filename = self.filepath
 
                 parent_index = self.createIndex(root.row,0,root)

@@ -21,7 +21,7 @@ from PyQt4.QtGui import *
 import numpy
 
 import Model as Model
-COLUMNS = ['File Name','Machine', 'Energy', 'Field Size']
+COLUMNS = ['File Name/Machine/Energy/Accessory/Field Size','Plot Type', 'Depth']
 from radpy.plugins.BeamAnalysis.view.ChacoPlot import ChacoPlot, ChacoPlotEditor
 from radpy.plugins.BeamAnalysis.view.Plot3D import Plot3D, Plot3DEditor
 from radpy.plugins.BeamAnalysis.preferences.api import BeamAnalysisPreferencesHelper
@@ -75,14 +75,14 @@ class TreeWidget(QTreeView):
         self.connect(self, SIGNAL("expanded(QModelIndex)"),
                      self.expanded)
         self.expanded()
-        #self.load("radpy/plugins/BeamAnalysis/view/RFB/Unit Tests/Test1.rfb")
+        self.load("radpy/plugins/BeamAnalysis/view/RFB/Unit Tests/Test2.rfb")
         #self.load("c:/users/steve/desktop/xml test/test.xml")
         #self.load("radpy/plugins/BeamAnalysis/view/DicomRT/tests/3d_dose_wedge.dcm")
 
         
     def load(self, filename):
         #Passes lists of scans to tree model class.
-        nesting = len(COLUMNS)
+        nesting = len(COLUMNS[0].split('/'))
         try:
             self.model().load(filename, nesting, COLUMNS)
         except IOError, e:
