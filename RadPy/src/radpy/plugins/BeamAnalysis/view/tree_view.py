@@ -21,7 +21,7 @@ from PyQt4.QtGui import *
 import numpy
 
 import Model as Model
-COLUMNS = ['File Name/Machine/Energy/Accessory/Field Size','Plot Type', 'Depth']
+COLUMNS = ['Plot Type', 'Depth']
 from radpy.plugins.BeamAnalysis.view.ChacoPlot import ChacoPlot, ChacoPlotEditor
 from radpy.plugins.BeamAnalysis.view.Plot3D import Plot3D, Plot3DEditor
 from radpy.plugins.BeamAnalysis.preferences.api import BeamAnalysisPreferencesHelper
@@ -82,7 +82,7 @@ class TreeWidget(QTreeView):
         
     def load(self, filename):
         #Passes lists of scans to tree model class.
-        nesting = len(COLUMNS[0].split('/'))
+        nesting = 5
         try:
             self.model().load(filename, nesting, COLUMNS)
         except IOError, e:
@@ -255,7 +255,7 @@ class TreeView(View):
                 traits_to_match =  beam.trait_get(parameters)
                 try:
                     if i.does_it_match(traits_to_match):
-                        if beam.get_scan_descriptor() == 'Dicom_3D_Dose':
+                        if beam.get_scan_descriptor()[0] == 'Dicom_3D_Dose':
                             start = [float(i.MeasurementDetails_StartPosition_x),
                                      float(i.MeasurementDetails_StartPosition_y),
                                      float(i.MeasurementDetails_StartPosition_z)]
@@ -312,7 +312,7 @@ class TreeView(View):
           
     def create_new_plot_editor(self, label, beam):
         """Create new ChacoPlot editor window"""
-        if beam.get_scan_descriptor() == "Dicom_3D_Dose":
+        if beam.get_scan_descriptor()[0] == "Dicom_3D_Dose":
             plot = Plot3D()
             self.window.workbench.edit(plot, kind=Plot3DEditor)
         else:   

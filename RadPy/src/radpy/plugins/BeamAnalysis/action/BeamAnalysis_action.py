@@ -24,7 +24,7 @@ from PyQt4.QtGui import *
 
 import os, fnmatch
 
-
+USERHOME = os.path.join(os.getcwd(),'Data')
 
 class NewPlotAction(Action):
     """ An action that creates a new plot window. """
@@ -77,7 +77,7 @@ class OpenDataFileAction(Action):
         """ Perform the action. """
 
         fname = unicode(QFileDialog.getOpenFileName(self.window.control,
-            "Choose Scan", "radpy/plugins/BeamAnalysis/view/DicomRT/Tests/",
+            "Choose Scan", USERHOME,
             "RadPy Files (*.dcm *.rfb *.xml)" + \
             ";;Dicom Files (*.dcm);;RFB Files (*.rfb);;XML Files (*.xml)"))
        
@@ -98,6 +98,8 @@ class SaveDataFileAction(Action):
 
     # A short description of the action used for tooltip text etc.
     tooltip = 'Save a beam data file'
+    
+    image = ImageResource(os.getcwd()+'/radpy/images/file_save.png')
 
     ###########################################################################
     # 'Action' interface.
@@ -113,7 +115,7 @@ class SaveDataFileAction(Action):
         extension = os.path.basename(filename).split('.')[1]
         if extension != 'xml':
             filename = unicode(QFileDialog.getSaveFileName(self.window.control,
-                            "Choose Save Filename", "radpy/plugins/BeamAnalysis/view/RFB/Unit Tests/",
+                            "Choose Save Filename", USERHOME,
                             "XML Files *.xml"))
         
         beam_list = file_root.asRecord()
@@ -132,6 +134,8 @@ class OpenDirectoryAction(Action):
 
     # A short description of the action used for tooltip text etc.
     tooltip = 'Open all files in a directory'
+    
+    image = ImageResource(os.getcwd()+'/radpy/images/open_directory.png')
 
     ###########################################################################
     # 'Action' interface.
@@ -141,16 +145,9 @@ class OpenDirectoryAction(Action):
         """Perform the action. """
         
         fname = unicode(QFileDialog.getExistingDirectory(self.window.control,
-            "Choose Directory", "radpy/plugins/BeamAnalysis/view/DicomRT/Tests/"))
+            "Choose Directory", USERHOME))
        
         if fname:
-#            rootPath = fname
-#            patterns = ['*.rfb','*.dcm','*.xml'] 
-# 
-#            for root, dirs, files in os.walk(rootPath):
-#                for p in patterns:
-#                    for filename in fnmatch.filter(files, p):
-#                        
-#                        self.window.active_view.control.load(os.path.join(root, filename))
+
             self.window.active_view.control.load(fname)
         

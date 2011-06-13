@@ -160,7 +160,9 @@ class LeafNode(object):
         self.fields = []
         self.row = 0
         #self.fields = fields
-        self.fields.append(beam.get_scan_descriptor())
+        profile_type, depth = beam.get_scan_descriptor()
+        self.fields.append(profile_type)
+        self.fields.append(depth)
         self.beam = beam
 
 
@@ -187,15 +189,15 @@ class LeafNode(object):
             branch=branch.parent
             
         assert record and not record[0]
-        record = "|".join(record[1:]) + "|" + \
-            self.beam.get_scan_descriptor()
+        profile_type, depth = self.beam.get_scan_descriptor()
+        record = "|".join(record[1:]) + "|" + profile_type + "|" + depth
         return (record, self.beam)
         
 
     def field(self, column):
         assert 0 <= column <= len(self.fields)
-        #return self.fields[column]
-        return self.beam.get_scan_descriptor()
+        return self.fields[column]
+        #return self.beam.get_scan_descriptor()
     
     def getFileBranch(self):
         """Returns the branch node that contains the entire data file."""
@@ -203,7 +205,7 @@ class LeafNode(object):
         One use is in the Save Data File action, which saves the file that 
         contains the currently selected node in the tree view."""
         
-       if self.parent.parent == None:
+        if self.parent.parent == None:
             return self
         else:
             parent = self.parent
@@ -292,6 +294,7 @@ class TreeModel(QAbstractItemModel):
         #assert len(fields) > self.nesting
         root = self.root
         branch = None
+        #fields = (beam.filename + "|" + beam.get_tree_path()).split("|")
         fields = (beam.filename + "|" + beam.get_tree_path()).split("|")
         for i in range(self.nesting):
             key = fields[i].lower()
@@ -311,14 +314,15 @@ class TreeModel(QAbstractItemModel):
                 root = branch
         assert branch is not None
 
-        item = LeafNode(beam, branch)
-        self.columns = max(self.columns,1)
-
+        #item = LeafNode(beam, branch)
+        items = fields[self.nesting:]
+        #self.columns = max(self.columns,1)
+        self.columns = max(self.columns, len(items))
         
 
         parent_index = self.createIndex(branch.row,0,branch)
         self.beginInsertRows(parent_index,len(branch),len(branch))
-        branch.insertChild(item)
+        branch.insertChild(LeafNode(beam, branch))
         
         self.endInsertRows()
         
@@ -347,6 +351,19 @@ class TreeModel(QAbstractItemModel):
     def data(self, index, role):
         if role == Qt.TextAlignmentRole:
             return int(Qt.AlignTop|Qt.AlignLeft)
+        
+        if role == Qt.DecorationRole:
+            node = self.nodeFromIndex(index)
+            if node is None:
+                return None
+            if isinstance(node, LeafNode) and index.column() == 0:
+                filename = os.path.join('./radpy/plugins/BeamAnalysis/view/images',
+                                        node.field(0)+'.png')
+                pixmap = QPixmap(filename)
+                if pixmap.isNull():
+                    return None
+                return pixmap
+                           
         if role != Qt.DisplayRole:
             return None
         node = self.nodeFromIndex(index)

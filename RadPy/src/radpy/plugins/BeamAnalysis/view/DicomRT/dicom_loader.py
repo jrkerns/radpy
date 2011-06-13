@@ -17,7 +17,7 @@ class DicomBeam(Beam):
         
         
     def get_scan_descriptor(self):
-        return "Dicom_3D_Dose"
+        return ("Dicom_3D_Dose","")
     
     def does_it_match(self, args):
         

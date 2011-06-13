@@ -347,7 +347,8 @@ class Beam(HasTraits):
                       'MeasurementDetails_StartPosition_z',
                       'MeasurementDetails_StopPosition_z')
     def set_label(self):
-        self.label = '|'.join([self.get_tree_path(),self.get_scan_descriptor()])
+        profile_type, depth = self.get_scan_descriptor()
+        self.label = '|'.join([self.get_tree_path(), profile_type, depth])
         
     #If the isocenter depth coordinate is changed, recalculate SSD.
     @on_trait_change('MeasurementDetails_Isocenter_z')
@@ -446,13 +447,13 @@ class Beam(HasTraits):
         
         scan_type = self.get_scan_type()
         if scan_type == "Crossplane Profile":
-            return "Crossplane_Profile_" + \
-                str(-self.MeasurementDetails_StopPosition_z/10.)
+            return ("Crossplane",
+                str(-self.MeasurementDetails_StopPosition_z/10.))
         elif scan_type == "Inplane Profile":
-            return "Inplane_Profile_" + \
-                   str(-self.MeasurementDetails_StopPosition_z/10.)
+            return ("Inplane",
+                   str(-self.MeasurementDetails_StopPosition_z/10.))
         else:
-            return "Depth_Dose"
+            return ("Depth_Dose","")
          
     def get_collimator(self, direction="crossplane"):
         

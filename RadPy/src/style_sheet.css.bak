@@ -1,5 +1,5 @@
 QDockWidget {font: 12pt "Verdana"} 
-QDockWidget::title {background-color: #ffedd8}
+QDockWidget::title {background-color: #c0a5a3}
 QToolBar {background-color: #c9e1eb}
 QToolButton {background-color: #c9e1eb}
 QMenuBar {background-color: #c9e1eb}
@@ -7,4 +7,4 @@ QMenuBar::item {background-color: #c9e1eb}
 QMenu {background-color: #c9e1eb}
 QTreeView {font: 10pt "Verdana"; background-color: qlineargradient(x1:0, y1:0, x2:0, y2: 1,stop: 0 #c9e1eb, stop: 1 #FFFFFF); border: 2px solid black}
 QGroupBox { background-color: qlineargradient(x1:0, y1:0, x2:0, y2: 1,stop: 0 #c9e1eb, stop: 1 #FFFFFF); border: 2px solid black}
-QMainWindow {background-color: qlineargradient(x1:0, y1:0, x2:0, y2: 1,stop: 0 #a67946, stop: 1 #FFFFFF)}
+QMainWindow {background-color: qlineargradient(x1:0, y1:0, x2:0, y2: 1,stop: 0#c08e8b, stop: 1 #FFFFFF)}
