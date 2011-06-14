@@ -45,7 +45,7 @@ class RadPy(WorkbenchApplication):
     
     # The name of the application (also used on window title bars etc).
     name = 'RadPy'
-    version = '0.0.1'
+    version = '0.1.0'
     
     ###########################################################################
     # 'WorkbenchApplication' interface.
@@ -109,6 +109,13 @@ class RadPy(WorkbenchApplication):
             #style sheet
             window.control.findChild(QtGui.QToolBar).setIconSize(
                                                             QtCore.QSize(32,32))
+            
+            #For some reason the workbench status bar doesn't display the
+            #first message
+            window.status_bar_manager.message = ''
+            
+            window.status_bar_manager.message = ' '.join(
+                                                    [self.name, self.version])
 
             # Start the GUI event loop.
             #

@@ -49,8 +49,7 @@ class ParameterPanel(HasTraits):
                           padding=15,show_border=True),
                    width=100,
                    resizable=True, title="Parameters", 
-                   id='radpy.plugins.BeamAnalysis.ParameterPanel'#,
-                   #style_sheet='* { background-color: #c08e8b; font: 12pt "Calibri";  }'
+                   id='radpy.plugins.BeamAnalysis.ParameterPanel'
                    )  
 
 
@@ -60,7 +59,7 @@ class ParameterPanel(HasTraits):
         
             for i in self.parameter_list:
                 parameter = i.calc(beam)
-                exec("self." + i.name + " = parameter")
+                setattr(self, i.name, parameter)
         
         else:
             self.scan_type = 'None'

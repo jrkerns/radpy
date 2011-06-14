@@ -38,7 +38,6 @@ from enthought.chaco.tools.api import PanTool, ZoomTool, LegendTool, \
 from plot_select_tool import PlotSelectTool
 from highlight_legend import HighlightLegend
 
-
 class ChacoPlotEditor(TraitsUIEditor):
     # Needed to make the editor window title human readable.
     selected_beam = DelegatesTo('obj')
@@ -94,6 +93,11 @@ class ChacoPlot(HasTraits):
         self.value_mapper = None
         self.index_mapper = None
         self.plots = {}
+        
+        # Store Python object ids to distinguish between different plots
+        # with the same label
+        self.plot_ids = []
+        
         self.beams = {}
         x = numpy.arange(0)
         y = numpy.arange(0)
@@ -173,16 +177,25 @@ class ChacoPlot(HasTraits):
     def add_plot(self, label, beam):
         
         # Check to see if beam has already been plotted.
-        if label in self.plots.keys():
+        if id(beam) in self.plot_ids:
             return          
-        
-        x, y = (beam.Data_Abscissa, beam.Data_Ordinate)
         
         # The plot_type trait is defined by the geometry of the scanned plot 
         # (inline, crossline, depth dose, etc.).  
         if self.plot_type is not None:
             self.plot_type = beam.get_scan_type()
             
+        # Reformat labels
+        fields = label.split('|')
+        if self.plot_type == 'Depth Dose':
+            label = '|'.join(fields[:-1])
+        elif self.plot_type in ['Inplane Profile','Crossplane Profile']:
+            label = label + ' cm depth'
+            
+        x, y = (beam.Data_Abscissa, beam.Data_Ordinate)
+        if label in self.plots.keys():
+            #label = increment(label)
+            label = label + '_' + str(len(self.plots))
         plot = create_line_plot((x,y), color=tuple(
                                     self.get_plot_color()), width=2.0)
         plot.index.sort_order = "ascending"
@@ -203,6 +216,7 @@ class ChacoPlot(HasTraits):
         # the selected_plot trait to the selected_beam trait.
         self.beams[plot] = beam
         self.plots[label] = plot
+        self.plot_ids.append(id(beam))
         
         self.legend.visible = True
         self.legend.plots = self.plots
@@ -222,8 +236,8 @@ class ChacoPlot(HasTraits):
         
         #If there is only one scan, return generic name.
         if len(self.plots.keys()) < 2:
-            #return self.plots.keys[0]
-            return ["Scan"]
+            return [self.plots.keys()[0].split('|')[-1]]
+            #return ["Scan"]
         else:
             plots = [i for i in self.plots.keys()]
             plots.sort()

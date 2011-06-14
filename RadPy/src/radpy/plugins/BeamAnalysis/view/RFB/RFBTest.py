@@ -1,7 +1,7 @@
 import unittest
 import cPickle
 
-from rfb import omnipro_file
+#from rfb import omnipro_file
 
 class ImportTest(unittest.TestCase):
 
@@ -9,8 +9,8 @@ class ImportTest(unittest.TestCase):
         '''Read in test rfb files and check certain attributes against
         reference pickled files. '''
         for i in range(1,5):
-            f = open('../Unit Tests/test'+str(i)+'.rfb','rb')
-            print '../Unit Tests/test'+str(i)+'.rfb'
+            f = open(r'./Unit Tests/test'+str(i)+'.rfb','rb')
+            print './Unit Tests/test'+str(i)+'.rfb'
             input = omnipro_file.parse(f.read())
             f.close()
             

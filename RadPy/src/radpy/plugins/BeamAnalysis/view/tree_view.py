@@ -74,11 +74,11 @@ class TreeWidget(QTreeView):
                      self.activated)
         self.connect(self, SIGNAL("expanded(QModelIndex)"),
                      self.expanded)
-        self.expanded()
+        
         self.load("radpy/plugins/BeamAnalysis/view/RFB/Unit Tests/Test2.rfb")
         #self.load("c:/users/steve/desktop/xml test/test.xml")
         #self.load("radpy/plugins/BeamAnalysis/view/DicomRT/tests/3d_dose_wedge.dcm")
-
+        self.expanded()
         
     def load(self, filename):
         #Passes lists of scans to tree model class.
@@ -88,12 +88,6 @@ class TreeWidget(QTreeView):
         except IOError, e:
             QMessageBox.warning(self, "Server Info - Error",
                                 unicode(e))
-#        except PlanError as e:
-#            QMessageBox.warning(self,'''Gantry and collimator angles must be 0 
-#                (IEC Scale).  Instead the plan has a gantry angle of ''' + \
-#                str(e.gantry) + ' and a collimator angle of ' + \
-#                str(e.collimator) + '.')
-        
             
     def currentFields(self):
         return self.model().asRecord(self.currentIndex())
@@ -309,6 +303,8 @@ class TreeView(View):
         else:
             
             self.create_new_plot_editor(label, beam)
+            
+        self.window.status_bar_manager.message = label
           
     def create_new_plot_editor(self, label, beam):
         """Create new ChacoPlot editor window"""

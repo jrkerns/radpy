@@ -1,6 +1,7 @@
 from rfb_xml import omnipro_file    
 from radpy.plugins.BeamAnalysis.view.beam_xml import Beam
 from lxml import etree, objectify
+from PyQt4 import QtGui, QtCore
 
 class RFBBeam(Beam):
     
@@ -20,14 +21,19 @@ def load_rfb_data(infile):
     a = omnipro_file.parse(f.read())
     b = []
     for i in a:
-        
-        xml_class = RFBBeam()
-        i.set_xml_elements(xml_class)
-        xml_class.Data_Abscissa = i.abscissa
-        xml_class.Data_Ordinate = i.ordinate
-        xml_class.Data_Quantity = i.measurement_header['data_type']
-        xml_class.initialize_traits()
-        b.append(xml_class)
+        try:
+            xml_class = RFBBeam()
+            i.set_xml_elements(xml_class)           
+            xml_class.Data_Abscissa = i.abscissa
+            xml_class.Data_Ordinate = i.ordinate
+            xml_class.Data_Quantity = i.measurement_header['data_type']
+            xml_class.initialize_traits()
+            b.append(xml_class)
+        except:
+            QtGui.QMessageBox.warning(None, "RFB Read Error", ("Error reading "  
+                    + infile + ".  The file may be from a old version of "
+                     "Omnipro (earlier than 6.0) or may contain TMR data."),
+                    buttons=QtGui.QMessageBox.Ok)
     f.close()
     return b
     
