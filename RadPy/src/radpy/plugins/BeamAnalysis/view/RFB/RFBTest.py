@@ -1,7 +1,8 @@
 import unittest
 import cPickle
+import numpy.testing as npt
 
-#from rfb import omnipro_file
+from rfb_xml import omnipro_file
 
 class ImportTest(unittest.TestCase):
 
@@ -14,19 +15,15 @@ class ImportTest(unittest.TestCase):
             input = omnipro_file.parse(f.read())
             f.close()
             
-            compare_file = open('../Unit Tests/test'+str(i)+'.pkl','rb')
+            compare_file = open('./Unit Tests/test'+str(i)+'.pkl','rb')
             compare = cPickle.load(compare_file)
             compare_file.close()
             
             for j in range(len(input)):
-                self.assertEqual(input[j].data_abscissa,
-                                 compare[j].data_abscissa)
-                self.assertEqual(input[j].data_ordinate,
-                                 compare[j].data_ordinate)
-                self.assertEqual(input[j].data_ordinate,
-                                 compare[j].data_ordinate)
-                self.assertEqual(input[j].data_ordinate,
-                                 compare[j].data_ordinate)
+                npt.assert_equal(input[j].abscissa,
+                                 compare[j].abscissa)
+                npt.assert_equal(input[j].ordinate,
+                                 compare[j].ordinate)
                 self.assertEqual(input[j].main_header['SSD'],
                                  compare[j].main_header['SSD'])
                 self.assertEqual(input[j].main_header['wedge_angle'],
@@ -38,7 +35,18 @@ class ImportTest(unittest.TestCase):
                                  compare[j].measurement_header\
                                  ['scan_start_depth'])
             
+def regen_pickle_data():
+    
+    for i in range(1,5):
+        f = open(r'./Unit Tests/test'+str(i)+'.rfb','rb')
+        input = omnipro_file.parse(f.read())
+        f.close()
+        
+        pickle_file = open('./Unit Tests/test'+str(i)+'.pkl','wb')
+        cPickle.dump(input, pickle_file)
+        pickle_file.close()
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
+    #regen_pickle_data()
