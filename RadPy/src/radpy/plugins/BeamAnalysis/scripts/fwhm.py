@@ -20,7 +20,7 @@ class UserParameter(object):
         
         return Item(name = self.name, style = self.style,
                                 visible_when = self.visible_when,
-                                format_func = lambda v: '%.2f' % v)
+                                format_func = lambda v: '%.2f cm' % v)
         
     def calc(self, beam):
         

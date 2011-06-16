@@ -134,6 +134,8 @@ class Beam(object):
         #report of Task Group 11 "Information Transfer from Beam Data
         #Acquisition Systems", Figure 1. 
         #http://www.aapm.org/pubs/reports/OR_01.pdf
+        #All distances in the RFB file are stored in mm.  They are converted
+        #to cm here.
         
 #        isocenter_xyz = self.machine_axes_to_xyz(
 #                            (self.measurement_header['isocenter_crossplane'],
@@ -145,9 +147,9 @@ class Beam(object):
                          -self.measurement_header['isocenter_depth']]
         
         
-        data_structure.beam.MeasurementDetails.Isocenter.x = isocenter_xyz[0]
-        data_structure.beam.MeasurementDetails.Isocenter.y = isocenter_xyz[1]          
-        data_structure.beam.MeasurementDetails.Isocenter.z = isocenter_xyz[2]
+        data_structure.beam.MeasurementDetails.Isocenter.x = isocenter_xyz[0]/10.
+        data_structure.beam.MeasurementDetails.Isocenter.y = isocenter_xyz[1]/10.         
+        data_structure.beam.MeasurementDetails.Isocenter.z = isocenter_xyz[2]/10.
             
         
         
@@ -174,11 +176,11 @@ class Beam(object):
                              self.measurement_header['scan_start_depth']]
         
         data_structure.beam.MeasurementDetails.StartPosition.x = \
-            start_pos_xyz[0]# - isocenter_xyz[0]
+            start_pos_xyz[0]/10.# - isocenter_xyz[0]
         data_structure.beam.MeasurementDetails.StartPosition.y = \
-            start_pos_xyz[1]# - isocenter_xyz[1]
+            start_pos_xyz[1]/10.# - isocenter_xyz[1]
         data_structure.beam.MeasurementDetails.StartPosition.z = \
-            -start_pos_xyz[2]# - isocenter_xyz[2]
+            -start_pos_xyz[2]/10.# - isocenter_xyz[2]
         
         
         stop_pos_xyz = [self.measurement_header['scan_end_crossplane'],
@@ -186,11 +188,11 @@ class Beam(object):
                              self.measurement_header['scan_end_depth']]
         
         data_structure.beam.MeasurementDetails.StopPosition.x = \
-            stop_pos_xyz[0]# - isocenter_xyz[0]
+            stop_pos_xyz[0]/10.# - isocenter_xyz[0]
         data_structure.beam.MeasurementDetails.StopPosition.y = \
-            stop_pos_xyz[1]# - isocenter_xyz[1]
+            stop_pos_xyz[1]/10.# - isocenter_xyz[1]
         data_structure.beam.MeasurementDetails.StopPosition.z = \
-            -stop_pos_xyz[2]# - isocenter_xyz[2]
+            -stop_pos_xyz[2]/10.# - isocenter_xyz[2]
         
         data_structure.beam.MeasurementDetails.Physicist.EmailAddress = \
             self.main_header['email']
@@ -236,10 +238,10 @@ class Beam(object):
             self.main_header['particle']
             
         data_structure.beam.BeamDetails.SAD = \
-            self.main_header['SAD']
+            self.main_header['SAD']/10.
             
         data_structure.beam.BeamDetails.SSD = \
-            self.main_header['SSD']
+            self.main_header['SSD']/10.
             
         data_structure.beam.BeamDetails.CollimatorAngle= \
             self.main_header['collimator_angle']
@@ -248,16 +250,16 @@ class Beam(object):
             self.main_header['gantry_angle']
         
         data_structure.beam.BeamDetails.CrossplaneJawPositions.NegativeJaw = \
-            -self.main_header['crossplane_jaw_negative']
+            -self.main_header['crossplane_jaw_negative']/10.
         
         data_structure.beam.BeamDetails.CrossplaneJawPositions.PositiveJaw = \
-            self.main_header['crossplane_jaw_positive']
+            self.main_header['crossplane_jaw_positive']/10.
         
         data_structure.beam.BeamDetails.InplaneJawPositions.NegativeJaw = \
-            -self.main_header['inplane_jaw_negative']
+            -self.main_header['inplane_jaw_negative']/10.
             
         data_structure.beam.BeamDetails.InplaneJawPositions.PositiveJaw = \
-            self.main_header['inplane_jaw_positive']
+            self.main_header['inplane_jaw_positive']/10.
         
         data_structure.beam.BeamDetails.Wedge.Angle = \
             self.main_header['wedge_angle']

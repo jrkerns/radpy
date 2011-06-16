@@ -33,6 +33,7 @@ from enthought.chaco.api import create_line_plot, add_default_axes, \
         add_default_grids, OverlayPlotContainer, PlotLabel, Legend
 from enthought.chaco.tools.api import PanTool, ZoomTool, LegendTool, \
         TraitsTool, DragZoom
+from enthought.chaco.tools.cursor_tool import CursorTool
 
 #RadPy imports
 from plot_select_tool import PlotSelectTool
@@ -122,13 +123,15 @@ class ChacoPlot(HasTraits):
                 
         # The ZoomTool tool is stateful and allows drawing a zoom
         # box to select a zoom region.
-        zoom = ZoomTool(plot, tool_mode="box", always_on=False)
+        zoom = ZoomTool(plot, tool_mode="box", always_on=True)
+        zoom.zoom_factor = 1.2
         plot.overlays.append(zoom)
 
         # The DragZoom tool just zooms in and out as the user drags
         # the mouse vertically.
-        dragzoom = DragZoom(plot, drag_button="right")
-        plot.tools.append(dragzoom)
+#        dragzoom = DragZoom(plot, drag_button="right")
+#        dragzoom.speed = 0.2
+#        plot.tools.append(dragzoom)
 
         # Add a legend in the upper right corner, and make it relocatable
         self.legend = Legend(component=plot, padding=10, align="ur")
@@ -151,7 +154,7 @@ class ChacoPlot(HasTraits):
         plot_select_tool.parent = self
         plot.tools.append(plot_select_tool)
         
-        plot.x_axis.title = "Distance (mm)"
+        plot.x_axis.title = "Distance (cm)"
         plot.x_axis.title_font = "Verdana 12"
         plot.x_axis.tick_label_font = "Verdana 10"
         plot.y_axis.title = "% Dose"

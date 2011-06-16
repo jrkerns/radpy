@@ -20,12 +20,16 @@ class UserParameter(object):
         
         return Item(name = self.name, style = self.style,
                                 visible_when = self.visible_when,
-                                format_func = lambda v: '%.2f' % v)
+                                format_func = lambda v: '%.2f cm' % v)
         
     def calc(self, beam):
         
-        dmax = beam.Data_Abscissa[numpy.argmax(beam.Data_Ordinate)]
-        x_axis = numpy.where(beam.Data_Abscissa > dmax)
-        tck = interpolate.splrep(beam.Data_Abscissa[x_axis], 
-                                 beam.Data_Ordinate[x_axis])
-        return interpolate.splev(50, tck)
+        x = beam.Data_Abscissa
+        y = beam.Data_Ordinate
+        dmax = x[numpy.argmax(y)]
+        x_axis = x[numpy.where(x > dmax)]
+        y_axis = y[numpy.where(x > dmax)]
+        gt50 = x_axis[numpy.where(y_axis > numpy.max(y)/2.)]
+        return gt50[-1]
+        
+        

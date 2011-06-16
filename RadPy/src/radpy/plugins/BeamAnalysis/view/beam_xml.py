@@ -172,9 +172,9 @@ class Beam(HasTraits):
                              Item(name='BeamDetails_Energy',label='Energy (MV)',
                                   format_func = format_func),
                              Item(name='BeamDetails_Particle',label='Particle'),
-                             Item(name='BeamDetails_SAD',label='SAD (mm)',
+                             Item(name='BeamDetails_SAD',label='SAD (cm)',
                                   format_func = format_func),
-                             Item(name='BeamDetails_SSD',label='SSD (mm)',
+                             Item(name='BeamDetails_SSD',label='SSD (cm)',
                                   format_func = format_func),
                              Item(name='BeamDetails_CollimatorAngle',
                                   label='Collimator Angle',
@@ -185,16 +185,16 @@ class Beam(HasTraits):
                              
                              Group(Heading('Jaw Positions'),
                              Item(name='BeamDetails_CrossplaneJawPositions_NegativeJaw',
-                                  label='Crossplane Negative Jaw (mm)',
+                                  label='Crossplane Negative Jaw (cm)',
                                   format_func = format_func),
                              Item(name='BeamDetails_CrossplaneJawPositions_PositiveJaw',
-                                   label='Crossplane Positive Jaw (mm)',
+                                   label='Crossplane Positive Jaw (cm)',
                                   format_func = format_func),
                              Item(name='BeamDetails_InplaneJawPositions_NegativeJaw',
-                                   label='Inplane Negative Jaw (mm)',
+                                   label='Inplane Negative Jaw (cm)',
                                   format_func = format_func),
                              Item(name='BeamDetails_InplaneJawPositions_PositiveJaw',
-                                   label='Inplane Positive Jaw (mm)',
+                                   label='Inplane Positive Jaw (cm)',
                                   format_func = format_func),
                              show_border=True),
                              
@@ -435,9 +435,9 @@ class Beam(HasTraits):
         
         scan_type = self.get_scan_type()
         if scan_type == "Crossplane Profile":
-            return str(-self.MeasurementDetails_StopPosition_z/10.)
+            return str(-self.MeasurementDetails_StopPosition_z)
         elif scan_type == "Inplane Profile":
-            return str(-self.MeasurementDetails_StopPosition_z/10.)
+            return str(-self.MeasurementDetails_StopPosition_z)
         else:
             return "-"
         
@@ -448,10 +448,10 @@ class Beam(HasTraits):
         scan_type = self.get_scan_type()
         if scan_type == "Crossplane Profile":
             return ("Crossplane",
-                str(-self.MeasurementDetails_StopPosition_z/10.))
+                str(-self.MeasurementDetails_StopPosition_z))
         elif scan_type == "Inplane Profile":
             return ("Inplane",
-                   str(-self.MeasurementDetails_StopPosition_z/10.))
+                   str(-self.MeasurementDetails_StopPosition_z))
         else:
             return ("Depth_Dose","")
          

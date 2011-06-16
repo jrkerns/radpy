@@ -24,7 +24,7 @@ def load_rfb_data(infile):
         try:
             xml_class = RFBBeam()
             i.set_xml_elements(xml_class)           
-            xml_class.Data_Abscissa = i.abscissa
+            xml_class.Data_Abscissa = i.abscissa/10. #Convert to cm
             xml_class.Data_Ordinate = i.ordinate
             xml_class.Data_Quantity = i.measurement_header['data_type']
             xml_class.initialize_traits()
