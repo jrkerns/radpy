@@ -348,7 +348,8 @@ class Beam(HasTraits):
                       'MeasurementDetails_StopPosition_z')
     def set_label(self):
         profile_type, depth = self.get_scan_descriptor()
-        self.label = '|'.join([self.get_tree_path(), profile_type, depth])
+        #self.label = '|'.join([self.get_tree_path(), profile_type, depth])
+        self.label = self.get_tree_path()
         
     #If the isocenter depth coordinate is changed, recalculate SSD.
     @on_trait_change('MeasurementDetails_Isocenter_z')

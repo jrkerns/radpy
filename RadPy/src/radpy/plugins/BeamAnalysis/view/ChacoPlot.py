@@ -38,6 +38,7 @@ from enthought.chaco.tools.cursor_tool import CursorTool
 #RadPy imports
 from plot_select_tool import PlotSelectTool
 from highlight_legend import HighlightLegend
+from zoom import RadPyZoomTool
 
 class ChacoPlotEditor(TraitsUIEditor):
     # Needed to make the editor window title human readable.
@@ -123,7 +124,8 @@ class ChacoPlot(HasTraits):
                 
         # The ZoomTool tool is stateful and allows drawing a zoom
         # box to select a zoom region.
-        zoom = ZoomTool(plot, tool_mode="box", always_on=True)
+        zoom = ZoomTool(plot, tool_mode="box", always_on=True, 
+                        drag_button="right" )
         zoom.zoom_factor = 1.2
         plot.overlays.append(zoom)
 

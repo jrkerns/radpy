@@ -68,7 +68,7 @@ class PlotSelectTool(BaseTool):
             else:
                 self.parent.selected_plot = plot
                 plot.line_width *= 2
- 
+                
         plot.request_redraw()
 
     def _deselect(self, selected):

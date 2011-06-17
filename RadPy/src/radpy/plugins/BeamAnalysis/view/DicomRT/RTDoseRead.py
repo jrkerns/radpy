@@ -63,13 +63,13 @@ class RTDose(object):
         self.rad_vend = self.beam.Manufacturer
         self.rad_model = self.beam.ManufacturersModelName
         self.rad_serial = self.beam.DeviceSerialNumber
-        self.coll_x_neg = self.field[0x300a,0x011a][0][0x300a,0x011c][0]
-        self.coll_x_pos = self.field[0x300a,0x011a][0][0x300a,0x011c][1]
-        self.coll_y_neg = self.field[0x300a,0x011a][1][0x300a,0x011c][0]
-        self.coll_y_pos = self.field[0x300a,0x011a][1][0x300a,0x011c][1]
+        self.coll_x_neg = self.field[0x300a,0x011a][0][0x300a,0x011c][0]/10.
+        self.coll_x_pos = self.field[0x300a,0x011a][0][0x300a,0x011c][1]/10.
+        self.coll_y_neg = self.field[0x300a,0x011a][1][0x300a,0x011c][0]/10.
+        self.coll_y_pos = self.field[0x300a,0x011a][1][0x300a,0x011c][1]/10.
         self.gantry_angle = self.field.GantryAngle
         self.collimator_angle = self.field.BeamLimitingDeviceAngle
-        self.isocenter = self.field.IsocenterPosition
+        self.isocenter = numpy.array(self.field.IsocenterPosition)/10.
         if self.gantry_angle != 0 or self.collimator_angle != 0:
             raise IOError('Gantry and collimator angles must be 0 ' + \
                 '(IEC Scale).  Instead the plan has a gantry angle of ' + \
@@ -83,7 +83,7 @@ class RTDose(object):
         self.rows = tmp.Rows
         self.columns = tmp.Columns
         self.pixel_spacing = tmp.PixelSpacing
-        self.origin = tmp.ImagePositionPatient
+        self.origin = numpy.array(tmp.ImagePositionPatient)/10.
         
         #Set up coordinate axes relative to the isocenter
 #        self.x_axis_dicom = numpy.arange(self.columns)*self.pixel_spacing[0] + \
@@ -101,9 +101,12 @@ class RTDose(object):
 #        self.x_axis = self.x_axis_dicom
 #        self.y_axis = self.y_axis_dicom
 #        self.z_axis = self.z_axis_dicom
-        self.x_axis = numpy.arange(self.columns)*self.pixel_spacing[0] + self.origin[0]
-        self.y_axis = numpy.arange(self.rows)*self.pixel_spacing[1] + self.origin[1]
-        self.z_axis = numpy.array(tmp.GridFrameOffsetVector) + self.origin[2]
+        self.x_axis = (numpy.arange(self.columns)*self.pixel_spacing[0] / 10.
+                        + self.origin[0])
+        self.y_axis = (numpy.arange(self.rows)*self.pixel_spacing[1] / 10.
+                       + self.origin[1])
+        self.z_axis = (numpy.array(tmp.GridFrameOffsetVector) / 10.
+                        + self.origin[2])
             
  
         self.dose = numpy.swapaxes(tmp.pixel_array*tmp.DoseGridScaling,0,2)
