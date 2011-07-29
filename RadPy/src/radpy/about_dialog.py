@@ -63,7 +63,7 @@ _DIALOG_TEXT = '''
       </p>
       <p>
       Copyright &copy; 2009-2011 RadPy group<br>
-      http://code.google.com/p/radpy/
+      http://www.radpy.org
       </p>
   </center>
   </body>

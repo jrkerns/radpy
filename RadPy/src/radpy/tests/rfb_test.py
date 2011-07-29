@@ -2,20 +2,25 @@ import unittest
 import cPickle
 import numpy.testing as npt
 
-from rfb_xml import omnipro_file
+from radpy.plugins.BeamAnalysis.view.RFB.rfb_xml import omnipro_file
+
+
+PATH = r'./radpy/plugins/BeamAnalysis/view/RFB/Unit Tests/test'
 
 class ImportTest(unittest.TestCase):
 
-    def test_read_rfb(self):
+    def read_test(self):
         '''Read in test rfb files and check certain attributes against
         reference pickled files. '''
+        
+        
         for i in range(1,5):
-            f = open(r'./Unit Tests/test'+str(i)+'.rfb','rb')
-            print './Unit Tests/test'+str(i)+'.rfb'
+            f = open(PATH + str(i) + '.rfb','rb')
+            #print './Unit Tests/test'+str(i)+'.rfb'
             input = omnipro_file.parse(f.read())
             f.close()
             
-            compare_file = open('./Unit Tests/test'+str(i)+'.pkl','rb')
+            compare_file = open(PATH + str(i) + '.pkl','rb')
             compare = cPickle.load(compare_file)
             compare_file.close()
             
@@ -36,17 +41,18 @@ class ImportTest(unittest.TestCase):
                                  ['scan_start_depth'])
             
 def regen_pickle_data():
-    
+    import os; print os.getcwd()
+    PATH = '../plugins/BeamAnalysis/view/RFB/Unit Tests/test'
     for i in range(1,5):
-        f = open(r'./Unit Tests/test'+str(i)+'.rfb','rb')
+        f = open(PATH + str(i) +'.rfb','rb')
         input = omnipro_file.parse(f.read())
         f.close()
         
-        pickle_file = open('./Unit Tests/test'+str(i)+'.pkl','wb')
+        pickle_file = open(PATH + str(i) + '.pkl','wb')
         cPickle.dump(input, pickle_file)
         pickle_file.close()
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
-    unittest.main()
-    #regen_pickle_data()
+    #unittest.main()
+    regen_pickle_data()

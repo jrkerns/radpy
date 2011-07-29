@@ -22,7 +22,7 @@ class DicomBeam(Beam):
     def does_it_match(self, args):
         
         for i,j in args.items():
-            if i == 'scan_type':
+            if i in ['scan_type','depth']:
                 pass
             elif self.trait_get(i) != dict([(i,j)]):
                 return False
@@ -46,6 +46,8 @@ class DicomBeam(Beam):
         if len(scan_range.nonzero()[0]) != 1:
             raise ValueError("Point to point scans are not able to matched in RadPy.")
         axis = scan_range.nonzero()[0][0]
+        
+        #Always orient the array from negative to positive coordinate values.
         if start[axis] > stop[axis]:
             start[axis], stop[axis] = stop[axis], start[axis]
             
@@ -59,13 +61,13 @@ class DicomBeam(Beam):
             
         
         
-        axis = scan_range.nonzero()[0][0]
+        #axis = scan_range.nonzero()[0][0]
         abs_0 = dcm_start[axis]
         abs_1 = dcm_stop[axis]
-        
+        abscissa = numpy.linspace(start[axis], stop[axis], axis_len)
 #        abs_0 = start[axis]
 #        abs_1 = stop[axis]
-        abscissa = numpy.linspace(abs_0,abs_1,axis_len)
+        
         
         x_interp = scipy.interpolate.interp1d(self.Data.x_axis, 
                                           numpy.arange(len(self.Data.x_axis)))
@@ -78,6 +80,14 @@ class DicomBeam(Beam):
         x_values = x_interp(numpy.linspace(start[0],stop[0],axis_len))
         y_values = y_interp(numpy.linspace(start[1],stop[1],axis_len))
         z_values = z_interp(numpy.linspace(start[2],stop[2],axis_len))
+        
+#        axes = [x_values, y_values, z_values]
+#        #abscissa = numpy.linspace(abs_0,abs_1,axis_len)
+#        abscissa = axes[axis]
+        
+#        x_ind, y_ind, z_ind = numpy.mgrid[0:axis_len,0:axis_len,0:axis_len]
+#        x_step = self.Data.x_axis[1] - self.Data.x_axis[0]
+#        x_values =  x_ind*x_step + start[0]
         
         interp_vals = numpy.array([x_values,y_values,z_values])
         ordinate = scipy.ndimage.map_coordinates(self.Data.dose, interp_vals)
@@ -94,8 +104,8 @@ class DicomBeam(Beam):
         #Create and initialize a new Beam object
         xml_beam = Beam()
         xml_beam.copy_traits(self)
-        xml_beam.Data_Abscissa = abscissa[numpy.argsort(abscissa)]
-        xml_beam.Data_Ordinate = ordinate[numpy.argsort(abscissa)]
+        xml_beam.Data_Abscissa = abscissa#[numpy.argsort(abscissa)]
+        xml_beam.Data_Ordinate = ordinate#[numpy.argsort(abscissa)]
         xml_beam.MeasurementDetails_StartPosition_x = start[0]
         xml_beam.MeasurementDetails_StopPosition_x = stop[0]
         xml_beam.MeasurementDetails_StartPosition_y = start[1]
@@ -103,7 +113,7 @@ class DicomBeam(Beam):
         xml_beam.MeasurementDetails_StartPosition_z = start[2]
         xml_beam.MeasurementDetails_StopPosition_z = stop[2]
         xml_beam.filename = self.filename
-        xml_beam.set_label()
+        #xml_beam.set_label()
         return xml_beam
         
         

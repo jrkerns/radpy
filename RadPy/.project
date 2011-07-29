@@ -3,7 +3,6 @@
 	<name>RadPy</name>
 	<comment></comment>
 	<projects>
-		<project>RadPy_workbench</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

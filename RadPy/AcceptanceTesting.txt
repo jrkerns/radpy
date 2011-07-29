@@ -1,0 +1,75 @@
+To simulate the opening of the program on the computer for the first time, make sure that the file {User directory}\Application Data\RadPy\radpy\pyface\workbench\qt4\window_memento is deleted.
+
+1. Open RadPy.  The 'Tree View' and 'Parameters' windows should appear.  There should be icons on the taskbar corresponding to the 'New plot', 'Open File', 'Add Cursor', 'Normalize' and 'Smooth' actions.  Under the 'File' menu there should be the 'Exit', 'New Plot', 'Open File', 'Open Directory' and 'Save File' actions.
+
+2. Click the 'New plot' icon.  A new plot window should appear.
+
+3. Click the 'Open File' icon.  Browse to the 'Test1.rfb' file and load it.  The scan tree should load into the 'Tree View' window.
+
+4. The scan tree should have a top level named 'Test1'.  The second level should have a single item named '21EX'.  The third level should have two items named '6X' and '18X'.  Under both '6X' and '18X' there should be a single item named 'Open'.  Each of those items should have 12 branches underneath corresponding to 3, 4, 6, 8, 10, 12, 15, 20, 25, 30, 35 and 40 cm field sizes.
+
+5. Each field size branch should have 5 Crossplane profiles at depths of 1.6 (3.3 for 18X), 5, 10, 20 and 30 cm.  There should also be one Depth Dose.  The 10x10 branch should additionally have an Inplane profile at a depth of 10 cm.  (The 40x40 branch will only have one Crossplane and one Inplane branch at depths of 10 cm plus one Depth Dose).  Each scan should have the proper image (inplane, crossplane, depth dose) displayed beside it.
+
+6. Go the scan at 'Test1/21EX/6x/Open/10x10/Crossplane/10.0'.  Right click on the scan and select 'Edit Beam parameters'.  The Edit properties dialog should appear.
+
+7. Verify the following parameters.
+	
+	Beam Details Tab
+
+	Energy		6.0
+	Particle	Photon
+	SAD		100.0
+	SSD		99.99
+	Collimator	0.0
+	Gantry		0.0
+	Cross Neg Jaw	5.0
+	Cross Pos Jaw	5.0
+	Inp Neg Jaw	5.0
+	Inp Pos	Jaw	5.0
+	Wedge Type	Open
+	Model		21EX
+	Machine Scale	IEC 1217
+
+	Measurement Details Tab
+
+	Meas Dev Model	IC10-1567
+	Meas Dev Type	ion_chamber_cylindrical
+	Manufacturer	IBA dosimetry
+	Servo Model	blue_48_48_41
+	Vendor		IBA dosimetry
+	Elec Model	CU500E
+	Voltage		300.0
+	Medium		Water
+	Isocenter	x: 0.0 y: 0.0 z: -0.01
+	Start Position	x: 7.7 y: 0.0 z: -10.0
+	Stop Position   x: -7.7 y:0.0 z: -10.0
+
+8.  Change Crossplane Negative Jaw to 10.0 and click 'Ok'.  A new branch should appear under '6X/Open' named '10x15' with one scan named 'Crossplane 10.0'.  Right click on this scan, select 'Edit beam parameters' and verify that all of the above parameters are unchanged (except for Cross Neg Jaw). Leave the edit window open for the next step.
+
+9.  Change Energy to 18.0 and click 'Ok'. The 10x15 branch should disappear from 6X and appear under the 18X branch.  Check the edit parameters window to make sure nothing else changed.
+
+10. For the same beam, change Particle to 'Electron', 'Wedge Type' to 'Hard' and 'Wedge Angle' to 15.  Click 'Ok'.  A new branch under 'Test1/21EX' should appear named '18E'.  Under it should be one branch named 'Hard_15.0'.  Under that should be one branch named '10x15'.  Under that should be one scan named 'Crossplane 10.0'.  Right click on that scan and select 'Remove Beam'.  The 18E branch should disappear.
+
+11. Go to the 'Test1/21EX/6X/Open/10x10/Inplane 10.0' scan and select 'Edit beam parameters'.  Change Energy to 18.0.  Do not click 'Ok', but instead click 'Cancel'.  Verify that the scan is still in the '6X' branch and the energy has not changed.
+
+12. Go to the 'Test1/21EX/6X/Open/10x10/Depth_Dose' scan, right click and select 'Add to plot'.  The depth dose should be added to the plot.  The plot title should be 'Test1 21EX 6X Open 10x10 Depth_Dose'.  The legend label should be 'Depth Dose'.
+
+13. Go to the 'Test1/21EX/6X/Open/40x40/Depth_Dose' scan.  Double left click on the scan.  The new depth dose curve should be overlayed on the 10x10 plot.  The plot title should change to 'Test1 21EX 6X Open Depth_Dose'.  The legend should have two labels: '10x10' and '40x40'.
+
+14. Click on the 10x10 plot in the plot window.  Two parameters should appear in the 'Parameters' window.  They should be 'R100: 1.37 cm' and 'R50: 15.10 cm'.  click on the 40x40 plot label in the legend.  The parameters should change to 'R100: 1.13 cm' and 'R50: 17.98 cm'.
+
+15. Go to the 'Test1/21EX/6X/Open/10x10/Inplane 10.0' scan and double left click on it.  A new plot window should be opened.  The title should be 'Test1 21EX 6X Open 10x10 Inplane 10.0_cm_depth'.  The legend label should be '10.0_cm_depth'.
+
+16. Go to the 'Test1/21EX/18X/Open/40x40/Inplane 10.0.' scan and double left click on it.  The scan should be added to the existing plot window.  The new title should be 'Test1 21EX Open Inplane 10.0_cm_depth'.  The legend labels should be '18X 40x40' and '6X 10x10'.  Click on each profile in the plot and also each of the legend items.  The 'Parameters' window should display the FWHM for each scan.  When the 18X/40x40 plot is selected the FWHM should be 44.52 cm.  When the 6X/10x10 plot is selected the FWHM should be 11.06 cm.
+
+17.  Right click on the 'Test1' branch and select close.  The branch should disappear.  Reopen the Test1 rfb file. 
+Go to the 'File' menu and select 'Save File'.  Name the file 'test.xml' and save it.  Close the Test1 branch and then open the new XML file.  Perform the checks in steps 4-7 on the new 'Test1' tree.
+
+18. Change Crossplane Negative Jaw on the 'Test1/21EX/6x/Open/10x10/Crossplane/10.0' scan to 10.0 and click 'Ok'.  A new branch should appear under '6X/Open' named '10x15' with one scan named 'Crossplane 10.0'.  Right click on this scan, select 'Edit beam parameters' and verify that all of the above parameters are unchanged (except for Cross Neg Jaw).
+
+19. Save the 'test' branch under the file name 'test2.xml'.  Close the test branch and then open the 'test2.xml' file.  Verify that there is a 10x15 branch under '6X/Open' and that the 'Crossplane 10.0' scan has the proper parameters.  Close the 'test2' branch.
+
+20. Open the 'Test1.rfb' file.  Go to the 'Test1/21EX/6x/Open/10x10/Crossplane/10.0' scan and add it to the plot.  Open the '3d_dose_wedge.dcm' file.  A new branch should appear as '3d_dose_wedge/2300IX 737/6X/STANDARD_60.0/15x15/Dicom_3D_Dose'.  Right click on the '3d_dose_wedge' branch and select 'Add matching beams'.  Select only the Energy to match and click 'Ok'.
+A new scan should be added to the plot.  The title should be '6X Crossplane 10.0_cm_depth'.  The legend labels should be '3d_dose_wedge 2300IX 737 STANDARD_60.0 15x15' and 'Test1 21EX Open 10x10'.
+
+21. Profile matching.  Need to match depth.

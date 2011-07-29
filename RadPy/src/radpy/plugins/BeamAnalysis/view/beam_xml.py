@@ -166,6 +166,7 @@ class Beam(HasTraits):
     label = String()
     field_size = String()
     scan_type = String()
+    depth = Float()
     
     traits_view = View(Tabbed(
                         Group(Group(Heading('Beam Parameters'),
@@ -396,7 +397,7 @@ class Beam(HasTraits):
     
     def get_accessory(self):
         
-        if self.BeamDetails_Wedge_Type == 'Open':
+        if self.BeamDetails_Wedge_Type in ['','Open']:
             return 'Open'
         else:
             return self.BeamDetails_Wedge_Type + '_' + str(self.BeamDetails_Wedge_Angle)
@@ -435,7 +436,7 @@ class Beam(HasTraits):
     def get_scan_depth(self):
         
         scan_type = self.get_scan_type()
-        if scan_type == "Crossplane Profile":
+        if scan_type == "Crossplane Profile": 
             return str(-self.MeasurementDetails_StopPosition_z)
         elif scan_type == "Inplane Profile":
             return str(-self.MeasurementDetails_StopPosition_z)
@@ -459,10 +460,10 @@ class Beam(HasTraits):
     def get_collimator(self, direction="crossplane"):
         
         if direction == "crossplane":
-            return '%g' % (self.BeamDetails_CrossplaneJawPositions_PositiveJaw + \
+            return '%g' % (self.BeamDetails_CrossplaneJawPositions_PositiveJaw + 
                  self.BeamDetails_CrossplaneJawPositions_NegativeJaw)
         elif direction == "inplane":
-            return '%g' % (self.BeamDetails_InplaneJawPositions_PositiveJaw + \
+            return '%g' % (self.BeamDetails_InplaneJawPositions_PositiveJaw + 
                  self.BeamDetails_InplaneJawPositions_NegativeJaw)
         else:
             pass
@@ -565,6 +566,11 @@ class Beam(HasTraits):
  
         self.field_size = self.get_field_size()
         self.scan_type = self.get_scan_type()
+        depth = self.get_scan_depth()
+        if depth == '-':
+            self.depth = numpy.NaN
+        else:
+            self.depth = float(depth)
   
             
                 

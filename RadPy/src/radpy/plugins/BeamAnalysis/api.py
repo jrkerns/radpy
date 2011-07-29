@@ -3,4 +3,5 @@ from view.tree_view import TreeView
 from BeamAnalysis_action_set import BeamAnalysisActionSet
 from BeamAnalysis_action_set_user import BeamAnalysisActionSetUser
 from BeamAnalysis_workbench_plugin import BeamAnalysisWorkbenchPlugin
-from view.parameter_panel import ParameterPanel
+#from view.parameter_panel import ParameterPanel
+from view.parameter_panel import ParameterView

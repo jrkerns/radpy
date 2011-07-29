@@ -83,21 +83,23 @@ class BeamAnalysisWorkbenchPlugin(Plugin):
         """ Trait initializer. """
 
         from radpy.plugins.BeamAnalysis.api import TreeView
+        from radpy.plugins.BeamAnalysis.api import ParameterView
 
-        return [TreeView, self._create_parameter_view]
+        #return [TreeView, self._create_parameter_view]
+        return [TreeView, ParameterView]
     
-    def _create_parameter_view(self, **traits):
-        """ Factory method for the data view. """
-
-        from radpy.plugins.BeamAnalysis.api import ParameterPanel
-
-        parameter_view = TraitsUIView(
-            id   = 'ParameterPanel',
-            name = 'Parameters',
-            obj  = ParameterPanel(),
-            **traits
-        )
-        
-        return parameter_view
+#    def _create_parameter_view(self, **traits):
+#        """ Factory method for the data view. """
+#
+#        from radpy.plugins.BeamAnalysis.api import ParameterPanel
+#
+#        parameter_view = TraitsUIView(
+#            id   = 'ParameterPanel',
+#            name = 'Parameters',
+#            obj  = ParameterPanel(),
+#            **traits
+#        )
+#        
+#        return parameter_view
 
 #### EOF ######################################################################

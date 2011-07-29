@@ -15,7 +15,7 @@
 # http://code.google.com/p/radpy/  
 
 # Python imports
-import sys, os
+import sys, os, imp
 
 # Enthought library imports.
 from enthought.envisage.ui.action.api import Action, Group, Menu, ToolBar
@@ -54,38 +54,73 @@ class BeamAnalysisActionSetUser(WorkbenchActionSet):
     
     def _actions_default(self):
         action_list = []
-        sys.path.append('./RadPy/plugins/BeamAnalysis/scripts')
+        #sys.path.append(os.path.join(os.pardir,'Scripts'))
+        script_path = os.path.join(os.pardir,'Scripts')
 #        
-        for name in os.listdir('./RadPy/plugins/BeamAnalysis/scripts') :
+        for name in os.listdir(script_path) :
             if name.endswith(".py" ) and name != '__init__.py':
-                name = os.path.splitext(name)[0]
-                class_name = 'radpy.plugins.BeamAnalysis.scripts.' + \
-                            name + ':UserAction'
-                try: 
-                    exec("from " + name +" import UserAction")
-                    
-                except ImportError:
-                    pass
+                try:
+                    module = os.path.splitext(name)[0]
+                    f, filename, description = imp.find_module(module, [script_path])
                 
-                except:
-                    print "Unexpected error:", sys.exc_info()[0]
-                    raise
-                                        
-                else:
-
-                    if UserAction.menubar_path:
+                    # Import the module if no exception occurred
+                    class_name = module+'.UserAction'
+                    script = imp.load_module(module, f, filename, description)
+                    
+                    # If the module is a single file, close it
+                    if not (description[2] == imp.PKG_DIRECTORY):
+                        f.close()
+                    
+                    
+                    if script.UserAction.menubar_path:
                         user_action = Action(
                             class_name = class_name,
-                            path = UserAction.menubar_path
+                            path = script.UserAction.menubar_path
                             )
                         action_list.append(user_action)
                         
-                    if UserAction.toolbar_path:
+                    if script.UserAction.toolbar_path:
                         user_action = Action(
                             class_name = class_name,
-                            path = UserAction.toolbar_path
+                            path = script.UserAction.toolbar_path
                             )
                         action_list.append(user_action)
+                
+                    #print 'Plugin:', module, 'loaded'
+                
+                except (ImportError, AttributeError):
+                    # Not able to find module so pass
+                    pass
+               
+                        
+#                name = os.path.splitext(name)[0]
+#                class_name = 'Scripts.' + \
+#                            name + ':UserAction'
+#                try: 
+#                    exec("from " + name +" import UserAction")
+#                    
+#                except ImportError:
+#                    pass
+#                
+#                except:
+#                    print "Unexpected error:", sys.exc_info()[0]
+#                    raise
+#                                        
+#                else:
+#
+#                    if UserAction.menubar_path:
+#                        user_action = Action(
+#                            class_name = class_name,
+#                            path = UserAction.menubar_path
+#                            )
+#                        action_list.append(user_action)
+#                        
+#                    if UserAction.toolbar_path:
+#                        user_action = Action(
+#                            class_name = class_name,
+#                            path = UserAction.toolbar_path
+#                            )
+#                        action_list.append(user_action)
                             
         return action_list
 

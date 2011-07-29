@@ -40,7 +40,8 @@ class MatchDialog(HasTraits):
     
     view = TraitsView(Item('selection', editor=SetEditor(name='choices',
                     can_move_all=True, ordered=False),show_label=False),
-                    buttons = [OKButton, CancelButton],kind='modal')
+                    buttons = [OKButton, CancelButton],kind='modal',
+                    title='Parameters to match')
 
 
     
@@ -75,16 +76,18 @@ class TreeWidget(QTreeView):
         self.connect(self, SIGNAL("expanded(QModelIndex)"),
                      self.expanded)
         
-        self.load("radpy/plugins/BeamAnalysis/view/RFB/Unit Tests/Test1.rfb")
+        #self.load("radpy/plugins/BeamAnalysis/view/RFB/Unit Tests/Test1.rfb")
         #self.load("c:/users/steve/desktop/xml test/test.xml")
-        self.load("radpy/plugins/BeamAnalysis/view/DicomRT/tests/3d_dose_wedge.dcm")
+        #self.load("radpy/plugins/BeamAnalysis/view/DicomRT/tests/3d_dose_wedge.dcm")
+        #self.load('e:/trilogy09')
         self.expanded()
         
     def load(self, filename):
         #Passes lists of scans to tree model class.
         nesting = 5
         try:
-            self.model().load(filename, nesting, COLUMNS)
+            progress = QProgressBar()
+            self.model().load(filename, nesting, COLUMNS, progress=progress)
         except IOError, e:
             QMessageBox.warning(self, "Server Info - Error",
                                 unicode(e))
@@ -128,7 +131,7 @@ class TreeWidget(QTreeView):
             editAllAction = menu.addAction("&Edit parameters for all beams")
             self.connect(editAllAction, SIGNAL("triggered()"), self.editAll)
             
-            delAction = menu.addAction("&Delete")
+            delAction = menu.addAction("&Close")
             self.connect(delAction, SIGNAL("triggered()"), self.delBeam)
             
         menu.exec_(event.globalPos())
@@ -209,7 +212,8 @@ class TreeWidget(QTreeView):
                    'SSD':'BeamDetails_SSD',
                    'Wedge Angle':'BeamDetails_Wedge_Angle',
                    'Applicator':'BeamDetails_Applicator',
-                   'Linac Model':'BeamDetails_RadiationDevice_Model'}
+                   'Linac Model':'BeamDetails_RadiationDevice_Model',
+                   'Depth': 'depth'}
         
         dialog = MatchDialog(choices=choices.keys())
         dialog.selection = helper.match_traits
@@ -240,15 +244,23 @@ class TreeView(View):
         self.widget = TreeWidget()
         QObject.connect(self.widget, SIGNAL('activated'),self.activated)
         QObject.connect(self.widget, SIGNAL('reference'), self.reference)
+        
+#        #If there is no plot editor window, open one
+#        if self.window.active_editor is None:
+#            plot = ChacoPlot()
+#            self.window.workbench.edit(plot, kind=ChacoPlotEditor)
 
     def reference(self, record, parameters):
         label, beam = record
-        if self.window.active_editor is not None:
+        if (self.window.active_editor) is not None and isinstance(
+                                        self.window.active_editor.obj,ChacoPlot):
             #Check all beams in the active window to see if there is a match
             for i in self.window.active_editor.obj.beams.values():
-                traits_to_match =  beam.trait_get(parameters)
+#                traits_to_match =  beam.trait_get(parameters)
+                traits_to_match = i.trait_get(parameters)
                 try:
-                    if i.does_it_match(traits_to_match):
+#                    if i.does_it_match(traits_to_match):
+                    if beam.does_it_match(traits_to_match):
                         if beam.get_scan_descriptor()[0] == 'Dicom_3D_Dose':
                             start = [float(i.MeasurementDetails_StartPosition_x),
                                      float(i.MeasurementDetails_StartPosition_y),
@@ -258,8 +270,12 @@ class TreeView(View):
                                      float(i.MeasurementDetails_StopPosition_z)]
                             axis_len = len(i.Data_Abscissa)
                             ref_beam = beam.get_beam(start, stop, axis_len)
+                            
                             #Setup new beam object label/tree path.
-                            label = '|'.join([ref_beam.filename,ref_beam.label])
+                            new_label = label.split('|')[:-2]                         
+                            new_label.extend(ref_beam.get_scan_descriptor())                        
+                            label = '|'.join(new_label).replace(' ','_')
+                        
                         else:
                             ref_beam = beam                       
                         title = self.window.active_editor.obj.add_plot(label, ref_beam)

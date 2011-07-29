@@ -31,14 +31,14 @@ from enthought.traits.ui.api import View, Item, Group
 # Chaco imports
 from enthought.chaco.api import create_line_plot, add_default_axes, \
         add_default_grids, OverlayPlotContainer, PlotLabel, Legend
-from enthought.chaco.tools.api import PanTool, ZoomTool, LegendTool, \
-        TraitsTool, DragZoom
+from enthought.chaco.tools.api import PanTool, LegendTool, \
+        TraitsTool, ZoomTool
 from enthought.chaco.tools.cursor_tool import CursorTool
+#from  better_selecting_zoom import BetterSelectingZoom as ZoomTool
 
 #RadPy imports
 from plot_select_tool import PlotSelectTool
 from highlight_legend import HighlightLegend
-from zoom import RadPyZoomTool
 
 class ChacoPlotEditor(TraitsUIEditor):
     # Needed to make the editor window title human readable.
@@ -48,11 +48,14 @@ class ChacoPlotEditor(TraitsUIEditor):
         return "Scan Plot"
     
     def _selected_beam_changed(self):
-        self.window.get_view_by_id('ParameterPanel').obj.update_parameters(
+        
+        self.window.get_view_by_id(
+            'radpy.plugins.BeamAnalysis.ParameterPanel').panel.update_parameters(
                                                             self.selected_beam)
     def _has_focus_changed(self):
         
-        self.window.get_view_by_id('ParameterPanel').obj.update_parameters(
+        self.window.get_view_by_id(
+            'radpy.plugins.BeamAnalysis.ParameterPanel').panel.update_parameters(
                                                             self.selected_beam)
     
 class ChacoPlot(HasTraits):
@@ -124,8 +127,13 @@ class ChacoPlot(HasTraits):
                 
         # The ZoomTool tool is stateful and allows drawing a zoom
         # box to select a zoom region.
-        zoom = ZoomTool(plot, tool_mode="box", always_on=True, 
-                        drag_button="right" )
+        zoom = ZoomTool(plot, tool_mode="box", always_on=False, 
+                        drag_button="right", always_on_modifier='control')#,
+#                        x_min_zoom_factor=0.5,
+#                        y_min_zoom_factor=0.5,
+#                        x_max_zoom_factor=40.,
+#                        y_max_zoom_factor=40.)
+        
         zoom.zoom_factor = 1.2
         plot.overlays.append(zoom)
 
@@ -142,7 +150,7 @@ class ChacoPlot(HasTraits):
         plot.overlays.append(self.legend)
         self.legend.visible = False
         
-        # The HighlightLegend tool allows plots to be selected by left clicking
+        # The  Legend tool allows plots to be selected by left clicking
         # on the label in the plot legend.  This tool sets the ChacoPlot 
         # selected plot trait.
         highlight_legend = HighlightLegend(self.legend)
@@ -185,17 +193,22 @@ class ChacoPlot(HasTraits):
         if id(beam) in self.plot_ids:
             return          
         
+        # Remove extraneous whitespace
+        label = '|'.join([i.strip() for i in label.split('|')])
+        # Remove spaces in fields within the label so that when the '|' are
+        # replaced with spaces, the label will be able to be split on spaces.
+        label = label.replace(' ','_')
         # The plot_type trait is defined by the geometry of the scanned plot 
         # (inline, crossline, depth dose, etc.).  
         if self.plot_type is not None:
             self.plot_type = beam.get_scan_type()
             
-        # Reformat labels
-        fields = label.split('|')
-        if self.plot_type == 'Depth Dose':
-            label = '|'.join(fields[:-1])
-        elif self.plot_type in ['Inplane Profile','Crossplane Profile']:
-            label = label + ' cm depth'
+#        # Reformat labels
+#        fields = [i.strip() for i in label.split('|')]
+#        if self.plot_type == 'Depth Dose':
+#            label = ' '.join(fields[:-1])
+        if self.plot_type in ['Inplane Profile','Crossplane Profile']:
+            label = label+'_cm_depth'
             
         x, y = (beam.Data_Abscissa, beam.Data_Ordinate)
         if label in self.plots.keys():
@@ -241,7 +254,10 @@ class ChacoPlot(HasTraits):
         
         #If there is only one scan, return generic name.
         if len(self.plots.keys()) < 2:
-            return [self.plots.keys()[0].split('|')[-1]]
+            if self.plot_type == 'Depth Dose':
+                return ['Depth_Dose']
+            else:
+                return [self.plots.keys()[0].split('|')[-1]]
             #return ["Scan"]
         else:
             plots = [i for i in self.plots.keys()]
@@ -263,7 +279,7 @@ class ChacoPlot(HasTraits):
                 for i, field in enumerate(key):
                     if columns[i]:
                         tmp.append(field)
-                labels.append("|".join(tmp))
+                labels.append(" ".join(tmp))
                 
             return labels
                     
@@ -276,7 +292,8 @@ class ChacoPlot(HasTraits):
         #Differing fields will be included in the legend of the scan
         #window.
         if len(self.plots.keys()) < 2:
-            return self.plots.keys()[0]
+            return self.plots.keys()[0].replace('|',' ')
+            
             #return "Scan"
         else:
             keys = [x.split("|") for x in self.plots.keys()]
@@ -296,7 +313,7 @@ class ChacoPlot(HasTraits):
             for i, field in enumerate(keys[0]):
                 if columns[i]:
                     tmp.append(field)
-            return "|".join(tmp)
+            return " ".join(tmp)
                 
             
         

@@ -64,7 +64,8 @@ class BeamAnalysisPreferencesPage(PreferencesPage):
                    'SSD':'BeamDetails_SSD',
                    'Wedge Angle':'BeamDetails_Wedge_Angle',
                    'Applicator':'BeamDetails_Applicator',
-                   'Linac Model':'BeamDetails_RadiationDevice_Model'}
+                   'Linac Model':'BeamDetails_RadiationDevice_Model',
+                   'Depth': 'depth'}
     
     choices = choices_dict.keys()
     #### Traits UI views ######################################################

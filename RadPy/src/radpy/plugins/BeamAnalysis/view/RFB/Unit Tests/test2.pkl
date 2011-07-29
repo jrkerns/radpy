@@ -2,7 +2,7 @@
 ccopy_reg
 _reconstructor
 p2
-(crfb_xml
+(cradpy.plugins.BeamAnalysis.view.RFB.rfb_xml
 Beam
 p3
 c__builtin__

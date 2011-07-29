@@ -17,8 +17,6 @@
 # http://code.google.com/p/radpy/  
 
 # Python system imports
-import bisect
-import string
 import re
 import os
 import fnmatch
@@ -26,8 +24,6 @@ import fnmatch
 # Major library imports
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-import scipy
-import numpy
 import lxml
 
 
@@ -224,7 +220,7 @@ class TreeModel(QAbstractItemModel):
         self.headers = headers
 
 
-    def load(self, filename, nesting, columns, separator = "|"): 
+    def load(self, filename, nesting, columns, separator = "|", progress=None): 
         assert nesting > 0
         self.nesting = nesting
         #self.root = BranchNode("", "")
@@ -246,10 +242,20 @@ class TreeModel(QAbstractItemModel):
             filenames = [filename]
             #self.filename = os.path.basename(filename).split('.')[0]
             self.filename = os.path.splitext(os.path.basename(filename))[0]
-        for file in filenames:
             
+        if progress:
+            progress.setWindowTitle('Loading...')
+            progress.setMinimum(0)
+            progress.setMaximum(len(filenames))
+            progress.show()
+        
+        for value, file in enumerate(filenames):
+            
+            if progress:
+                progress.setValue(value)
             #extension = os.path.basename(file).split('.')[-1]
             extension = os.path.splitext(file)[-1]
+            
             try:
                 if extension == '.rfb':
                     data = load_rfb_data(file)
@@ -262,14 +268,16 @@ class TreeModel(QAbstractItemModel):
                     beam.set_label()
                     beam.filename = self.filename
                     self.addRecord(beam, False)
-            except IOError, e:
-                exception = e
-            finally:
+            
+            except (IOError, ValueError):
                 
-                self.reset()
-                
-                if exception is not None:
-                    raise exception
+                QMessageBox.warning(None, "RFB Read Error", ("Error reading "  
+                + file + ".  The file may be from a old version of "
+                 "Omnipro (earlier than 6.0) or may contain TMR data."),
+                buttons=QMessageBox.Ok)        
+                    
+            
+        self.reset()
     
     def removeRecord(self, index):
         
@@ -357,7 +365,7 @@ class TreeModel(QAbstractItemModel):
             if node is None:
                 return None
             if isinstance(node, LeafNode) and index.column() == 0:
-                filename = os.path.join('./radpy/plugins/BeamAnalysis/view/images',
+                filename = os.path.join('./radpy/images',
                                         node.field(0)+'.png')
                 pixmap = QPixmap(filename)
                 if pixmap.isNull():
@@ -446,4 +454,4 @@ class ProxyModel(QSortFilterProxyModel):
     
     def removeRecord(self, index):
         return self.sourceModel().removeRecord(self.mapToSource(index))
-        
+    
