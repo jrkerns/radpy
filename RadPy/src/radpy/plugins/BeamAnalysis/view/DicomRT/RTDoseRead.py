@@ -101,16 +101,24 @@ class RTDose(object):
 #        self.x_axis = self.x_axis_dicom
 #        self.y_axis = self.y_axis_dicom
 #        self.z_axis = self.z_axis_dicom
-        self.x_axis = (numpy.arange(self.columns)*self.pixel_spacing[0] / 10.
-                        + self.origin[0])
-        self.y_axis = (numpy.arange(self.rows)*self.pixel_spacing[1] / 10.
-                       + self.origin[1])
-        self.z_axis = (numpy.array(tmp.GridFrameOffsetVector) / 10.
-                        + self.origin[2])
+        x_axis = (numpy.arange(self.columns)*self.pixel_spacing[0] / 10.
+                        + self.origin[0] - self.isocenter[0])
+        y_axis = (numpy.arange(self.rows)*self.pixel_spacing[1] / 10.
+                       + self.origin[1] - self.isocenter[1])
+        z_axis = (numpy.array(tmp.GridFrameOffsetVector) / 10.
+                        + self.origin[2]- self.isocenter[2])
             
  
-        self.dose = numpy.swapaxes(tmp.pixel_array*tmp.DoseGridScaling,0,2)
-        a = tmp.pixel_array        
+        
+        self.dose = numpy.rot90(tmp.pixel_array*tmp.DoseGridScaling)
+        self.dose = numpy.swapaxes(self.dose,0,2)
+        
+        self.x_axis = x_axis
+        self.y_axis = z_axis
+        self.z_axis = -y_axis
+        
+        #self.dose = tmp.pixel_array*tmp.DoseGridScaling
+             
         return
             
         

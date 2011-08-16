@@ -58,12 +58,17 @@ class DicomBeam(Beam):
         for i in range(3):
             if not (self.overlap((start[i],stop[i]),(dcm_start[i], dcm_stop[i]))):
                 raise ValueError("The scan range is outside the Dicom data range.")
+            #Truncate if scan extends beyond dicom range
+            if start[i] < dcm_start[i]:
+                start[i] = dcm_start[i]
+            if stop[i] > dcm_stop[i]:
+                stop[i] = dcm_stop[i]
             
         
         
         #axis = scan_range.nonzero()[0][0]
-        abs_0 = dcm_start[axis]
-        abs_1 = dcm_stop[axis]
+#        abs_0 = dcm_start[axis]
+#        abs_1 = dcm_stop[axis]
         abscissa = numpy.linspace(start[axis], stop[axis], axis_len)
 #        abs_0 = start[axis]
 #        abs_1 = stop[axis]
@@ -73,7 +78,8 @@ class DicomBeam(Beam):
                                           numpy.arange(len(self.Data.x_axis)))
         y_interp = scipy.interpolate.interp1d(self.Data.y_axis, 
                                           numpy.arange(len(self.Data.y_axis)))
-        z_interp = scipy.interpolate.interp1d(self.Data.z_axis, 
+        z_indices = numpy.argsort(self.Data.z_axis)
+        z_interp = scipy.interpolate.interp1d(self.Data.z_axis[z_indices], 
                                           numpy.arange(len(self.Data.z_axis)))
         
         
@@ -92,6 +98,9 @@ class DicomBeam(Beam):
         interp_vals = numpy.array([x_values,y_values,z_values])
         ordinate = scipy.ndimage.map_coordinates(self.Data.dose, interp_vals)
         
+#        abscissa = self.Data.x_axis[27:89]
+#        ordinate = self.Data.dose[27:89,38,24]
+        
 #        abscissa = []
 #        i0 = numpy.sqrt(start[0]**2 + start[1]**2 + start[2]**2)
 #        i1 = numpy.sqrt((stop[0] - start[0])**2 + (stop[1] - start[1])**2 +
@@ -104,8 +113,13 @@ class DicomBeam(Beam):
         #Create and initialize a new Beam object
         xml_beam = Beam()
         xml_beam.copy_traits(self)
-        xml_beam.Data_Abscissa = abscissa#[numpy.argsort(abscissa)]
-        xml_beam.Data_Ordinate = ordinate#[numpy.argsort(abscissa)]
+        if axis == 2:  #Depth dose
+            xml_beam.Data_Abscissa = -abscissa[::-1]
+            xml_beam.Data_Ordinate = ordinate[::-1]
+        else:
+            xml_beam.Data_Abscissa = abscissa    
+            xml_beam.Data_Ordinate = ordinate
+        
         xml_beam.MeasurementDetails_StartPosition_x = start[0]
         xml_beam.MeasurementDetails_StopPosition_x = stop[0]
         xml_beam.MeasurementDetails_StartPosition_y = start[1]
@@ -113,6 +127,7 @@ class DicomBeam(Beam):
         xml_beam.MeasurementDetails_StartPosition_z = start[2]
         xml_beam.MeasurementDetails_StopPosition_z = stop[2]
         xml_beam.filename = self.filename
+        xml_beam.scan_type = xml_beam.get_scan_type()
         #xml_beam.set_label()
         return xml_beam
         

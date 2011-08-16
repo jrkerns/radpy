@@ -24,6 +24,9 @@ class UserParameter(object):
         
     def calc(self, beam):
         
+        if beam.scan_type in ['Crossplane Profile', 'Inplane Profile']:
+            return numpy.NaN
+        
         x = beam.Data_Abscissa
         y = beam.Data_Ordinate
         dmax = x[numpy.argmax(y)]

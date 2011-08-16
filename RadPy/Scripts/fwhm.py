@@ -24,9 +24,14 @@ class UserParameter(object):
         
     def calc(self, beam):
         
+        if beam.scan_type == 'Depth Dose':
+            return numpy.NaN
+        
         x = beam.Data_Abscissa
         y = beam.Data_Ordinate
         tck = interpolate.splrep(x,y)
         cax_value = interpolate.splev(0, tck)
         gt_50 = x[numpy.where(y > cax_value/2.)]
         return gt_50[-1] - gt_50[0]
+        
+       
