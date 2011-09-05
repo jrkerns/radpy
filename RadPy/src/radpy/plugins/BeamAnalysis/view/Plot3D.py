@@ -436,6 +436,7 @@ class Plot3D(HasTraits):
 #        self.container = container
         self.plotdata = ArrayPlotData()
         self.model = beam.Data
+        self.model.z_axis = self.model.z_axis[::-1]
         cmap = jet
         self._update_model(cmap)
         self.plotdata.set_data("xy",self.model.dose)

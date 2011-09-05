@@ -19,7 +19,11 @@ def load_rfb_data(infile):
     """Read in a file in RFB format and return a list of Beam objects"""
     #try:
     f = open(infile,'rb')
-    a = omnipro_file.parse(f.read())
+    try:
+        a = omnipro_file.parse(f.read())
+    except (IOError, ValueError):
+        raise IOError('RFB file may be corrupt, contain data other than 1D scan'
+            ' data, or may be from an Omnipro version earlier than 6.0.')
     b = []
     
     for i in a:

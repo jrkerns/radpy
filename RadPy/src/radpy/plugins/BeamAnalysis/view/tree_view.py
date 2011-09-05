@@ -294,7 +294,11 @@ class TreeView(View):
         """
         
         label, beam = record
-        scan_type_list = ['None', beam.get_scan_type()]
+        scan_type = beam.get_scan_type()
+        if scan_type == 'Dicom 3D Dose':
+            scan_type_list = [scan_type]
+        else:
+            scan_type_list = ['None', scan_type]
         if self.window.active_editor is not None:
             
             if self.window.active_editor.obj.plot_type in scan_type_list:

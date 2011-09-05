@@ -1,0 +1,9 @@
+1. Run the RadPy setup script with 'python setup.py py2exe'.
+
+2. Setup script options.
+	To turn logging on/off, comment out the 'atext.register' lines in the py2exe boot_common.py file (in Lib/site-packages)
+	
+3. Move PyQt dlls to PyQt folder.
+
+4. The following folders can be safely deleted.
+	IPython, matplotlib, PIL, reportlab, wxPython

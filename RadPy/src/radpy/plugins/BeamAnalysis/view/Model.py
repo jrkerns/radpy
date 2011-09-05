@@ -269,13 +269,13 @@ class TreeModel(QAbstractItemModel):
                     beam.filename = self.filename
                     self.addRecord(beam, False)
             
-            except (IOError, ValueError):
+            #except (IOError, ValueError):
+            except Exception as error:
                 
-                QMessageBox.warning(None, "RFB Read Error", ("Error reading "  
-                + file + ".  The file may be from a old version of "
-                 "Omnipro (earlier than 6.0) or may contain TMR data."),
+                QMessageBox.warning(None, "File Read Error", ("Error reading "  
+                + file + ".  " + str(error)),
                 buttons=QMessageBox.Ok)        
-                    
+            
             
         self.reset()
     

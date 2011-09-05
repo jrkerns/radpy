@@ -23,11 +23,12 @@ import logging
 from enthought.envisage.ui.workbench.api import WorkbenchApplication
 from enthought.pyface.api import ImageResource, SplashScreen
 from about_dialog import AboutDialog
+from plugins.BeamAnalysis.view.ChacoPlot import ChacoPlot, ChacoPlotEditor
 
 from PyQt4 import QtGui, QtCore
 
 # Logging.
-logger = logging.getLogger(__name__)
+#logger = logging.getLogger(__name__)
 
 class RadPy(WorkbenchApplication):
     """ The RadPy application. """
@@ -86,7 +87,7 @@ class RadPy(WorkbenchApplication):
 
         """
 
-        logger.debug('---------- workbench application ----------')
+        #logger.debug('---------- workbench application ----------')
 
         # Make sure the GUI has been created (so that, if required, the splash
         # screen is shown).
@@ -116,6 +117,9 @@ class RadPy(WorkbenchApplication):
             
             window.status_bar_manager.message = ' '.join(
                                                     [self.name, self.version])
+            
+            plot = ChacoPlot()
+            window.workbench.edit(plot, kind=ChacoPlotEditor)
 
             # Start the GUI event loop.
             #

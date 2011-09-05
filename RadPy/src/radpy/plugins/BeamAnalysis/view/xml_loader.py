@@ -6,10 +6,14 @@ def load_xml_data(infile):
     f = open(infile,'rb')
     tree = objectify.parse(f)
     f.close()
-    bdml = tree.getroot()
+    
     schema_file = open('radpy/plugins/BeamAnalysis/BDML/bdml.xsd','r')
     bdml_schema = etree.parse(schema_file)
     xmlschema = etree.XMLSchema(bdml_schema)
+    if not xmlschema.validate(tree):
+            raise IOError('Not a valid BDML file.')
+    
+    bdml = tree.getroot()
     b = []
     for i in bdml.Beam:
         

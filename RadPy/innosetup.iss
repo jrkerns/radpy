@@ -5,19 +5,17 @@
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId={{7DF70720-0D0E-4322-9924-96FDEE965F8C}
-AppName=DVH Extractor
-AppVersion=0.3
-;AppVerName=DVH Extractor 0.1
-AppPublisher=Centra Healthcare
-DefaultDirName={pf}\DVH Extractor
-DefaultGroupName=DVH Extractor
+AppId={{4020619C-F961-4B3A-82CE-CF378B2F2D51}}
+AppName=RadPy
+AppVersion=0.1
+AppPublisher=RadPy
+DefaultDirName={pf}\RadPy
+DefaultGroupName=RadPy
 AllowNoIcons=yes
-OutputDir=C:\Documents and Settings\terrst1\Desktop\Shared
 OutputBaseFilename=setup
 Compression=lzma
 SolidCompression=yes
-VersionInfoVersion = 0.3
+VersionInfoVersion = 0.1
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -26,15 +24,18 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Documents and Settings\terrst1\My Documents\Python\DVH Extractor\src\dist\DVH Extractor.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Documents and Settings\terrst1\My Documents\Python\DVH Extractor\src\dist\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "dist\*"; DestDir: "{app}\dist"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "Scripts\*"; DestDir: "{app}\Scripts"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+[Dirs]
+Name: "{app}\Data\"
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
-Name: "{group}\DVH Extractor"; Filename: "{app}\DVH Extractor.exe"; IconFilename: "{app}\DVH Extractor.ico"
-Name: "{group}\{cm:UninstallProgram,DVH Extractor}"; Filename: "{uninstallexe}"
-Name: "{commondesktop}\DVH Extractor"; Filename: "{app}\DVH Extractor.exe"; Tasks: desktopicon; IconFilename: "{app}\DVH Extractor.ico"
+Name: "{group}\RadPy"; Filename: "{app}\dist\RadPy.exe"; IconFilename: "{app}\dist\RadPy.ico"
+Name: "{group}\{cm:UninstallProgram,RadPy}"; Filename: "{uninstallexe}"
+Name: "{commondesktop}\RadPy"; Filename: "{app}\dist\RadPy.exe"; Tasks: desktopicon; IconFilename: "{app}\dist\RadPy.ico"
 
-[Run]
-Filename: "{app}\DVH Extractor.exe"; Description: "{cm:LaunchProgram,DVH Extractor}"; Flags: nowait postinstall skipifsilent
+;[Run]
+;Filename: "{app}\dist\RadPy.exe"; Description: "{cm:LaunchProgram,RadPy}"; Flags: nowait postinstall skipifsilent
 

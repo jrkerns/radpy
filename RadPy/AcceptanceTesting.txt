@@ -70,6 +70,13 @@ Go to the 'File' menu and select 'Save File'.  Name the file 'test.xml' and save
 19. Save the 'test' branch under the file name 'test2.xml'.  Close the test branch and then open the 'test2.xml' file.  Verify that there is a 10x15 branch under '6X/Open' and that the 'Crossplane 10.0' scan has the proper parameters.  Close the 'test2' branch.
 
 20. Open the 'Test1.rfb' file.  Go to the 'Test1/21EX/6x/Open/10x10/Crossplane/10.0' scan and add it to the plot.  Open the '3d_dose_wedge.dcm' file.  A new branch should appear as '3d_dose_wedge/2300IX 737/6X/STANDARD_60.0/15x15/Dicom_3D_Dose'.  Right click on the '3d_dose_wedge' branch and select 'Add matching beams'.  Select only the Energy to match and click 'Ok'.
-A new scan should be added to the plot.  The title should be '6X Crossplane 10.0_cm_depth'.  The legend labels should be '3d_dose_wedge 2300IX 737 STANDARD_60.0 15x15' and 'Test1 21EX Open 10x10'.
+A new scan should be added to the plot.  The title should be '6X Crossplane 10.0_cm_depth'.  The legend labels should be '3d_dose_wedge 2300IX 737 STANDARD_60.0 15x15' and 'Test1 21EX Open 10x10'.  The added profile should have a higher dose on the positive side of the x axis and lower on the negative side of the axis.
 
-21. Profile matching.  Need to match depth.
+21. Repeat step 20 with the 'Test1/21EX/6x/Open/10x10/Inplane/10.0' scan.  The labels should be the same except that the title should be '6X Inplane 10.0_cm_depth'.  The added Dicom profile should be flat (not wedged).  Its FWHM should be 15.40 cm.
+
+22. Repeat step 20 with the 'Test1/21EX/6X/Open/10x10/Depth_Dose' scan.  Again, the labels should be the same except that the title should be '6X Depth_Dose'.  R100 for the added Dicom scan should be 1.66 cm and R50 should be 16.69 cm.
+
+23.  Open the 'RD.10x10.dcm' file.  Add all scans from the 'Test1/21EX/6X/Open/10x10' branch to individual plot views and then add matching beams from the 'RD.10x10' file.  Match 'Energy', 'Depth', 'Field Size', and 'Scan Type'.  Normalize the scans and verify that the profiles match.  (The 20 cm depth Crossplane profile will not match.  It is at the very edge of the phantom and will show substantial calculation artifacts.  The 30 cm depth Crossplane profile should give a warning that the scan range is outside the Dicom data range when matching is attempted.)
+
+24. Test the smooth and renormalize functions.  Also add a cursor to a plot with two scans and make sure the cursor works with the selected scan.
+	

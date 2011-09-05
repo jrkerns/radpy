@@ -46,10 +46,10 @@ from radpy.plugins.BeamAnalysis.api import \
 
 
 # Do whatever you want to do with log messages! Here we create a log file.
-logger = logging.getLogger()
+#logger = logging.getLogger()
 #logger.addHandler(logging.StreamHandler(file('acmelab.log', 'w')))
-logger.addHandler(logging.StreamHandler())
-logger.setLevel(logging.DEBUG)
+#logger.addHandler(logging.StreamHandler())
+#logger.setLevel(logging.DEBUG)
 
 
 def main():

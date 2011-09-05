@@ -38,12 +38,16 @@ class RTDose(object):
         filename is a string containing the full path to a DICOM RT Dose file.
         '''
         tmp = dicom.read_file(filename)
-        self.dose_unit = tmp.DoseUnits
-        
+        try:
+            self.dose_unit = tmp.DoseUnits
+        except AttributeError:
+            raise AttributeError('Not a DICOM RT-Dose file.')
         #Call the RTPlan module to find RT Plan DICOM file with same
         #SOP Instance UID
         self.plan = RTPlan(tmp[0x300c,0x0002][0].ReferencedSOPInstanceUID
                            ,os.path.dirname(filename))
+        if self.plan.dicom_file == None:
+            raise IOError('No associated DICOM RT-Plan file found.')
         if len(self.plan.dicom_file[0x300a,0x00b0].value) > 1:
             raise IOError('Plans with multiple fields are not supported.')
         self.beam = self.plan.dicom_file[0x300a,0x00b0][0]
