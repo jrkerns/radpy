@@ -9,6 +9,8 @@ AppId={{4020619C-F961-4B3A-82CE-CF378B2F2D51}}
 AppName=RadPy
 AppVersion=0.1
 AppPublisher=RadPy
+AppPublisherURL=http://www.radpy.org/
+AppCopyright=Copyright (C) 2009-2011 Radpy contributors
 DefaultDirName={pf}\RadPy
 DefaultGroupName=RadPy
 AllowNoIcons=yes
@@ -16,6 +18,7 @@ OutputBaseFilename=setup
 Compression=lzma
 SolidCompression=yes
 VersionInfoVersion = 0.1
+LicenseFile=license.txt
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -26,6 +29,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 Source: "dist\*"; DestDir: "{app}\dist"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "Scripts\*"; DestDir: "{app}\Scripts"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "license.txt"; DestDir: "{app}"; Flags: ignoreversion
 
 [Dirs]
 Name: "{app}\Data\"

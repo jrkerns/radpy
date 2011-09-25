@@ -87,7 +87,7 @@ _DIALOG_TEXT = '''
       Qt %s<br>
       </p>
       <p>
-      Copyright &copy; 2009-2011 RadPy group<br>
+      Copyright &copy; 2009-2011 RadPy contributors<br>
       http://www.radpy.org
       </p>
   </center>
