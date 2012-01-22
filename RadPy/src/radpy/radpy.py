@@ -65,7 +65,7 @@ class RadPy(WorkbenchApplication):
     
     # The name of the application (also used on window title bars etc).
     name = 'RadPy'
-    version = '0.1.0'
+    version = '0.1.1'
     
     ###########################################################################
     # 'WorkbenchApplication' interface.

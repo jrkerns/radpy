@@ -7,17 +7,17 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{4020619C-F961-4B3A-82CE-CF378B2F2D51}}
 AppName=RadPy
-AppVersion=0.1
+AppVersion=0.1.1
 AppPublisher=RadPy
 AppPublisherURL=http://www.radpy.org/
 AppCopyright=Copyright (C) 2009-2011 Radpy contributors
 DefaultDirName={pf}\RadPy
 DefaultGroupName=RadPy
 AllowNoIcons=yes
-OutputBaseFilename=setup
+OutputBaseFilename=RadPy_setup_0.1.1.win32
 Compression=lzma
 SolidCompression=yes
-VersionInfoVersion = 0.1
+VersionInfoVersion = 0.1.1
 LicenseFile=license.txt
 
 [Languages]

@@ -252,6 +252,19 @@ class ChacoPlot(HasTraits):
         self.legend.visible = True
         self.legend.plots = self.plots
         self.legend.labels = self.get_legend_labels()
+        
+        # legend.plots dictionary must have keys that match the labels in 
+        # legend.labels in order for the labels to be visible.
+        legend_plot_dict = {}
+        for i in self.legend.plots.keys():
+            for j in self.legend.labels:
+                label_set = set(j.split(' '))
+                plot_set = set(i.split('|'))
+                if label_set.issubset(plot_set):
+                    legend_plot_dict[j] = self.legend.plots[i]
+        self.legend.plots = legend_plot_dict
+        
+        
                     
         self.title.text = self.get_title()
         self.container.request_redraw()
