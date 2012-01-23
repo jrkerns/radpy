@@ -30,6 +30,9 @@
 # PURPOSES.  ANY OTHER USE IS ENTIRELY AT THE DISCRETION AND RISK OF THE USER.
 ################################################################################ 
 
+# Python imports
+import platform
+
 # Major library imports
 import numpy
 
@@ -112,6 +115,11 @@ class ChacoPlot(HasTraits):
         self.index_mapper = None
         self.plots = {}
         
+        if platform.system() == 'Linux':
+            plot_font = 'sans-serif'
+        else:
+            plot_font = 'Verdana'
+        
         # Store Python object ids to distinguish between different plots
         # with the same label
         self.plot_ids = []
@@ -159,7 +167,7 @@ class ChacoPlot(HasTraits):
         # Add a legend in the upper right corner, and make it relocatable
         self.legend = Legend(component=plot, padding=10, align="ur")
         self.legend.tools.append(LegendTool(self.legend, drag_button="right"))
-        self.legend.font = 'Verdana 12'
+        self.legend.font = plot_font+' 12'
         plot.overlays.append(self.legend)
         self.legend.visible = False
         
@@ -178,11 +186,11 @@ class ChacoPlot(HasTraits):
         plot.tools.append(plot_select_tool)
         
         plot.x_axis.title = "Distance (cm)"
-        plot.x_axis.title_font = "Verdana 12"
-        plot.x_axis.tick_label_font = "Verdana 10"
+        plot.x_axis.title_font = plot_font+" 12"
+        plot.x_axis.tick_label_font = plot_font+" 10"
         plot.y_axis.title = "% Dose"
-        plot.y_axis.title_font = "Verdana 12"
-        plot.y_axis.tick_label_font = "Verdana 10"
+        plot.y_axis.title_font = plot_font+" 12"
+        plot.y_axis.tick_label_font = plot_font+" 10"
 
         container.add(plot)
         
@@ -192,7 +200,7 @@ class ChacoPlot(HasTraits):
         # Add the title at the top
         self.title = PlotLabel("Scans",
                                   component=container,
-                                  font = 'Verdana 16',
+                                  font = plot_font+' 16',
                                   overlay_position="top")
         container.overlays.append(self.title)
 
