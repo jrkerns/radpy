@@ -76,7 +76,7 @@ A new scan should be added to the plot.  The title should be '6X Crossplane 10.0
 
 22. Repeat step 20 with the 'Test1/21EX/6X/Open/10x10/Depth_Dose' scan.  Again, the labels should be the same except that the title should be '6X Depth_Dose'.  R100 for the added Dicom scan should be 1.66 cm and R50 should be 16.69 cm.
 
-23.  Open the 'RD.10x10.dcm' file.  Add all scans from the 'Test1/21EX/6X/Open/10x10' branch to individual plot views and then add matching beams from the 'RD.10x10' file.  Match 'Energy', 'Depth', 'Field Size', and 'Scan Type'.  Normalize the scans and verify that the profiles match.  (The 20 cm depth Crossplane profile will not match.  It is at the very edge of the phantom and will show substantial calculation artifacts.  The 30 cm depth Crossplane profile should give a warning that the scan range is outside the Dicom data range when matching is attempted.)
+23.  Open the 'RD.10x10.dcm' file.  Add all scans from the 'Test1/21EX/6X/Open/10x10' branch to individual plot views, select the plot view that contains the Crossplane profiles, and then add matching beams from the 'RD.10x10' file.  Match 'Energy', 'Depth', 'Field Size', and 'Scan Type'.  Normalize the scans and verify that the profiles match.  (The 20 cm depth Crossplane profile will not match.  It is at the very edge of the phantom and will show substantial calculation artifacts.  The 30 cm depth Crossplane profile should give a warning that the scan range is outside the Dicom data range when matching is attempted.)
 
 24. Test the smooth and renormalize functions.  Also add a cursor to a plot with two scans and make sure the cursor works with the selected scan.
 	

@@ -73,7 +73,7 @@ class HighlightLegend(BaseTool):
             return (legend.plots[legend.plots.keys()[0]],)
         else:
             for plot_label in legend.plots.keys():
-                if set(label_name.split(' ')).issubset(set(plot_label.split('|'))): 
+                if set(label_name.split(' ')).issubset(set(plot_label.split(' '))): 
                     return (legend.plots[plot_label],)
             
         

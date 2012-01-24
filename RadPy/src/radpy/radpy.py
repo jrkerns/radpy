@@ -37,7 +37,7 @@
 # Standard library imports.
 from logging import DEBUG
 import logging
-import platform
+import sys
 
 # Enthought library imports.
 from enthought.envisage.ui.workbench.api import WorkbenchApplication
@@ -123,8 +123,10 @@ class RadPy(WorkbenchApplication):
 
             # We stop the application when the workbench has exited.
             self.workbench.on_trait_change(self._on_workbench_exited, 'exited')
-            if platform.system() == 'Linux':
+            if sys.platform == 'linux2':
                 style_sheet_file = open('style_sheet_linux.css')
+            elif sys.platform == 'darwin':
+                style_sheet_file = open('style_sheet_mac.css')
             else:
                 style_sheet_file = open('style_sheet.css')
             window.control.setStyleSheet(style_sheet_file.read())

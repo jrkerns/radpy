@@ -31,7 +31,7 @@
 ################################################################################ 
 
 # Python imports
-import platform
+import sys
 
 # Major library imports
 import numpy
@@ -115,8 +115,10 @@ class ChacoPlot(HasTraits):
         self.index_mapper = None
         self.plots = {}
         
-        if platform.system() == 'Linux':
+        if sys.platform == 'linux2':
             plot_font = 'sans-serif'
+        elif sys.platform == 'darwin':
+            plot_font = 'Helvetica'
         else:
             plot_font = 'Verdana'
         
