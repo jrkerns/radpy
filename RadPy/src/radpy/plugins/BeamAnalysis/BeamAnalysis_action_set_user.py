@@ -31,7 +31,7 @@
 ################################################################################
 
 # Python imports
-import sys, os, imp
+import sys, os, imp, shutil
 
 # Enthought library imports.
 from enthought.envisage.ui.action.api import Action, Group, Menu, ToolBar
@@ -71,8 +71,16 @@ class BeamAnalysisActionSetUser(WorkbenchActionSet):
     def _actions_default(self):
         action_list = []
         #sys.path.append(os.path.join(os.pardir,'Scripts'))
-        script_path = os.path.join(os.pardir,'Scripts')
-#        
+        if sys.platform == 'darwin':
+            script_path = os.path.expanduser(
+                '~/Library/Application Support/RadPy/Scripts')
+            if not os.path.exists(script_path):
+                os.makedirs(script_path)
+                for name in glob.glob('../Scripts/*.py'):
+                    shutil.copy(name, script_path)
+        else:
+            script_path = os.path.join(os.pardir,'Scripts')
+       
         for name in os.listdir(script_path) :
             if name.endswith(".py" ) and name != '__init__.py':
                 try:

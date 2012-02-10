@@ -41,7 +41,7 @@ from enthought.traits.ui.api import View
 from enthought.pyface.workbench.api import View as PyFaceView
 
 # Python imports
-import sys, os, imp
+import sys, os, imp, shutil, glob
 
 
 class ParameterPanel(HasTraits):  
@@ -51,8 +51,17 @@ class ParameterPanel(HasTraits):
     
     #Load all Python modules in the scripts directory and import
     #the UserParameter object if it exists.  See /scripts/parameter.template
-    #for user parameter script syntax.
-    script_path = os.path.join(os.pardir,'Scripts')
+    #for user parameter script syntax.if sys.platform == 'darwin':
+    
+    if sys.platform == 'darwin':
+        script_path = os.path.expanduser(
+                '~/Library/Application Support/RadPy/Scripts')
+        if not os.path.exists(script_path):
+            os.makedirs(script_path)
+            for name in glob.glob('../Scripts/*.py'):
+                shutil.copy(name, script_path)
+    else:
+        script_path = os.path.join(os.pardir,'Scripts')
 #        
     for name in os.listdir(script_path) :
         if name.endswith(".py" ) and name != '__init__.py':
